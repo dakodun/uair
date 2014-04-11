@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html>
+	<head>
+			<link rel="stylesheet" type="text/css" href="../style.css">
+	</head>
+	
+	<body>
+		<div id="main">
+			<!-- Page Header -->
+			<div id="header">
+				<div id="headerTitle">Uair Engine</div>
+				<div id="headerSubtitle">Alpha</div>
+			</div>
+			
+			<!-- Page Navigation -->
+			<div id="navigation">
+				<div id="navigationBar">
+					<div class="navigationBarItem"><a href="../index.html">Home</a></div>
+					<div class="navigationBarSeperator"><img src="../img/seperator.png"></img></div>
+					<div class="navigationBarItem"><a href="_classlist.html" id="navigationBarItemCurrent">Class List</a></div>
+					<div class="navigationBarSeperator"><img src="../img/seperator.png"></img></div>
+					<div class="navigationBarItem"><a href="_filelist.html">File List</a></div>
+					<div class="navigationBarSeperator"><img src="../img/seperator.png"></img></div>
+				</div>
+				<div id="navigationTitle">
+					Polygon
+					<br>
+			</div>
+			
+			<!-- Page Content -->
+			<div id="content">
+				<div class="spacer16"></div>
+				<div class="contentHeading">Overview</div>
+				<div class="spacer8"></div>
+				<div class="contentBlock">
+					A collection of points that form a polygon, used for such things as bounding boxes and collision masks.
+				</div>
+				
+				<div class="spacer16"></div>
+				
+				<span class="contentSubHeading">Member Functions</span>
+				<div class="contentItemContainer">
+					<div class="contentItemA">Public:</div>
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								std::vector&lt;glm::vec2&gt;
+							</span>
+							<a href="#anchGetPoints">
+								GetPoints() const
+							</a>
+						</div>
+						<div class="contentItemC">
+							Returns a copy of the std::vector that holds the relative points that make up the polygon, excluding the first (which is the position).
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								std::vector&lt;glm::vec2&gt;
+							</span>
+							<a href="#anchGetAbsolutePoints">
+								GetAbsolutePoints() const
+							</a>
+						</div>
+						<div class="contentItemC">
+							Returns a std::vector that holds the absolute points that make up the polygon, excluding the first (which is the position).
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchAddPoint">
+								AddPoint(const glm::vec2 &amp; point)
+							</a>
+						</div>
+						<div class="contentItemC">
+							Adds a relative point to the polygon and updates the bounds.
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchAddPoints">
+								AddPoints(const std::vector&lt;glm::vec2&gt; &amp; points)
+							</a>
+						</div>
+						<div class="contentItemC">
+							Adds a group of relative points to the polygon and updates the bounds.
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchAddAbsolutePoint">
+								AddAbsolutePoint(const glm::vec2 &amp; point)
+							</a>
+						</div>
+						<div class="contentItemC">
+							Adds an absolute point to the polygon and updates the bounds.
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchAddAbsolutePoints">
+								AddAbsolutePoints(const std::vector&lt;glm::vec2&gt; &amp; points)
+							</a>
+						</div>
+						<div class="contentItemC">
+							Adds a group of absolute points to the polygon and updates the bounds.
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchClear">
+								Clear()
+							</a>
+						</div>
+						<div class="contentItemC">
+							Clears the polygon by removing all points and resetting the bounds.
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								glm::vec2
+							</span>
+							<a href="#anchGetPosition">
+								GetPosition() const
+							</a>
+						</div>
+						<div class="contentItemC">
+							Returns a copy of polygon's position.
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchSetPosition">
+								SetPosition(const glm::vec2 &amp; newPos)
+							</a>
+						</div>
+						<div class="contentItemC">
+							Sets the position of the polygon.
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchMakeRectangle">
+								MakeRectangle(const glm::vec2 &amp; position, const glm::vec2 &amp; size)
+							</a>
+						</div>
+						<div class="contentItemC">
+							Sets the polygon to a rectangle with the specified dimensions.
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchMakeCircle">
+								MakeCircle(const glm::vec2 &amp; position, const float &amp; radius, const unsigned int &amp; numPoints)
+							</a>
+						</div>
+						<div class="contentItemC">
+							Sets the polygon to a circle with the specified dimensions.
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								std::vector&lt;glm::vec2&gt;
+							</span>
+							<a href="#anchGetBounds">
+								GetBounds() const
+							</a>
+						</div>
+						<div class="contentItemC">
+							Returns a copy of the polygon's bounds (top-left and bottom-right)
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchTransform">
+								Transform(const glm::mat3 &amp; transform)
+							</a>
+						</div>
+						<div class="contentItemC">
+							Transforms the polygon's points by the supplied transformation matrix.
+						</div>
+				</div>
+				
+				<div class="spacer8"></div>
+				
+				<span class="contentSubHeading">Data Members</span>
+				<div class="contentItemContainer">
+					<div class="contentItemA">Private:</div>
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								std::vector&lt;glm::vec2&gt;
+							</span>
+							<a href="#anchmPoints">
+								mPoints
+							</a>
+						</div>
+						<div class="contentItemC">
+							The relative points that form the polygon.
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								std::vector&lt;glm::vec2&gt;
+							</span>
+							<a href="#anchmBounds">
+								mBounds
+							</a>
+						</div>
+						<div class="contentItemC">
+							The current bounds of the polygon (top-left and bottom-right extremes).
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								glm::vec2
+							</span>
+							<a href="#anchmPosition">
+								mPosition
+							</a>
+						</div>
+						<div class="contentItemC">
+							The position of the polygon (also acts as its first point).
+						</div>
+				</div>
+				
+				<div class="spacer32"></div>
+				
+				<div class="contentHeading">Member Functions and Data Members</div>
+				
+				<div class="spacer12"></div>
+				
+				<span class="contentSubHeading" id="anchGetPoints">
+					std::vector&lt;glm::vec2&gt;
+					GetPoints() const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Returns a copy of the std::vector that holds the relative points that make up the polygon, excluding the first (which is the position).
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						A std::vector of relative points that constitute the polygon.
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetAbsolutePoints">
+					std::vector&lt;glm::vec2&gt;
+					GetAbsolutePoints() const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Returns a std::vector that holds the absolute points that make up the polygon, excluding the first (which is the position). To convert a relative point to an absolute point the position is added to it.
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						A std::vector of absolute points that constitute the polygon.
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchAddPoint">
+					void
+					AddPoint(const glm::vec2 &amp; point)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Adds a relative point to the polygon and updates the bounds.
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const glm::vec2 &amp; point: the relative point to add to the polygon.
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchAddPoints">
+					void
+					AddPoints(const std::vector&lt;glm::vec2&gt; &amp; points)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Adds a group of relative points to the polygon and updates the bounds.
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const std::vector&lt;glm::vec2&gt; &amp; points: the std::vector of relative points to add to the polygon.
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchAddAbsolutePoint">
+					void
+					AddAbsolutePoint(const glm::vec2 &amp; point)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Adds an absolute point to the polygon and updates the bounds. To do so, it first converts the absolute point to a relative point (by subtracting the position from it) and then calls the relative add point function: <a href="__polygon.html#anchAddPoint">AddPoint</a>.
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const glm::vec2 &amp; point: the absolute point to add to the polygon.
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchAddAbsolutePoints">
+					void
+					AddAbsolutePoints(const std::vector&lt;glm::vec2&gt; &amp; points)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Adds a group of absolute points to the polygon and updates the local and global bounding boxes if neccesary. To do so, it first converts the absoulte points to relative points (by subtracting the position from them) and then calls the relative add points function: <a href="__polygon.html#anchAddPoints">AddPoints</a>.
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const std::vector&lt;glm::vec2&gt; &amp; points: the std::vector of absolute points to add to the polygon.
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchClear">
+					void
+					Clear()
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Clears the polygon by removing all points and resetting the bounds.
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetPosition">
+					glm::vec2
+					GetPosition() const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Returns a copy of polygon's position.
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						A copy of glm::vec2 representing the position of the polygon.
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchSetPosition">
+					void
+					SetPosition(const glm::vec2 &amp; newPos)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Sets the position of the polygon.
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const glm::vec2 &amp; newPos: the new position of the polygon.
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchMakeRectangle">
+					void
+					MakeRectangle(const glm::vec2 &amp; position, const glm::vec2 &amp; size)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Sets the polygon to a rectangle with the specified dimensions by first removing any existing points and resetting bounds, then adding the points that constitute the rectangle.
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const glm::vec2 &amp; position: the position of the rectangle (and first point).
+					</div>
+					<div class="contentItemC">
+						const glm::vec2 &amp; size: the width and height of the rectangle.
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchMakeCircle">
+					void
+					MakeCircle(const glm::vec2 &amp; position, const float &amp; radius, const unsigned int &amp; numPoints)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Sets the polygon to a circle with the specified dimensions by first removing any existing points and resetting bounds, then adding the points that constitute the circle.
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const glm::vec2 &amp; position: the position of the circle (and first point).
+					</div>
+					<div class="contentItemC">
+						const float &amp; radius: the radius of the circle (the distance between the position and the centre).
+					</div>
+					<div class="contentItemC">
+						const unsigned int &amp; numPoints: the number of points that form the circle; a higher number makes a smoother looking circle.
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetBounds">
+					std::vector&lt;glm::vec2&gt;
+					GetBounds() const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Returns a copy of the polygon's bounds (top-left and bottom-right)
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						A copy of the std::vector holding the polygon's bounds.
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchTransform">
+					void
+					Transform(const glm::mat3 &amp; transform)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Transforms the polygon's points by the supplied transformation matrix.
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const glm::mat3 &amp; transform: the transformation matrix (3x3) to apply to each of the polygon's points.
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmPoints">
+					std::vector&lt;glm::vec2&gt;
+					mPoints
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						The relative points that form the polygon.
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmBounds">
+					std::vector&lt;glm::vec2&gt;
+					mBounds
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						The current bounds of the polygon (top-left and bottom-right extremes).
+					</div>
+					<div class="contentItemB">Default Value:</div>
+					<div class="contentItemC">
+						Two glm::vec2 with x and y values of 0.0f.
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmPosition">
+					glm::vec2
+					mPosition
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						The position of the polygon (also acts as its first point).
+					</div>
+				</div>
+				
+				<div class="spacer32"></div>
+				
+				<div class="contentHeading">Source Files</div>
+				
+				<div class="spacer8"></div>
+				
+				<div class="contentBlock">
+					<a href="source/inc/uair/polygon.hpp">inc/uair/polygon.hpp</a>
+				</div>
+				
+				<div class="spacer4"></div>
+				
+				<div class="contentBlock">
+					<a href="source/src/polygon.cpp">src/polygon.cpp</a>
+				</div>
+				
+				<div class="spacer32"></div>
+			</div>
+			
+			<!-- Page Footer -->
+			<div id="footer">
+				Documentation last updated on the 6th of February, 2014.
+			</div>
+		</div>
+	</body>
+</html>
+

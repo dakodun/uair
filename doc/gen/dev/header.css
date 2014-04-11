@@ -1,0 +1,20 @@
+/* HEADER STYLES */
+
+#header {
+	background-color: #FFFFFF;
+	
+	padding-bottom: 10px;
+}
+
+#headerTitle {
+	text-align: center;
+	font-size: 20px;
+	
+	font-weight: 800;
+	font-size: 18px;
+}
+
+#headerSubtitle {
+	text-align: center;
+	font-size: 14px;
+}

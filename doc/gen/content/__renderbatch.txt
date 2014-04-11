@@ -1,0 +1,44 @@
+__	Class List
+	uair::RenderBatch
+--
+	inc/uair/renderbatch.hpp
+	src/renderbatch.cpp
+--
+	RenderBatch
+--
+	Processes and renders a batch of [link:Renderables|__renderables.html] using a
+	[link:VBO|__vbo.html].
+--
+	Processes and renders a batch of [link:Renderables|__renderable.html] using a
+	[link:VBO|__vbo.html]. When a Renderable is added to the batch (via the
+	[link:Add|#anchAdd] function) its vertex and index data is computed (via a call to its
+	[link:Upload|__renderable.html#anchUpload] function) and added to the store. Then – when
+	the batch's [link:Upload|#anchUpload] function is called – it is sorted by texture id, split into segments
+	(of matching texture ids) and uploaded to a VBO; the store is then cleared.
+__
+
++	public
+	void Add(const Renderable & renderable)
+=	Processes and adds a [link:Renderable|__renderable.html] to the batch's store.
+>	const Renderable & renderable: the Renderable to add to the batch.
+
++	public
+	void Upload()
+=	Processes and uploads current render data in the batch's store to a [link:VBO|__vbo.html].
+==	Processes and uploads current render data in the batch's store to a [link:VBO|__vbo.html], splitting it into
+	segments of data which share the same texture (to reduce binds and draw calls).
+	
++	public
+	void Draw()
+=	Draws all [link:Renderables|__renderable.html] added to this batch (and uploaded) using a [link:VBO|__vbo.html].
+
+
+-	private
+	std::vector<RenderBatchData> mRenderData
+=	The data of processed [link:Renderables|__renderable.html] added to the batch, prior to being uploaded to a
+	[link:VBO|__vbo.html].
+	
+-	private
+	VBO mVBO
+=	The [link:VBO|__vbo.html] associated with this render batch that is used to display all added
+	[link:Renderables|__renderable.html].

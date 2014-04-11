@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+	<head>
+			<link rel="stylesheet" type="text/css" href="../style.css">
+	</head>
+	
+	<body>
+		<div id="main">
+			<!-- Page Header -->
+			<div id="header">
+				<div id="headerTitle">Uair Engine</div>
+				<div id="headerSubtitle">Alpha</div>
+			</div>
+			
+			<!-- Page Navigation -->
+			<div id="navigation">
+				<div id="navigationBar">
+					<div class="navigationBarItem"><a href="../index.html">Home</a></div>
+					<div class="navigationBarSeperator"><img src="../img/seperator.png"></img></div>
+					<div class="navigationBarItem"><a href="_classlist.html" id="navigationBarItemCurrent">Class List</a></div>
+					<div class="navigationBarSeperator"><img src="../img/seperator.png"></img></div>
+					<div class="navigationBarItem"><a href="_filelist.html">File List</a></div>
+					<div class="navigationBarSeperator"><img src="../img/seperator.png"></img></div>
+				</div>
+				<div id="navigationTitle">
+					SegmentInfo
+					<br>
+			</div>
+			
+			<!-- Page Content -->
+			<div id="content">
+				<div class="spacer16"></div>
+				<div class="contentHeading">Overview</div>
+				<div class="spacer8"></div>
+				<div class="contentBlock">
+					Holds data relating to segments of vertices in a <a href="__vbo.html">VBO</a> that share the same texture id which are used to reduce draw calls and texture binds.
+				</div>
+				
+				<div class="spacer16"></div>
+				
+				<span class="contentSubHeading">Member Functions</span>
+				<div class="contentItemContainer">
+					<div class="contentItemA">Public:</div>
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+							</span>
+							<a href="#anchSegmentInfo">
+								SegmentInfo()
+							</a>
+						</div>
+						<div class="contentItemC">
+							Default constructor.
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+							</span>
+							<a href="#anchSegmentInfo2">
+								SegmentInfo(const GLuint &amp; texID, const GLuint &amp; start, const GLuint &amp; end)
+							</a>
+						</div>
+						<div class="contentItemC">
+							Constructor that sets the texture id and inclusive index bounds.
+						</div>
+				</div>
+				
+				<div class="spacer8"></div>
+				
+				<span class="contentSubHeading">Data Members</span>
+				<div class="contentItemContainer">
+					<div class="contentItemA">Public:</div>
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								GLuint
+							</span>
+							<a href="#anchmTexID">
+								mTexID
+							</a>
+						</div>
+						<div class="contentItemC">
+							The id of the texture associated with this segment.
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								GLuint
+							</span>
+							<a href="#anchmStart">
+								mStart
+							</a>
+						</div>
+						<div class="contentItemC">
+							The start index of the segment of vertices.
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								GLuint
+							</span>
+							<a href="#anchmEnd">
+								mEnd
+							</a>
+						</div>
+						<div class="contentItemC">
+							The end index of the segment of vertices.
+						</div>
+				</div>
+				
+				<div class="spacer32"></div>
+				
+				<div class="contentHeading">Member Functions and Data Members</div>
+				
+				<div class="spacer12"></div>
+				
+				<span class="contentSubHeading" id="anchSegmentInfo">
+					SegmentInfo()
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Default constructor.
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchSegmentInfo2">
+					SegmentInfo(const GLuint &amp; texID, const GLuint &amp; start, const GLuint &amp; end)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Constructor that sets the texture id and inclusive index bounds.
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const GLuint &amp; texID: the id of the associated texture.
+					</div>
+					<div class="contentItemC">
+						const GLuint &amp; start: the start index limit.
+					</div>
+					<div class="contentItemC">
+						const GLuint &amp; end: the end index limit.
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmTexID">
+					GLuint
+					mTexID
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						The id of the texture associated with this segment.
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmStart">
+					GLuint
+					mStart
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						The start index of the segment of vertices.
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmEnd">
+					GLuint
+					mEnd
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						The end index of the segment of vertices.
+					</div>
+				</div>
+				
+				<div class="spacer32"></div>
+				
+				<div class="contentHeading">Source Files</div>
+				
+				<div class="spacer8"></div>
+				
+				<div class="contentBlock">
+					<a href="source/inc/uair/renderbatch.hpp">inc/uair/renderbatch.hpp</a>
+				</div>
+				
+				<div class="spacer4"></div>
+				
+				<div class="contentBlock">
+					<a href="source/src/renderbatch.cpp">src/renderbatch.cpp</a>
+				</div>
+				
+				<div class="spacer32"></div>
+			</div>
+			
+			<!-- Page Footer -->
+			<div id="footer">
+				Documentation last updated on the 6th of February, 2014.
+			</div>
+		</div>
+	</body>
+</html>
+

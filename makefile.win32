@@ -1,0 +1,27 @@
+# makefile for Windows
+
+CXX=g++
+CXXFLAGS=-Wall -Wno-unused -std=c++11
+PRJPATHS=-I inc -I inc/uair -I inc/freetype
+EXTPATHS=
+PRJFLAGS=-DGLEW_STATIC=1
+
+CXXLIBS=
+
+SOURCES=$(patsubst %linux.cpp, , $(wildcard src/*.cpp))
+OBJECTS=$(patsubst src/%, obj/%, $(SOURCES:.cpp=.o))
+
+TARGET=bin\libuair.a
+
+$(TARGET): obj/glew.o $(OBJECTS) 
+	ar rs $(TARGET) obj/glew.o $(OBJECTS)
+
+obj/glew.o: src/glew.c
+	$(CXX) $(CXXFLAGS) $(PRJPATHS) $(EXTPATHS) $(PRJFLAGS) -o $@ -c $<
+
+obj/%.o: src/%.cpp
+	$(CXX) $(CXXFLAGS) $(PRJPATHS) $(EXTPATHS) $(PRJFLAGS) -o $@ -c $<
+
+clean:
+	if exist obj\*.o del obj\*.o
+	if exist $(TARGET) del $(TARGET)
