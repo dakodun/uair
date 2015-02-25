@@ -52,4 +52,6 @@ GLuint OpenGLStates::mCurrentArrayBuffer = 0;
 GLuint OpenGLStates::mCurrentElementArrayBuffer = 0;
 GLuint OpenGLStates::mCurrentProgram = 0;
 GLuint OpenGLStates::mCurrentTexture = 0;
+GLuint OpenGLStates::mCurrentFBO = 0;
+GLuint OpenGLStates::mCurrentRenderBuffer = 0;
 }

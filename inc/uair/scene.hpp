@@ -47,11 +47,12 @@ class Scene {
 		
 		virtual void Input() = 0;
 		virtual void Process() = 0;
-		virtual void PostProcess(unsigned int processed) = 0;
-		virtual void Render() = 0;
+		virtual void PostProcess(const unsigned int & processed) = 0;
+		virtual void Render(const unsigned int & pass) = 0;
 		
 		virtual void OnEnter() = 0;
 		virtual void OnLeave() = 0;
+		virtual bool OnQuit() = 0;
 		
 		virtual std::string GetTag() = 0;
 		

@@ -37,41 +37,33 @@ template<class T>
 class Resource {
 	public :
 		~Resource() {
-			for (auto iter = mStore.begin(); iter != mStore.end(); ++iter) {
-				iter->second->UnsetResource();
-			}
+			mStore.clear(); // remove all referenced resource pointers
+			mPtrCount = 1u; // set the reference count back to default
 		}
 		
 		unsigned int AddReference(ResourcePtr<T>* resPtr, const unsigned int &id = 0u) {
-			if (id == 0u) {
-				mStore.insert(std::make_pair(mPtrCount, resPtr));
-				return mPtrCount++;
+			if (id == 0u) { // if no id was supplied...
+				mStore.insert(std::make_pair(mPtrCount, resPtr)); // add to the end of the container
+				return mPtrCount++; // return reference count and increment it
 			}
 			else {
-				mStore.at(id) = resPtr;
-				return id;
+				mStore.at(id) = resPtr; // replace the reference at the position specified
+				return id; // return the replaced id
 			}
 		}
 		
 		unsigned int RemoveReference(ResourcePtr<T>* resPtr) {
-			mStore.erase(resPtr->GetID());
+			mStore.erase(resPtr->GetID()); // remove the reference from the store
 			
-			if (mStore.empty()) {
-				mPtrCount = 1u;
+			if (mStore.empty()) { // if there are no references left...
+				mPtrCount = 1u; // set the reference count back to default
 			}
 			
 			return 0;
 		}
-		
-		/* {
-			mPtrCount = 1u;
-			iterate map
-				move value from key to mPtrCount++;
-				notify value about change
-		} */
 	protected :
-		std::map<unsigned int, ResourcePtr<T>*> mStore;
-		unsigned int mPtrCount = 1u;
+		std::map<unsigned int, ResourcePtr<T>*> mStore; // container holding references and associated id
+		unsigned int mPtrCount = 1u; // reference counter - current count implies reference id (1-index)
 };
 }
 

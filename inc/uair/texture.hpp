@@ -36,12 +36,12 @@
 
 namespace uair {
 struct TextureData {
-	std::vector<unsigned char> mData;
-	unsigned int mWidth;
-	unsigned int mHeight;
+	std::vector<unsigned char> mData; // the data of the current layer including padding
+	unsigned int mWidth; // the width of the layer without padding
+	unsigned int mHeight; // the height of the layer without padding
 	
-	float mSMax;
-	float mTMax;
+	float mSMax; // the max s coordinate without padding
+	float mTMax; // the max t coordinate without padding
 };
 
 class Texture : public Resource<Texture> {
@@ -55,24 +55,27 @@ class Texture : public Resource<Texture> {
 		
 		friend void swap(Texture& first, Texture& second);
 		
-		bool AddFromFile(const std::string& filename);
+		bool AddFromFile(const std::string& filename); // add a layer to the texture from an image file
+		bool AddFromMemory(std::vector<unsigned char> data, const unsigned int& width, const unsigned int& height); // add a layer to the texture from memory
 		
-		bool CreateTexture();
+		bool CreateTexture(); // create the texture with the added layers
 		
-		void EnsureInitialised();
-		void Clear();
+		void EnsureInitialised(); // ensure the texture has been properly set up before use
+		void Clear(); // remove resources used by the texture
 		
-		unsigned int GetTextureID() const;
-		unsigned int GetWidth() const;
-		unsigned int GetHeight() const;
-		unsigned int GetDepth() const;
-		TextureData GetData(const std::size_t& index) const;
+		unsigned int GetTextureID() const; // return the assigned id
+		unsigned int GetWidth() const; // return the width
+		unsigned int GetHeight() const; // return the height
+		unsigned int GetDepth() const; // return the number of layers
+		TextureData GetData(const std::size_t& index) const; // return a copy of the texture data
 	private :
-		GLuint mTextureID = 0;
+		GLuint mTextureID = 0; // the assigned id
 		
-		std::vector<TextureData> mData;
-		unsigned int mWidth;
-		unsigned int mHeight;
+		std::vector<TextureData> mData; // the texture data store
+		unsigned int mWidth; // the width of the texture
+		unsigned int mHeight; // the height of the texture
+		
+		bool mIsTextureNull = true; // indicates if the texture has actual data
 };
 }
 

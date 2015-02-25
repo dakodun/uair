@@ -4,7 +4,7 @@ CXX=g++
 CXXFLAGS=-Wall -Wno-unused -std=c++11
 PRJPATHS=-I inc -I inc/uair -I inc/freetype
 EXTPATHS=
-PRJFLAGS=-DGLEW_STATIC=1
+PRJFLAGS=-DGLEW_STATIC=1 -DGLM_FORCE_RADIANS
 
 CXXLIBS=
 
@@ -13,10 +13,13 @@ OBJECTS=$(patsubst src/%, obj/%, $(SOURCES:.cpp=.o))
 
 TARGET=bin\libuair.a
 
-$(TARGET): obj/glew.o $(OBJECTS) 
+$(TARGET): obj/glew.o obj/tess.o $(OBJECTS) 
 	ar rs $(TARGET) obj/glew.o $(OBJECTS)
 
 obj/glew.o: src/glew.c
+	$(CXX) $(CXXFLAGS) $(PRJPATHS) $(EXTPATHS) $(PRJFLAGS) -o $@ -c $<
+	
+obj/tess.o: src/tess.c
 	$(CXX) $(CXXFLAGS) $(PRJPATHS) $(EXTPATHS) $(PRJFLAGS) -o $@ -c $<
 
 obj/%.o: src/%.cpp

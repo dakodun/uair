@@ -43,135 +43,165 @@ Texture::~Texture() {
 }
 
 Texture& Texture::operator=(Texture other) {
-	Clear();
-	
 	swap(*this, other);
 	
 	return *this;
 }
 
 void swap(Texture& first, Texture& second) {
-	using std::swap; 
+	std::swap(first.mTextureID, second.mTextureID);
 	
-	swap(first.mTextureID, second.mTextureID);
-	
-	swap(first.mData, second.mData);
-	swap(first.mWidth, second.mWidth);
-	swap(first.mHeight, second.mHeight);
+	std::swap(first.mData, second.mData);
+	std::swap(first.mWidth, second.mWidth);
+	std::swap(first.mHeight, second.mHeight);
+	std::swap(first.mIsTextureNull, second.mIsTextureNull);
 }
 
 bool Texture::AddFromFile(const std::string & fileName) {
-	TextureData tempData;
-	std::vector<unsigned char> buffer;
+	TextureData tempData; // create temporary texture data
+	std::vector<unsigned char> buffer; // create a buffer for the texture data from the image file
 	
-	lodepng::load_file(buffer, fileName.c_str());
-	unsigned int error = lodepng::decode(tempData.mData, tempData.mWidth, tempData.mHeight, buffer);
-	if (error != 0) {
-		std::cout << error << ": " << lodepng_error_text(error) << std::endl;
-		return false;
+	lodepng::load_file(buffer, fileName.c_str()); // load the image file
+	unsigned int error = lodepng::decode(tempData.mData, tempData.mWidth, tempData.mHeight, buffer); // parse the texture data from the file and store it in the buffer
+	if (error != 0) { // if an error occured...
+		std::cout << error << ": " << lodepng_error_text(error) << std::endl; // output the error message
+		return false; // return failure
 	}
 	
-	mData.push_back(std::move(tempData));
+	if (!tempData.mData.empty() && mIsTextureNull) { // if there is data in the temporary and the texture is currently null...
+		mIsTextureNull = false; // indicate texture is no longer null
+	}
+	
+	mData.push_back(std::move(tempData)); // move the temporary into the texture data store
+	return true;
+}
+
+bool Texture::AddFromMemory(std::vector<unsigned char> data, const unsigned int& width, const unsigned int& height) {
+	TextureData tempData; // create temporary texture data
+	
+	tempData.mData = std::move(data); // move the (copy of) supplied texture data into temporary
+	tempData.mWidth = width; tempData.mHeight = height; // set width and height of temporary
+	
+	if (!tempData.mData.empty() && mIsTextureNull) { // if there is data in the temporary and the texture is currently null...
+		mIsTextureNull = false; // indicate texture is no longer null
+	}
+	
+	mData.push_back(std::move(tempData)); // move the temporary into the texture data store
 	return true;
 }
 
 bool Texture::CreateTexture() {
-	mWidth = 0;
-	mHeight = 0;
+	mWidth = 0; // reset the width
+	mHeight = 0; // reset the height
 	
-	for (auto iter = mData.begin(); iter != mData.end(); ++iter) {
-		if (iter->mWidth > mWidth) {
-			mWidth = iter->mWidth;
+	for (auto iter = mData.begin(); iter != mData.end(); ++iter) { // for all texture layers...
+		if (iter->mWidth > mWidth) { // if the width of the current layer is longer than the stored width...
+			mWidth = iter->mWidth; // update the stored width
 		}
 		
-		if (iter->mHeight > mHeight) {
-			mHeight = iter->mHeight;
-		}
-	}
-	
-	mWidth = util::NextPowerOf2(mWidth);
-	mHeight = util::NextPowerOf2(mHeight);
-	
-	std::vector<unsigned char> data;
-	for (auto iter = mData.begin(); iter != mData.end(); ++iter) {
-		std::size_t count = 0;
-		unsigned int padWidth = mWidth - iter->mWidth;
-		unsigned int padHeight = mHeight - iter->mHeight;
-		
-		iter->mSMax = static_cast<float>(iter->mWidth) / mWidth;
-		iter->mTMax = static_cast<float>(iter->mHeight) / mHeight;
-		
-		for (unsigned int i = 0; i < iter->mHeight; ++i) {
-			std::size_t max = (count + (iter->mWidth * 4));
-			data.insert(data.end(), iter->mData.begin() + count, iter->mData.begin() + max);
-			
-			for (unsigned int j = 0; j < padWidth; ++j) {
-				data.emplace_back(255); data.emplace_back(255);
-				data.emplace_back(255); data.emplace_back(0);
-			}
-			
-			count += iter->mWidth * 4;
-		}
-		
-		for (unsigned int i = 0; i < padHeight; ++i) {
-			for (unsigned int j = 0; j < iter->mWidth + padWidth; ++j) {
-				data.emplace_back(255); data.emplace_back(255);
-				data.emplace_back(255); data.emplace_back(0);
-			}
+		if (iter->mHeight > mHeight) { // if the height of the current layer is longer than the stored height...
+			mHeight = iter->mHeight; // update the stored height
 		}
 	}
 	
-	EnsureInitialised();
+	mWidth = util::NextPowerOf2(mWidth); // upscale the width to the nearest power of 2
+	mHeight = util::NextPowerOf2(mHeight); // upscale the height to the nearest power of 2
+	
+	std::vector<unsigned char> data; // array of texture data for all layers
+	for (auto iter = mData.begin(); iter != mData.end(); ++iter) { // for all texture layers...
+		std::size_t count = 0; // the position of the start of the current row
+		unsigned int padWidth = mWidth - iter->mWidth; // the amount of width padding required for the current layer
+		unsigned int padHeight = mHeight - iter->mHeight; // the amount of height padding required for the current layer
+		
+		iter->mSMax = static_cast<float>(iter->mWidth) / mWidth; // calculate the max s coordinate without padding
+		iter->mTMax = static_cast<float>(iter->mHeight) / mHeight; // calculate the max t coordinate without padding
+		
+		if (!mIsTextureNull) { // if the texture isn't null...
+			for (unsigned int i = 0; i < iter->mHeight; ++i) { // for all rows
+				std::size_t max = (count + (iter->mWidth * 4)); // calculate the position of the end of the row
+				data.insert(data.end(), iter->mData.begin() + count, iter->mData.begin() + max); // add the row data for the current layer
+				
+				for (unsigned int j = 0; j < padWidth; ++j) { // for all width padding...
+					data.emplace_back(255); data.emplace_back(255); // add a white, transparent texel
+					data.emplace_back(255); data.emplace_back(0);
+				}
+				
+				count += iter->mWidth * 4; // update the row start position to the next row
+			}
+			
+			for (unsigned int i = 0; i < padHeight; ++i) { // for all height padding...
+				for (unsigned int j = 0; j < iter->mWidth + padWidth; ++j) { // for the width of a row...
+					data.emplace_back(255); data.emplace_back(255); // add a white, transparent texel
+					data.emplace_back(255); data.emplace_back(0);
+				}
+			}
+		}
+	}
+	
+	EnsureInitialised(); // ensure the texture is properly set up
 	
 	{
-		glBindTexture(GL_TEXTURE_2D_ARRAY, mTextureID);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, mTextureID); // bind the texture
+		OpenGLStates::mCurrentTexture = mTextureID; // set the texture as the currently bound texture
+		
+		// set the texture's default properties
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		
-		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA8, mWidth, mHeight, mData.size(), 0, GL_RGBA, GL_UNSIGNED_BYTE, data.data());
-		
-		OpenGLStates::mCurrentTexture = mTextureID;
+		if (!mIsTextureNull) { // if the texture isn't a null texture...
+			glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA8, mWidth, mHeight, mData.size(), 0, GL_RGBA, GL_UNSIGNED_BYTE, data.data()); // create the texture using the texture data
+		}
+		else { // otherwise it is a null texture...
+			glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA8, mWidth, mHeight, mData.size(), 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL); // create a null texture
+		}
 	}
 	
 	return true;
 }
 
 void Texture::EnsureInitialised() {
-	if (mTextureID == 0) {
-		glGenTextures(1, &mTextureID);
+	if (mTextureID == 0) { // if texture has no assigned id...
+		glGenTextures(1, &mTextureID); // create texture and store assigned id
 	}
 }
 
 void Texture::Clear() {
-	if (mTextureID != 0) {
-		if (OpenGLStates::mCurrentTexture == mTextureID) {
-			glBindTexture(GL_TEXTURE_2D, 0);
-			OpenGLStates::mCurrentTexture = 0;
+	if (mTextureID != 0) { // if texture has an assigned id...
+		if (OpenGLStates::mCurrentTexture == mTextureID) { // if texture is currently bound...
+			glBindTexture(GL_TEXTURE_2D, 0); // unbind texture
+			OpenGLStates::mCurrentTexture = 0; // set currently bound texture to none
 		}
 		
-		glDeleteTextures(1, &mTextureID);
+		glDeleteTextures(1, &mTextureID); // delete texture
 	}
+	
+	mTextureID = 0; // set assigned id to none
+	
+	mData.clear(); // clear texture data
+	mWidth = 0u; // reset width
+	mHeight = 0u; // reset height
+	mIsTextureNull = true; // reset texture status
 }
 
 unsigned int Texture::GetTextureID() const {
-	return mTextureID;
+	return mTextureID; // return the assigned id
 }
 
 unsigned int Texture::GetWidth() const {
-	return mWidth;
+	return mWidth; // return the width
 }
 
 unsigned int Texture::GetHeight() const {
-	return mHeight;
+	return mHeight; // return the height
 }
 
 unsigned int Texture::GetDepth() const {
-	return mData.size();
+	return mData.size(); // return the count of stored texture data
 }
 
-TextureData Texture::GetData(const std::size_t & index) const {
-	return mData.at(index);
+TextureData Texture::GetData(const std::size_t& index) const {
+	return mData.at(index); // return the texture data at the requested index
 }
 }

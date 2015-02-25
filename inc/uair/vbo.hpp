@@ -25,14 +25,10 @@
 **		   source distribution.
 ** **************************************************************** */
 
-/** 
-* \file		vbo.hpp
-* \brief	
-**/
-
 #ifndef UAIRVBO_HPP
 #define UAIRVBO_HPP
 
+#include <map>
 #include <vector>
 
 #include "init.hpp"
@@ -54,28 +50,27 @@ struct VBOVertex {
 class VBO {
 	public :
 		VBO() = default;
-		VBO(const VBO & copyFrom) = delete;
+		VBO(const VBO& copyFrom) = delete;
 		~VBO();
 		
-		VBO & operator=(const VBO & other) = delete;
+		VBO & operator=(const VBO& other) = delete;
 		
-		void AddData(const std::vector<VBOVertex> & vertData, const std::vector<VBOIndex> & indData);
-		void AddData(const std::vector<VBOVertex> & vertData, const std::vector<VBOIndex> & indData,
-				const std::vector<SegmentInfo> & segmentInfo);
-		void Draw();
+		void AddData(const std::vector<VBOVertex>& vertData, const std::vector<VBOIndex>& indData);
+		void AddData(const std::vector<VBOVertex>& vertData, const std::vector<VBOIndex>& indData, const std::map< unsigned int, std::vector<SegmentInfo> >& segmentInfo);
+		void Draw(const unsigned int& fboID, const unsigned int& pass);
+		void Draw(const unsigned int& pass = 0);
 		
 		void EnsureInitialised();
 	public :
 		GLenum mType = GL_DYNAMIC_DRAW;
-		GLenum mRenderMode = GL_TRIANGLES;
 		std::size_t mMinimumSize = 0;
 	private :
+		typedef std::pair< unsigned int, std::vector<SegmentInfo> > IndexedSegmentInfo; // unsigned int/segment info vector pair
+		
 		GLuint mVertVBOID = 0;
 		GLuint mIndVBOID = 0;
 		
-		std::size_t mIndicesSize;
-		
-		std::vector<SegmentInfo> mSegmentInfo;
+		std::map< unsigned int, std::vector<SegmentInfo> > mSegmentInfo;
 };
 }
 

@@ -28,37 +28,63 @@
 #ifndef UAIRRESOURCEPTR_HPP
 #define UAIRRESOURCEPTR_HPP
 
+#include <iostream>
+
 namespace uair {
 template<class T>
 class ResourcePtr {
 	public :
-		ResourcePtr(T* ptr = nullptr) : mPtr(ptr) {
+		ResourcePtr() = default;
+		
+		ResourcePtr(T* ptr) : mPtr(ptr) {
 			AddReference();
 		}
 		
-		ResourcePtr(const ResourcePtr<T>& other) {
-			RemoveReference();
-			
+		ResourcePtr(const ResourcePtr<T>& other) : ResourcePtr() {
 			mPtr = other.mPtr;
 			AddReference();
 		}
 		
-		ResourcePtr(ResourcePtr<T>&& other) {
-			RemoveReference();
+		/* ResourcePtr(const ResourcePtr<T>& other) {
+			// RemoveReference();
+			
+			mPtr = other.mPtr;
+			AddReference();
+		} */
+		
+		ResourcePtr(ResourcePtr<T>&& other) : ResourcePtr() {
+			mPtr = other.mPtr;
+			other.mPtr = nullptr;
+			
+			mID = other.mID;
+			other.mID = 0u;
+			
+			AddReference(mID);
+		}
+		
+		/* ResourcePtr(ResourcePtr<T>&& other) {
+			// RemoveReference();
 			
 			mPtr = other.mPtr;
 			AddReference(other.mID);
 			
 			other.mPtr = nullptr;
 			other.mID = 0u;
-		}
+		} */
 		
 		~ResourcePtr() {
 			RemoveReference();
 			mPtr = nullptr;
+			mID = 0u;
 		}
 		
-		ResourcePtr<T>& operator=(const ResourcePtr<T>& other) {
+		ResourcePtr<T>& operator=(ResourcePtr<T> other) {
+			swap(*this, other);
+			
+			return *this;
+		}
+		
+		/* ResourcePtr<T>& operator=(const ResourcePtr<T>& other) {
 			if (mPtr != other.mPtr || mID != other.mID) {
 				RemoveReference();
 				
@@ -67,9 +93,9 @@ class ResourcePtr {
 			}
 			
 			return *this;
-		}
+		} */
 		
-		ResourcePtr<T>& operator=(ResourcePtr<T>&& other) {
+		/* ResourcePtr<T>& operator=(ResourcePtr<T>&& other) {
 			if (mPtr != other.mPtr || mID != other.mID) {
 				RemoveReference();
 				
@@ -81,6 +107,14 @@ class ResourcePtr {
 			}
 			
 			return *this;
+		} */
+		
+		void swap(ResourcePtr<T>& first, ResourcePtr<T>& second) {
+			std::swap(first.mPtr, second.mPtr);
+			std::swap(first.mID, second.mID);
+			
+			first.AddReference(first.mID);
+			second.AddReference(second.mID);
 		}
 		
 		void SetResource(T* ptr) {
@@ -96,12 +130,17 @@ class ResourcePtr {
 			return mPtr;
 		}
 		
+		const T* GetConstResource() const {
+			return mPtr;
+		}
+		
 		void UnsetResource() {
 			RemoveReference();
 			mPtr = nullptr;
+			mID = 0u;
 		}
 		
-		void AddReference(const unsigned int &id = 0u) {
+		void AddReference(const unsigned int& id = 0u) {
 			if (mPtr) {
 				mID = mPtr->AddReference(this, id);
 			}

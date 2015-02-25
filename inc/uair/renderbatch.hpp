@@ -29,6 +29,7 @@
 #define UAIRRENDERBATCH_HPP
 
 #include <string>
+#include <map>
 #include <vector>
 
 #include "vbo.hpp"
@@ -40,21 +41,26 @@ struct RenderBatchData {
 	std::vector<VBOIndex> mIndData; // indices to send to vbo
 	
 	GLuint mTexID = 0; // the texture id to bind in vbo
+	GLenum mRenderMode = GL_TRIANGLE_FAN;
 	std::string mTag = ""; // the tag (type) of the underlying renderable
 };
 
 // a segment of vertices in vbo that share the same texture
 struct SegmentInfo {
 	SegmentInfo() = default;
-	SegmentInfo(const GLuint & texID, const GLuint & start, const GLuint & end) :
-			mTexID(texID), mStart(start), mEnd(end) {
+	SegmentInfo(const GLuint& texID, const GLenum& renderMode, const GLuint& count, const GLuint& offset, const GLuint& min, const GLuint& max) :
+			mTexID(texID), mRenderMode(renderMode), mIndicesCount(count), mIndicesOffset(offset), mMinIndex(min), mMaxIndex(max) {
 		
 		
 	}
 	
 	GLuint mTexID = 0; // the texture id of the segment
-	GLuint mStart = 0; // the start index of the segment
-	GLuint mEnd = 0; // the final index of the segment
+	GLenum mRenderMode = GL_TRIANGLE_FAN;
+	
+	GLuint mIndicesCount = 0;
+	GLuint mIndicesOffset = 0;
+	GLuint mMinIndex = 0;
+	GLuint mMaxIndex = 0;
 };
 
 class Renderable; // forward declare the renderable class
@@ -62,11 +68,15 @@ class Renderable; // forward declare the renderable class
 // a batch of renderable objects that is processed and uploaded to a vbo
 class RenderBatch {
 	public :
-		void Add(Renderable& renderable); // add a renderable to the batch
+		void Add(Renderable& renderable, const unsigned int& pass = 0); // add a renderable to the batch for the specified render pass
 		void Upload(); // upload the batch to vbo
-		void Draw(); // draw the batch to the context
+		void Draw(const unsigned int& fboID, const unsigned int& pass); // draw the specified pass to the specified framebuffer
+		void Draw(const unsigned int& pass = 0); // draw the specified pass to the default framebuffer
 	private :
-		std::vector<RenderBatchData> mRenderData; // the processed data of the added renderables
+		typedef std::pair< unsigned int, std::vector<RenderBatchData> > IndexedRenderBatchData; // unsigned int/render batch data vector pair
+		typedef std::pair< unsigned int, std::vector<SegmentInfo> > IndexedSegmentInfo; // unsigned int/segment info vector pair
+		
+		std::map< unsigned int, std::vector<RenderBatchData> > mRenderData;
 		
 		VBO mVBO; // vertex buffer object (vbo) used for rendering
 };

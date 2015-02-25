@@ -25,11 +25,6 @@
 **		   source distribution.
 ** **************************************************************** */
 
-/** 
-* \file		windowwin32.hpp
-* \brief	Defines the WindowWin32 class which may be (depending on OS) inherited by the Window class (via WindowOS typedef).
-**/
-
 #ifndef UAIRWINDOWWIN32_HPP
 #define UAIRWINDOWWIN32_HPP
 
@@ -53,6 +48,8 @@
 
 namespace uair {
 class WindowWin32 {
+	friend class Game;
+	
 	public :
 		WindowWin32();
 		WindowWin32(const std::string & windowTitle, const WindowDisplaySettings & settings,
@@ -65,6 +62,7 @@ class WindowWin32 {
 		void Process();
 		bool Display() const;
 		
+		void Quit();
 		bool IsOpen() const;
 		
 		WindowDisplaySettings GetCurrentDS() const;
@@ -76,14 +74,12 @@ class WindowWin32 {
 		unsigned int GetActualWidth() const;
 		unsigned int GetActualHeight() const;
 	private :
-		friend class Game;
-		
 		void SetUpWindow();
 		
 		void SetUpOpenGL();
 		void CreateContext();
 		
-		void HandleEvents(const HWND & hWnd, const UINT & message, const WPARAM & wParam, const LPARAM & lParam);
+		LRESULT CALLBACK HandleEvents(const HWND & hWnd, const UINT & message, const WPARAM & wParam, const LPARAM & lParam);
 		
 		static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 		

@@ -25,18 +25,13 @@
 **		   source distribution.
 ** **************************************************************** */
 
-/** 
-* \file		windowwin32.cpp
-* \brief	
-**/
+#include "windowwin32.hpp"
 
 #include <iostream>
 #include <vector>
 
 #include "exception.hpp"
 #include "inputenums.hpp"
-
-#include "windowwin32.hpp"
 
 namespace uair {
 WindowWin32::WindowWin32() : WindowWin32("Uair Window", WindowDisplaySettings()) {
@@ -49,6 +44,7 @@ WindowWin32::WindowWin32(const std::string & windowTitle, const WindowDisplaySet
 	try {
 		SetUpWindow(); // set up the window
 		SetUpOpenGL(); // set up opengl context and link it to our window
+		// [!] SET UP CONTEXT IN OWN CLASS AND LINK IT HERE
 	} catch (UairException& e) {
 		std::cout << e.what() << std::endl;
 		throw;
@@ -56,6 +52,14 @@ WindowWin32::WindowWin32(const std::string & windowTitle, const WindowDisplaySet
 }
 
 WindowWin32::~WindowWin32() {
+	if (mRenderContext) { // if we have a valid render context
+		wglMakeCurrent(0, 0); // make sure it is not current
+		wglDeleteContext(mRenderContext); // delete our render context
+		// [!] UNLINK CONTEXT HERE (NO NEED TO DELETE IT, THOUGH MAYBE MARK IT)
+		
+		mRenderContext = 0; // reset handle to 0
+	}
+
 	if (mWindowHandle) { // if we have a valid window handle
 		if (mDeviceContext) { // if we have a valid device context
 			ReleaseDC(mWindowHandle, mDeviceContext); // release our dc
@@ -68,13 +72,6 @@ WindowWin32::~WindowWin32() {
 		mOpen = false; // indicate window is now closed
 		
 		UnregisterClassW(L"UairGLWindow", GetModuleHandle(0)); // unregister our window class
-	}
-	
-	if (mRenderContext) { // if we have a valid render context
-		wglMakeCurrent(0, 0); // make sure it is not current
-		wglDeleteContext(mRenderContext); // delete our render context
-		
-		mRenderContext = 0; // reset handle to 0
 	}
 }
 
@@ -116,6 +113,14 @@ bool WindowWin32::Display() const {
 	}
 	
 	return false;
+}
+
+void WindowWin32::Quit() {
+	if (mWindowHandle) {
+		if (DestroyWindow(mWindowHandle) != 0) {
+			mOpen = false;
+		}
+	}
 }
 
 bool WindowWin32::IsOpen() const {
@@ -294,8 +299,7 @@ void WindowWin32::SetUpOpenGL() {
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD);
 		
 		glEnable(GL_BLEND);
-		glBlendFunc(GL_ONE, GL_ONE);
-		// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		
 		glClearDepth(1.0f);
 	}
@@ -522,17 +526,21 @@ LRESULT CALLBACK WindowWin32::WndProc(HWND hWnd, UINT message, WPARAM wParam, LP
 	
 	WindowWin32* win = reinterpret_cast<WindowWin32*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 	if (win) {
-		win->HandleEvents(hWnd, message, wParam, lParam);
+		return win->HandleEvents(hWnd, message, wParam, lParam);
     }
-	
-	return DefWindowProcW(hWnd, message, wParam, lParam);
+	else {
+		return DefWindowProcW(hWnd, message, wParam, lParam);
+	}
 }
 
-void WindowWin32::HandleEvents(const HWND & hWnd, const UINT & message, const WPARAM & wParam, const LPARAM & lParam) {
+LRESULT CALLBACK WindowWin32::HandleEvents(const HWND & hWnd, const UINT & message, const WPARAM & wParam, const LPARAM & lParam) {
 	switch (message) {
 		case WM_CLOSE :
-			mOpen = false;
-			break;
+			WindowEvent e;
+			e.type = WindowEvent::CloseType;
+			mEventQueue.push_back(e);
+			
+			return 0;
 		case WM_SIZE : {
 			WindowEvent e;
 			e.type = WindowEvent::SizeType;
@@ -567,7 +575,7 @@ void WindowWin32::HandleEvents(const HWND & hWnd, const UINT & message, const WP
 				glViewport(0, 0, width, height);
 			}
 			
-			break;
+			return 0;
 		}
 		case WM_MOVE : {
 			WindowEvent e;
@@ -579,7 +587,7 @@ void WindowWin32::HandleEvents(const HWND & hWnd, const UINT & message, const WP
 			
 			mWinPos = glm::ivec2(e.move.x, e.move.y);
 			
-			break;
+			return 0;
 		}
 		case WM_SETFOCUS : {
 			wglMakeCurrent(mDeviceContext, mRenderContext);
@@ -589,7 +597,8 @@ void WindowWin32::HandleEvents(const HWND & hWnd, const UINT & message, const WP
 			mEventQueue.push_back(e);
 			
 			mHasFocus = true;
-			break;
+			
+			return 0;
 		}
 		case WM_KILLFOCUS : {
 			WindowEvent e;
@@ -600,7 +609,8 @@ void WindowWin32::HandleEvents(const HWND & hWnd, const UINT & message, const WP
 			mCaptureCount = 0;
 			
 			mHasFocus = false;
-			break;
+			
+			return 0;
 		}
 		case WM_DISPLAYCHANGE : {
 			WindowEvent e;
@@ -609,6 +619,8 @@ void WindowWin32::HandleEvents(const HWND & hWnd, const UINT & message, const WP
 			e.displayChange.width = LOWORD(lParam);
 			
 			mEventQueue.push_back(e);
+			
+			return 0;
 		}
 		case WM_CAPTURECHANGED : {
 			WindowEvent e;
@@ -621,9 +633,9 @@ void WindowWin32::HandleEvents(const HWND & hWnd, const UINT & message, const WP
 			}
 			
 			mEventQueue.push_back(e);
+			
+			return 0;
 		}
-		default :
-			break;
 	}
 	
 	// input related events: keyboard
@@ -639,7 +651,7 @@ void WindowWin32::HandleEvents(const HWND & hWnd, const UINT & message, const WP
 			
 			mEventQueue.push_back(e);
 			
-			break;
+			return 0;
 		}
 		case WM_KEYUP :
 		case WM_SYSKEYUP : {
@@ -652,7 +664,7 @@ void WindowWin32::HandleEvents(const HWND & hWnd, const UINT & message, const WP
 			
 			mEventQueue.push_back(e);
 			
-			break;
+			return 0;
 		}
 	}
 	
@@ -669,7 +681,7 @@ void WindowWin32::HandleEvents(const HWND & hWnd, const UINT & message, const WP
 			SetCapture(mWindowHandle);
 			++mCaptureCount;
 			
-			break;
+			return 0;
 		}
 		case WM_LBUTTONUP : {
 			WindowEvent e;
@@ -684,7 +696,7 @@ void WindowWin32::HandleEvents(const HWND & hWnd, const UINT & message, const WP
 				ReleaseCapture();
 			}
 			
-			break;
+			return 0;
 		}
 		case WM_LBUTTONDBLCLK : {
 			WindowEvent e;
@@ -697,7 +709,7 @@ void WindowWin32::HandleEvents(const HWND & hWnd, const UINT & message, const WP
 			SetCapture(mWindowHandle);
 			++mCaptureCount;
 			
-			break;
+			return 0;
 		}
 		case WM_MBUTTONDOWN : {
 			WindowEvent e;
@@ -710,7 +722,7 @@ void WindowWin32::HandleEvents(const HWND & hWnd, const UINT & message, const WP
 			SetCapture(mWindowHandle);
 			++mCaptureCount;
 			
-			break;
+			return 0;
 		}
 		case WM_MBUTTONUP : {
 			WindowEvent e;
@@ -725,7 +737,7 @@ void WindowWin32::HandleEvents(const HWND & hWnd, const UINT & message, const WP
 				ReleaseCapture();
 			}
 			
-			break;
+			return 0;
 		}
 		case WM_MBUTTONDBLCLK : {
 			WindowEvent e;
@@ -738,7 +750,7 @@ void WindowWin32::HandleEvents(const HWND & hWnd, const UINT & message, const WP
 			SetCapture(mWindowHandle);
 			++mCaptureCount;
 			
-			break;
+			return 0;
 		}
 		case WM_RBUTTONDOWN : {
 			WindowEvent e;
@@ -751,7 +763,7 @@ void WindowWin32::HandleEvents(const HWND & hWnd, const UINT & message, const WP
 			SetCapture(mWindowHandle);
 			++mCaptureCount;
 			
-			break;
+			return 0;
 		}
 		case WM_RBUTTONUP : {
 			WindowEvent e;
@@ -766,7 +778,7 @@ void WindowWin32::HandleEvents(const HWND & hWnd, const UINT & message, const WP
 				ReleaseCapture();
 			}
 			
-			break;
+			return 0;
 		}
 		case WM_RBUTTONDBLCLK : {
 			WindowEvent e;
@@ -779,7 +791,7 @@ void WindowWin32::HandleEvents(const HWND & hWnd, const UINT & message, const WP
 			SetCapture(mWindowHandle);
 			++mCaptureCount;
 			
-			break;
+			return 0;
 		}
 		case WM_XBUTTONDOWN : {
 			WindowEvent e;
@@ -799,7 +811,7 @@ void WindowWin32::HandleEvents(const HWND & hWnd, const UINT & message, const WP
 			SetCapture(mWindowHandle);
 			++mCaptureCount;
 			
-			break;
+			return 0;
 		}
 		case WM_XBUTTONUP : {
 			WindowEvent e;
@@ -821,7 +833,7 @@ void WindowWin32::HandleEvents(const HWND & hWnd, const UINT & message, const WP
 				ReleaseCapture();
 			}
 			
-			break;
+			return 0;
 		}
 		case WM_XBUTTONDBLCLK : {
 			WindowEvent e;
@@ -841,7 +853,7 @@ void WindowWin32::HandleEvents(const HWND & hWnd, const UINT & message, const WP
 			SetCapture(mWindowHandle);
 			++mCaptureCount;
 			
-			break;
+			return 0;
 		}
 		case WM_MOUSEWHEEL :
 			WindowEvent e;
@@ -850,7 +862,7 @@ void WindowWin32::HandleEvents(const HWND & hWnd, const UINT & message, const WP
 			
 			mEventQueue.push_back(e);
 			
-			break;
+			return 0;
 		/* case WM_MOUSEMOVE : {
 			WindowEvent e;
 			e.type = WindowEvent::MouseMoveType;
@@ -866,9 +878,9 @@ void WindowWin32::HandleEvents(const HWND & hWnd, const UINT & message, const WP
 			
 			break;
 		} */
-		default :
-			break;
 	}
+	
+	return DefWindowProcW(hWnd, message, wParam, lParam);
 }
 
 Keyboard WindowWin32::ToKeyboard(const WPARAM & code, const LPARAM & flags) const {

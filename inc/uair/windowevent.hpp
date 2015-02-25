@@ -39,6 +39,7 @@ namespace uair {
 class WindowEvent {
 	public :
 		enum Type {
+			CloseType,
 			SizeType,
 			MoveType,
 			GainedFocusType,
@@ -53,6 +54,10 @@ class WindowEvent {
 		};
 		
 		Type type;
+		
+		struct Close {
+			
+		};
 		
 		struct Size {
 			unsigned int type;
@@ -108,6 +113,7 @@ class WindowEvent {
 		};
 		
 		union {
+			Close close;
 			Size size;
 			Move move;
 			GainedFocus gainedFocus;

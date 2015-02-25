@@ -44,71 +44,76 @@ Game::Game() {
 }
 
 Game::~Game() {
-	// mWindow.reset();
 	mSceneManager->mStore.clear();
+	mWindow.reset();
 }
 
 void Game::Run() {
-	if (mWindow) {
-		mOpen = true;
+	while (mWindow) { // whilst we have a valid window...
+		mWindow->Process(); // process the window
 		
-		while (mOpen == true) {
-			while (!mWindow->mEventQueue.empty()) {
-				WindowEvent e = mWindow->mEventQueue.front(); // get the event at the front of the window's queue
-				mEventQueue.push_back(e); // add to our event queue
-				mWindow->mEventQueue.pop_front(); // remove it from the window's queue
+		while (!mWindow->mEventQueue.empty()) { // whilst there are events waiting in the queue...
+			WindowEvent e = mWindow->mEventQueue.front(); // get the event at the front of the window's queue
+			mEventQueue.push_back(e); // add to our event queue
+			mWindow->mEventQueue.pop_front(); // remove it from the window's queue
+			
+			HandleEventQueue(e); // handle the event queue
+		}
+		
+		for (unsigned int i = 0u; i < mRenderPasses; ++i) {
+			Render(i); // handle rendering for the current pass
+		}
+		
+		mWindow->Display(); // draw the window
+		Input(); // handle all user input
+		mInputManager->Process(); // process the input manager (to update states)
+		
+		{ // handle process timing
+			unsigned int processed = 0u; // the number of process calls this frame
+			
+			double prevFrameTime = mTimer.GetElapsedTime(); // the time since the prvious frame
+			mTimer.Reset(); // reset the frame timer
+			
+			if (prevFrameTime > mFrameUpperLimit) { // if our time is longer than the upper frame limit...
+				prevFrameTime = mFrameUpperLimit; // cap it at the upper limit
+			}
+			
+			mAccumulator += prevFrameTime; // increase the accumulated time
+			
+			while (mAccumulator >= mFrameLowerLimit) { // whilst the accumulated time is above the lower frame limit...
+				Process(); // handle all processing
+				++processed; // increase the process call count
 				
-				HandleEventQueue(e); // handle the event queue
+				// mTotalFrameTime += mFrameLowerLimit; // increase the total frame time
+				mAccumulator -= mFrameLowerLimit; // decrease the accumulated time
 				
-				if (!mWindow->IsOpen()) {
-					break;
+				if (mOpen == false) { // if we are to quit the game...
+					break; // stop processing this scene
+				}
+				
+				if (mSceneManager->mNextScene) { // if there is a scene change waiting...
+					break; // stop processing this scene, saving the accumulated time leftover
 				}
 			}
 			
-			Render();
-			Input();
-			mInputManager->Process();
-			
-			{
-				unsigned int processed = 0u;
-				
-				double prevFrameTime = mTimer.GetElapsedTime();
-				mTimer.Reset();
-				
-				if (prevFrameTime > mFrameUpperLimit) {
-					prevFrameTime = mFrameUpperLimit;
-				}
-				
-				mAccumulator += prevFrameTime;
-				
-				while (mAccumulator >= mFrameLowerLimit) {
-					Process();
-					++processed;
-					
-					mTotalFrameTime += mFrameLowerLimit;
-					mAccumulator -= mFrameLowerLimit;
-					
-					if (mSceneManager->mNextScene) { // if there is a scene change waiting
-						break; // stop processing this scene, saving the accumulated time leftover
-					}
-				}
-				
-				if (processed > 0u) {
-					PostProcess(processed);
-					mEventQueue.clear();
-				}
+			if (processed > 0u) { // if we have had at least 1 process call...
+				PostProcess(processed); // handle all post processing
+				// mEventQueue.clear(); // empty the event queue
 			}
-			
-			if (mSceneManager->ChangeScene() == true) {
-				mTimer.Reset(); // reset the frame timer
-			}
-			
-			if (mWindow->IsOpen() == false) {
-				if (mSceneManager->mCurrScene) { // if we have a current scene
-					mSceneManager->mCurrScene->OnLeave(); // we are leaving it
-				}
+		}
+		
+		if (mSceneManager->ChangeScene() == true) { // if we're changing scene...
+			mTimer.Reset(); // reset the frame timer
+		}
+		
+		if (mOpen == false) { // if the game is no longer open...
+			if (mSceneManager->mCurrScene) { // if we have a current scene...
+				mOpen = !(mSceneManager->mCurrScene->OnQuit()); // handle scene quitting logic, and see if we are still to quit
 				
-				mOpen = false;
+				if (mOpen == false) { // if we are still to quit...
+					mWindow->Quit(); // destroy the window
+					// mWindow.reset(); // remove the window
+				}
 			}
 		}
 	}
@@ -126,19 +131,18 @@ void Game::Process() {
 	}
 }
 
-void Game::PostProcess(unsigned int processed) {
+void Game::PostProcess(const unsigned int & processed) {
 	if (mSceneManager->mCurrScene) {
 		mSceneManager->mCurrScene->PostProcess(processed);
 	}
 }
 
-void Game::Render() {
+void Game::Render(const unsigned int & pass) {
 	if (mSceneManager->mCurrScene) {
-		mSceneManager->mCurrScene->Render();
+		mSceneManager->mCurrScene->Render(pass);
 	}
 	
-	mWindow->Process();
-	mWindow->Display();
+	glFlush();
 }
 
 bool Game::AddWindow() {
@@ -160,7 +164,6 @@ bool Game::AddWindow(const std::string & windowTitle, const WindowDisplaySetting
 }
 
 void Game::Quit() {
-	mWindow.reset();
 	mOpen = false;
 }
 
@@ -306,6 +309,10 @@ glm::ivec2 Game::GetGlobalMouseCoords() const {
 
 void Game::HandleEventQueue(const WindowEvent & e) {
 	switch (e.type) {
+		case WindowEvent::CloseType : {
+			mOpen = false;
+			break;
+		}
 		case WindowEvent::LostFocusType : {
 			mInputManager->Reset();
 			break;
@@ -343,4 +350,6 @@ void Game::SetResourceManager(ResourceManager* resMan) {
 ResourceManagerPtr Game::GetResourceManager() {
 	return mResourceManager;
 }
+
+Game GAME;
 }

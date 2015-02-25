@@ -25,11 +25,6 @@
 **		   source distribution.
 ** **************************************************************** */
 
-/** 
-* \file		vbo.cpp
-* \brief	
-**/
-
 #include "vbo.hpp"
 
 #include <iostream>
@@ -40,27 +35,36 @@
 namespace uair {
 VBO::~VBO() {
 	if (mVertVBOID != 0) {
-		if (OpenGLStates::mCurrentArrayBuffer == mVertVBOID) { // if our 
+		if (OpenGLStates::mCurrentArrayBuffer == mVertVBOID) {
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			OpenGLStates::mCurrentArrayBuffer = 0;
 		}
 		
-		glDeleteBuffers(1, &mVertVBOID); // destroy our 
+		glDeleteBuffers(1, &mVertVBOID);
 		mVertVBOID = 0;
 	}
 	
 	if (mIndVBOID != 0) {
-		if (OpenGLStates::mCurrentElementArrayBuffer == mIndVBOID) { // if our 
+		if (OpenGLStates::mCurrentElementArrayBuffer == mIndVBOID) {
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 			OpenGLStates::mCurrentElementArrayBuffer = 0;
 		}
 		
-		glDeleteBuffers(1, &mIndVBOID); // destroy our 
+		glDeleteBuffers(1, &mIndVBOID);
 		mIndVBOID = 0;
 	}
 }
 
-void VBO::AddData(const std::vector<VBOVertex> & vertData, const std::vector<VBOIndex> & indData) {
+void VBO::AddData(const std::vector<VBOVertex>& vertData, const std::vector<VBOIndex>& indData) {
+	std::vector<SegmentInfo> vecSegment; // container holding segment data
+	vecSegment.emplace_back(0, GL_TRIANGLE_FAN, indData.size(), 0, 0, indData.size());
+	
+	std::map< unsigned int, std::vector<SegmentInfo> > segmentInfo;
+	segmentInfo.insert(IndexedSegmentInfo(0, vecSegment));
+	AddData(vertData, indData, segmentInfo);
+}
+
+void VBO::AddData(const std::vector<VBOVertex>& vertData, const std::vector<VBOIndex>& indData, const std::map< unsigned int, std::vector<SegmentInfo> >& segmentInfo) {
 	EnsureInitialised();
 	
 	if (OpenGLStates::mCurrentArrayBuffer != mVertVBOID) {
@@ -69,7 +73,7 @@ void VBO::AddData(const std::vector<VBOVertex> & vertData, const std::vector<VBO
 	}
 	
 	std::size_t vertSize = std::max((mMinimumSize * 1024 * 1024), (vertData.size() * sizeof(uair::VBOVertex)));
-	glBufferData(GL_ARRAY_BUFFER, vertSize, &vertData[0], mType);
+	glBufferData(GL_ARRAY_BUFFER, vertSize, vertData.data(), mType);
 	
 	if (OpenGLStates::mCurrentElementArrayBuffer != mIndVBOID) {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndVBOID);
@@ -77,82 +81,66 @@ void VBO::AddData(const std::vector<VBOVertex> & vertData, const std::vector<VBO
 	}
 	
 	std::size_t indSize = std::max((mMinimumSize * 1024 * 1024), (indData.size() * sizeof(uair::VBOIndex)));
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indSize, &indData[0], mType);
-	
-	mIndicesSize = indData.size();
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indSize, indData.data(), mType);
 	
 	mSegmentInfo.clear();
-	mSegmentInfo.emplace_back(0, 0, mIndicesSize - 1);
+	mSegmentInfo.insert(segmentInfo.begin(), segmentInfo.end());
 }
 
-void VBO::AddData(const std::vector<VBOVertex> & vertData, const std::vector<VBOIndex> & indData,
-		const std::vector<SegmentInfo> & segmentInfo) {
+void VBO::Draw(const unsigned int& fboID, const unsigned int& pass) {
+	std::vector<SegmentInfo>& segmentInfo = ((mSegmentInfo.insert(IndexedSegmentInfo(pass, {}))).first)->second; // either create a new segment info vector or get the existing one
 	
-	EnsureInitialised();
-	
-	if (OpenGLStates::mCurrentArrayBuffer != mVertVBOID) {
-		glBindBuffer(GL_ARRAY_BUFFER, mVertVBOID);
-		OpenGLStates::mCurrentArrayBuffer = mVertVBOID;
-	}
-	
-	std::size_t vertSize = std::max((mMinimumSize * 1024 * 1024), (vertData.size() * sizeof(uair::VBOVertex)));
-	glBufferData(GL_ARRAY_BUFFER, vertSize, &vertData[0], mType);
-	
-	if (OpenGLStates::mCurrentElementArrayBuffer != mIndVBOID) {
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndVBOID);
-		OpenGLStates::mCurrentElementArrayBuffer = mIndVBOID;
-	}
-	
-	std::size_t indSize = std::max((mMinimumSize * 1024 * 1024), (indData.size() * sizeof(uair::VBOIndex)));
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indSize, &indData[0], mType);
-	
-	mIndicesSize = indData.size();
-	
-	mSegmentInfo.clear();
-	mSegmentInfo.insert(mSegmentInfo.end(), segmentInfo.begin(), segmentInfo.end());
-}
-
-void VBO::Draw() {
-	if (OpenGLStates::mCurrentArrayBuffer != mVertVBOID) {
-		glBindBuffer(GL_ARRAY_BUFFER, mVertVBOID);
-	 	OpenGLStates::mCurrentArrayBuffer = mVertVBOID;
-	}
-	
-	if (OpenGLStates::mCurrentElementArrayBuffer != mIndVBOID) {
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndVBOID);
-	 	OpenGLStates::mCurrentElementArrayBuffer = mIndVBOID;
-	}
-	
-	glUniformMatrix4fv(uair::OpenGLStates::mViewMatrixLocation, 1, GL_FALSE, &uair::OpenGLStates::mViewMatrix[0][0]);
-	glUniformMatrix4fv(uair::OpenGLStates::mModelMatrixLocation, 1, GL_FALSE, &uair::OpenGLStates::mModelMatrix[0][0]);
-	glUniformMatrix4fv(uair::OpenGLStates::mProjectionMatrixLocation, 1, GL_FALSE, &uair::OpenGLStates::mProjectionMatrix[0][0]);
-	
-	glEnableVertexAttribArray(uair::OpenGLStates::mVertexLocation);
-	glEnableVertexAttribArray(uair::OpenGLStates::mNormalLocation);
-	glEnableVertexAttribArray(uair::OpenGLStates::mColourLocation);
-	glEnableVertexAttribArray(uair::OpenGLStates::mTexCoordLocation);
-	glEnableVertexAttribArray(uair::OpenGLStates::mTexExistsLocation);
-	
-	glVertexAttribPointer(uair::OpenGLStates::mVertexLocation, 3, GL_FLOAT, GL_TRUE, sizeof(uair::VBOVertex), (void*)(offsetof(uair::VBOVertex, mX)));
-	glVertexAttribPointer(uair::OpenGLStates::mNormalLocation, 3, GL_FLOAT, GL_TRUE, sizeof(uair::VBOVertex), (void*)(offsetof(uair::VBOVertex, mNX)));
-	glVertexAttribPointer(uair::OpenGLStates::mColourLocation, 4, GL_FLOAT, GL_TRUE, sizeof(uair::VBOVertex), (void*)(offsetof(uair::VBOVertex, mR)));
-	glVertexAttribPointer(uair::OpenGLStates::mTexCoordLocation, 3, GL_FLOAT, GL_TRUE, sizeof(uair::VBOVertex), (void*)(offsetof(uair::VBOVertex, mS)));
-	glVertexAttribPointer(uair::OpenGLStates::mTexExistsLocation, 1, GL_FLOAT, GL_TRUE, sizeof(uair::VBOVertex), (void*)(offsetof(uair::VBOVertex, mTex)));
-	
-	for (unsigned int i = 0u; i < mSegmentInfo.size(); ++i) {
-		if (OpenGLStates::mCurrentTexture == mSegmentInfo[i].mTexID) {
-			glBindTexture(GL_TEXTURE_2D, mSegmentInfo[i].mTexID);
-			OpenGLStates::mCurrentTexture = 0;
+	if (!segmentInfo.empty()) { // if we have something to render this pass...
+		if (OpenGLStates::mCurrentArrayBuffer != mVertVBOID) {
+			glBindBuffer(GL_ARRAY_BUFFER, mVertVBOID);
+			OpenGLStates::mCurrentArrayBuffer = mVertVBOID;
 		}
 		
-		glDrawRangeElements(mRenderMode, mSegmentInfo[i].mStart, mSegmentInfo[i].mEnd, mIndicesSize, GL_UNSIGNED_INT, (void*)0);
+		if (OpenGLStates::mCurrentElementArrayBuffer != mIndVBOID) {
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndVBOID);
+			OpenGLStates::mCurrentElementArrayBuffer = mIndVBOID;
+		}
+		
+		glUniformMatrix4fv(uair::OpenGLStates::mViewMatrixLocation, 1, GL_FALSE, &uair::OpenGLStates::mViewMatrix[0][0]);
+		glUniformMatrix4fv(uair::OpenGLStates::mModelMatrixLocation, 1, GL_FALSE, &uair::OpenGLStates::mModelMatrix[0][0]);
+		glUniformMatrix4fv(uair::OpenGLStates::mProjectionMatrixLocation, 1, GL_FALSE, &uair::OpenGLStates::mProjectionMatrix[0][0]);
+		
+		glEnableVertexAttribArray(uair::OpenGLStates::mVertexLocation);
+		glEnableVertexAttribArray(uair::OpenGLStates::mNormalLocation);
+		glEnableVertexAttribArray(uair::OpenGLStates::mColourLocation);
+		glEnableVertexAttribArray(uair::OpenGLStates::mTexCoordLocation);
+		glEnableVertexAttribArray(uair::OpenGLStates::mTexExistsLocation);
+		
+		glVertexAttribPointer(uair::OpenGLStates::mVertexLocation, 3, GL_FLOAT, GL_TRUE, sizeof(uair::VBOVertex), (void*)(offsetof(uair::VBOVertex, mX)));
+		glVertexAttribPointer(uair::OpenGLStates::mNormalLocation, 3, GL_FLOAT, GL_TRUE, sizeof(uair::VBOVertex), (void*)(offsetof(uair::VBOVertex, mNX)));
+		glVertexAttribPointer(uair::OpenGLStates::mColourLocation, 4, GL_FLOAT, GL_TRUE, sizeof(uair::VBOVertex), (void*)(offsetof(uair::VBOVertex, mR)));
+		glVertexAttribPointer(uair::OpenGLStates::mTexCoordLocation, 3, GL_FLOAT, GL_TRUE, sizeof(uair::VBOVertex), (void*)(offsetof(uair::VBOVertex, mS)));
+		glVertexAttribPointer(uair::OpenGLStates::mTexExistsLocation, 1, GL_FLOAT, GL_TRUE, sizeof(uair::VBOVertex), (void*)(offsetof(uair::VBOVertex, mTex)));
+		
+		if (OpenGLStates::mCurrentFBO != fboID) {
+			glBindFramebuffer(GL_FRAMEBUFFER, fboID);
+			OpenGLStates::mCurrentFBO = fboID;
+		}
+		
+		for (unsigned int i = 0u; i < segmentInfo.size(); ++i) {
+			if (OpenGLStates::mCurrentTexture != segmentInfo[i].mTexID) {
+				glBindTexture(GL_TEXTURE_2D, segmentInfo[i].mTexID);
+				OpenGLStates::mCurrentTexture = segmentInfo[i].mTexID;
+			}
+			
+			glDrawRangeElements(segmentInfo[i].mRenderMode, segmentInfo[i].mMinIndex, segmentInfo[i].mMaxIndex, segmentInfo[i].mIndicesCount, GL_UNSIGNED_INT, (const GLuint*)(0) + segmentInfo[i].mIndicesOffset);
+		}
+		
+		glDisableVertexAttribArray(uair::OpenGLStates::mTexExistsLocation);
+		glDisableVertexAttribArray(uair::OpenGLStates::mTexCoordLocation);
+		glDisableVertexAttribArray(uair::OpenGLStates::mColourLocation);
+		glDisableVertexAttribArray(uair::OpenGLStates::mNormalLocation);
+		glDisableVertexAttribArray(uair::OpenGLStates::mVertexLocation);
 	}
-	
-	glDisableVertexAttribArray(uair::OpenGLStates::mTexExistsLocation);
-	glDisableVertexAttribArray(uair::OpenGLStates::mTexCoordLocation);
-	glDisableVertexAttribArray(uair::OpenGLStates::mColourLocation);
-	glDisableVertexAttribArray(uair::OpenGLStates::mNormalLocation);
-	glDisableVertexAttribArray(uair::OpenGLStates::mVertexLocation);
+}
+
+void VBO::Draw(const unsigned int& pass) {
+	Draw(0, pass);
 }
 
 void VBO::EnsureInitialised() {

@@ -35,6 +35,7 @@
 
 #include "init.hpp"
 
+#include "openglcontext.hpp"
 #include "openglstates.hpp"
 #include "window.hpp"
 #include "windowdisplaysettings.hpp"
@@ -47,25 +48,19 @@
 #include "timer.hpp"
 #include "util.hpp"
 
+#include "polygon.hpp"
+#include "transformable.hpp"
+#include "triangulate.hpp"
+
 #include "font.hpp"
 #include "renderbatch.hpp"
 #include "renderable.hpp"
 #include "shape.hpp"
-#include "sprite.hpp"
 #include "texture.hpp"
+#include "renderbuffer.hpp"
+#include "fbo.hpp"
 #include "vbo.hpp"
 
 #include "game.hpp"
 
 #endif
-
-/**
-* \mainpage 	What is Uair?
-* 				Uair is a fairly simple game engine that I wrote as both a learning tool
-*				and also a base for any applications or games that I hope to create. Whilst
-*				the extra work in creating an engine from the ground up is not insignificant
-*				and the end result may be sub-par to existing engines, the level of control and
-*				familiarity with the code-base is a definite boon.
-**/
-
-

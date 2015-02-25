@@ -25,13 +25,11 @@
 **		   source distribution.
 ** **************************************************************** */
 
-/** 
-* \file		util.hpp
-* \brief	Utility functions.
-**/
-
 #ifndef UAIRUTIL_HPP
 #define UAIRUTIL_HPP
+
+#include <sstream>
+#include <string>
 
 #include "init.hpp"
 
@@ -49,15 +47,27 @@ namespace util {
 static const float EPSILON = 1e-6f;
 static const double PI = 3.1415926535897;
 
-extern glm::mat3 GetTranslationMatrix(const glm::vec2 & translation);
-extern glm::mat3 GetRotationMatrix(const float & angle);
-extern glm::mat3 GetScalingMatrix(const glm::vec2 & scale);
-extern glm::mat3 GetSkewingMatrix(const glm::vec2 & skew);
+enum {
+	LessThan = 0u,
+	Equals,
+	GreaterThan
+};
 
-extern unsigned int NextPowerOf2(const unsigned int & input);
+extern bool CompareFloats(const float& first, const unsigned int& comparison, const float& second, const float& variance = util::EPSILON);
+
+extern glm::mat3 GetTranslationMatrix(const glm::vec2& translation);
+extern glm::mat3 GetRotationMatrix(const float& angle);
+extern glm::mat3 GetScalingMatrix(const glm::vec2& scale);
+extern glm::mat3 GetSkewingMatrix(const glm::vec2& skew);
+
+extern unsigned int NextPowerOf2(const unsigned int& input);
+extern int IsConvex(const glm::vec2& pointA, const glm::vec2& pointB, const glm::vec2& pointC);
+extern glm::vec2 ReflectPointByLine(const glm::vec2& pointA, const glm::vec2& pointB, const glm::vec2& pointC);
+
+extern std::string GetGLErrorStatus();
 
 template<typename T>
-extern int SignOf(const T & input) {
+extern int SignOf(const T& input) {
 	if (input < 0) {
 		return -1;
 	}
@@ -66,6 +76,29 @@ extern int SignOf(const T & input) {
 	}
 	
 	return 0;
+}
+
+template <class T>
+extern std::string ToString(const T& t, int precision = -1) {
+	std::stringstream ss;
+	
+	if (precision >= 0) {
+		ss.precision(precision);
+	}
+	
+	ss << t;
+	
+	return ss.str();
+}
+
+template <class T>
+extern T FromString(const std::string& s, std::ios_base& (*f)(std::ios_base&) = std::dec) {
+	T t;
+	
+	std::istringstream iss(s);
+	iss >> f >> t;
+	
+	return t;
 }
 }
 }

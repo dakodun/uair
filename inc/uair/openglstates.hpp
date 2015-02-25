@@ -59,6 +59,8 @@ class OpenGLStates {
 		static GLuint mCurrentElementArrayBuffer;
 		static GLuint mCurrentProgram;
 		static GLuint mCurrentTexture;
+		static GLuint mCurrentFBO;
+		static GLuint mCurrentRenderBuffer;
 };
 }
 

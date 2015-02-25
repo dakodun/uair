@@ -28,6 +28,7 @@
 #ifndef UAIRRESOURCESTORE_HPP
 #define UAIRRESOURCESTORE_HPP
 
+#include <iostream>
 #include <map>
 
 namespace uair {

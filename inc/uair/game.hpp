@@ -50,8 +50,8 @@ class Game {
 		
 		void Input();
 		void Process();
-		void PostProcess(unsigned int processed);
-		void Render();
+		void PostProcess(const unsigned int & processed);
+		void Render(const unsigned int & pass);
 		
 		bool AddWindow();
 		bool AddWindow(const std::string & windowTitle, const WindowDisplaySettings & settings,
@@ -142,6 +142,8 @@ class Game {
 		
 		float mFrameLowerLimit = 0.02f;
 		float mFrameUpperLimit = 1.0f;
+		
+		unsigned int mRenderPasses = 1u;
 	private :
 		void HandleEventQueue(const WindowEvent & e);
 	private :
@@ -150,7 +152,7 @@ class Game {
 		Timer mTimer;
 		
 		WindowPtr mWindow;
-		bool mOpen = false;
+		bool mOpen = true;
 		
 		SceneManagerPtr mSceneManager;
 		InputManagerPtr mInputManager;
@@ -161,7 +163,7 @@ class Game {
 		FT_Library mFTLibrary;
 };
 
-static Game GAME;
+extern Game GAME;
 }
 
 #endif

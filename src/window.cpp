@@ -25,11 +25,6 @@
 **		   source distribution.
 ** **************************************************************** */
 
-/** 
-* \file		window.hpp
-* \brief	
-**/
-
 #include "window.hpp"
 
 namespace uair {

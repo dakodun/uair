@@ -28,39 +28,80 @@
 #ifndef UAIRSHAPE_HPP
 #define UAIRSHAPE_HPP
 
-#include <vector>
-
+#include "polygon.hpp"
 #include "renderable.hpp"
+#include "resourceptr.hpp"
+#include "texture.hpp"
+#include "vbo.hpp"
+#include "triangulate.hpp"
 
 namespace uair {
-// a renderable shape
-class Shape : public Renderable {
-	friend class RenderBatch; // allow a render batch to access this class
+class RenderBatch;
+
+struct AnimationFrame {
+	ResourcePtr<Texture> mTexture;
+	std::vector<glm::vec2> mTexCoords; // texture coordinates for the vertices in the shape
+	std::vector<glm::vec2> mTexCoordsExtra; // texture coordinates for the extra vertices added by triangulation
+	
+	float mLayer;
+	glm::vec2 mMinST;
+	glm::vec2 mMaxST;
+};
+
+class Shape : public Polygon, public Renderable {
+	friend class RenderBatch;
 	
 	public :
-		std::string GetTag() const; // return the tag (type) of this renderable
+		Shape() = default;
+		explicit Shape(const std::vector<Contour>& contours, const CoordinateSpace& coordinateSpace = CoordinateSpace::Local);
+		explicit Shape(const ClipperLib::Paths& clipperPaths);
 		
-		std::vector<glm::vec2> GetPoints() const; // return the vector of relative points
-		std::vector<glm::vec2> GetAbsolutePoints() const; // return a vector of absolute points
-		void AddPoint(const glm::vec2 & point); // add a relative point to the shape
-		void AddPoints(const std::vector<glm::vec2> & points); // add a vector of relative points to the shape
-		void AddAbsolutePoint(const glm::vec2 & point); // add an absolute point to the shape
-		void AddAbsolutePoints(const std::vector<glm::vec2> & points); // add a vector of absolute points to the shape
-		void Clear(); // clear all points from the shape and reset bounds and bounding boxes
+		void AddContour(const Contour& contour, const CoordinateSpace& coordinateSpace = CoordinateSpace::Local);
+		void AddContours(const std::vector<Contour>& contours, const CoordinateSpace& coordinateSpace = CoordinateSpace::Local);
 		
-		// set the shape to a pre-defined shape
-		void MakeRectangle(const glm::vec2 & position, const glm::vec2 & size);
-		void MakeCircle(const glm::vec2 & position, const float & radius, const unsigned int & numPoints);
+		void Offset(const float& distance, const ClipperLib::JoinType& miterType = ClipperLib::jtRound, const double& miterLimit = 2.0d);
+		
+		void FromClipperPaths(const ClipperLib::Paths& clipperPaths);
+		
+		// return a copy of this shape with its transformations applied directly to its contours (transformations of new shape are reset back to default)
+		Shape GetTransformed() const;
+		
+		std::string GetTag() const;
+		
+		void Process();
+		
+		// set the winding rule for filled drawing (forces retriangulation)
+		void SetWindingRule(const WindingRule& windingRule);
+		
+		// add one or more animation frames to the shape from a sepecified texture or resource pointer
+		void AddFrame(ResourcePtr<Texture> texture, const unsigned int& layer, const std::vector<glm::vec2>& textureRect = {});
+		void AddFrame(Texture* texture, const unsigned int& layer, const std::vector<glm::vec2>& textureRect = {});
+		void AddFrames(ResourcePtr<Texture> texture, const unsigned int& layer, const unsigned int& numFrames, const unsigned int& numPerRow,
+				const unsigned int& numPerCol, const glm::ivec2& offset = glm::ivec2(0, 0));
+		void AddFrames(Texture* texture, const unsigned int& layer, const unsigned int& numFrames, const unsigned int& numPerRow,
+				const unsigned int& numPerCol, const glm::ivec2& offset = glm::ivec2(0, 0));
+		
+		// set the animation attributes
+		void SetAnimation(const float& speed, const unsigned int& start, const unsigned int& end, const int& loops = -1);
 	protected :
-		void UpdateGlobalBoundingBox(); // update the shape's global bounding box (according to it's transform)
-		void UpdateGlobalMask(); // update the shape's global mask (according to it's transform)
-		void CreateLocalMask(); // create a default local mask for the shape
-		RenderBatchData Upload(); // upload the shape to a render batch
+		RenderBatchData Upload();
 	private :
-		std::vector<glm::vec2> mPoints; // the relative points that make up the shape
+		void CalculateTexCoords(const std::vector<glm::vec2>& points, const std::vector<glm::vec2>& texCoordsMax, std::vector<glm::vec2>& texCoordsLocation);
+		void CreateVBOVertices(const std::vector<glm::vec2>& points, const glm::mat3& transform, RenderBatchData& batchData, std::vector<glm::vec2> texCoords);
+	private :
+		WindingRule mWindingRule = WindingRule::Odd;
+		std::vector< std::vector<VBOIndex> > mIndices = {{}, {}, {}, {}, {}}; // indices used to render this shape in various styles (line, fill, etc) stored for efficiency
+		std::vector<glm::vec2> mVertices; // any vertices added during the triangulation process stored for efficiency
 		
-		// the bounds of the shape (top-left and bottom-right)
-		std::vector<glm::vec2> mBounds = {glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 0.0f)};
+		std::vector<AnimationFrame> mFrames;
+		unsigned int mCurrentFrame = 0u;
+		bool mIsAnimated = false;
+		int mAnimationDirection = 1;
+		float mAnimationLimit = 0.0f;
+		float mAnimationTimer = 0.0f;
+		int mAnimationLoopCount = 0;
+		unsigned int mAnimationStartFrame = 0;
+		unsigned int mAnimationEndFrame = 0;
 };
 }
 

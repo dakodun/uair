@@ -33,63 +33,85 @@
 #include "renderable.hpp"
 
 namespace uair {
-void RenderBatch::Add(Renderable& renderable) {
-	// call the renderables upload function and add the result to the batch data container
-	mRenderData.push_back(renderable.Upload());
+void RenderBatch::Add(Renderable& renderable, const unsigned int& pass) {
+	std::vector<RenderBatchData>& vecRender = ((mRenderData.insert(IndexedRenderBatchData(pass, {}))).first)->second; // create a new vector for the specified pass, or return the existing one
+	vecRender.push_back(renderable.Upload()); // call the renderables upload function and add the result to the batch data container
 }
 
 void RenderBatch::Upload() {
-	if (mRenderData.size() > 0) {
-		std::vector<SegmentInfo> segmentInfo; // container holding segment data
+	std::map< unsigned int, std::vector<SegmentInfo> > segmentInfo; // container holding segment data
+	std::vector<uair::VBOVertex> verts; // final container for all vertex data
+	std::vector<uair::VBOIndex> inds; // final container for all index data
+	
+	GLuint offset = 0;
+	
+	std::size_t vertCount = 0; // the total current vertex count for the vbo
+	
+	for (auto iter = mRenderData.begin(); iter != mRenderData.end(); ++iter) {
+		unsigned int pass = iter->first; // get the render pass from the iterator
+		std::vector<RenderBatchData>& vecRender = iter->second; // get the vector from the iterator
+		std::vector<SegmentInfo>& vecSegment = ((segmentInfo.insert(IndexedSegmentInfo(pass, {}))).first)->second;
 		
-		// a lambda that is used to sort data by texture id (to ensure fewer binds)
-		auto sortDataLambda = [](const RenderBatchData & first, const RenderBatchData & second)->bool {
-			return (first.mTexID < second.mTexID);
-		};
-		
-		std::sort(mRenderData.begin(), mRenderData.end(), sortDataLambda); // sort the data by texture id
-		
-		GLuint currentTex = mRenderData[0].mTexID; // the current texture id we are checking
-		GLuint start = 0; GLuint end = mRenderData[0].mIndData.size() - 1; // the current start and end limits (inclusive)
-		for (unsigned int i = 1u; i < mRenderData.size(); ++i) { // for all batches of data
-			if (mRenderData[i].mTexID != currentTex) { // if the texture ids don't match
-				segmentInfo.emplace_back(currentTex, start, end); // add the current segment info to the container
+		if (vecRender.size() > 0) {
+			// a lambda that is used to sort data by texture id (to ensure fewer binds)
+			auto sortDataLambda = [](const RenderBatchData & first, const RenderBatchData & second)->bool {
+				return (first.mTexID < second.mTexID);
+			};
+			
+			std::sort(vecRender.begin(), vecRender.end(), sortDataLambda); // sort the data by texture id
+			
+			GLuint count = 0;
+			GLuint min = UINT_MAX;
+			GLuint max = 0;
+			
+			for (unsigned int i = 0u; i < vecRender.size(); ++i) { // for all batches of data...
+				for (unsigned int j = 0u; j < vecRender.at(i).mIndData.size(); ++j) { // for all indices in the batch...
+					vecRender.at(i).mIndData[j] += vertCount; // add the total vertex count to each of the indices
+					
+					min = std::min(min, vecRender.at(i).mIndData[j]); // store the smallest index
+					max = std::max(max, vecRender.at(i).mIndData[j]); // store the largest index
+				}
 				
-				currentTex = mRenderData[i].mTexID; // update the current texture id
-				start = end + 1; end = start + mRenderData[i].mIndData.size() - 1; // update the current limits
-				
-				continue; // go to the next loop iteration
+				vertCount += vecRender.at(i).mVertData.size(); // add the current batches vertex count to the total
 			}
 			
-			end += mRenderData[i].mIndData.size(); // add the current index count to the end limit
-		}
-		
-		segmentInfo.emplace_back(currentTex, start, end); // add the final segment info
-		
-		std::size_t vertCount = mRenderData[0].mVertData.size(); // get the number of vertices in the first batch of data
-		for (unsigned int i = 1u; i < mRenderData.size(); ++i) { // for all other batches of data
-			for (unsigned int j = 0u; j < mRenderData[i].mIndData.size(); ++j) { // for all indices in the batch
-				mRenderData[i].mIndData[j] += vertCount; // add the total vertex count to each of the indices
+			GLuint currentTex = vecRender.at(0).mTexID; // the current texture id we are checking
+			GLenum currentRenderMode = vecRender.at(0).mRenderMode; // the current render mode we are checking
+			for (unsigned int i = 0u; i < vecRender.size(); ++i) { // for all batches of data...
+				if (vecRender.at(i).mTexID != currentTex || vecRender.at(i).mRenderMode != currentRenderMode) { // if the texture ids or render modes don't match...
+					vecSegment.emplace_back(currentTex, currentRenderMode, count, offset, min, max); // add the current segment info to the container
+					
+					currentTex = vecRender.at(i).mTexID; // update the current texture id
+					currentRenderMode = vecRender.at(i).mRenderMode; // update the current render mode
+					offset += count;
+					count = 0;
+				}
+				
+				count += vecRender.at(i).mIndData.size(); // add the current index count to the end limit
 			}
 			
-			vertCount += mRenderData[i].mVertData.size(); // add the current batches vertex count to the total
+			vecSegment.emplace_back(currentTex, currentRenderMode, count, offset, min, max); // add the final segment info
+			offset += count;
+			
+			for (unsigned int i = 0u; i < vecRender.size(); ++i) { // for all batches of data
+				// add the data to the final containers
+				verts.insert(verts.end(), vecRender.at(i).mVertData.begin(), vecRender.at(i).mVertData.end());
+				inds.insert(inds.end(), vecRender.at(i).mIndData.begin(), vecRender.at(i).mIndData.end());
+			}
+			
+			vecRender.clear(); // clear any stored batch data
 		}
-		
-		std::vector<uair::VBOVertex> verts; // final container for all vertex data
-		std::vector<uair::VBOIndex> inds; // final container for all index data
-		for (unsigned int i = 0u; i < mRenderData.size(); ++i) { // for all batches of data
-			// add the data do the final containers
-			verts.insert(verts.end(), mRenderData[i].mVertData.begin(), mRenderData[i].mVertData.end());
-			inds.insert(inds.end(), mRenderData[i].mIndData.begin(), mRenderData[i].mIndData.end());
-		}
-		
-		mVBO.AddData(verts, inds, segmentInfo); // add the vertices, indices and segment data to the vbo
-		
-		mRenderData.clear(); // clear any stored batch data
 	}
+	
+	mVBO.AddData(verts, inds, segmentInfo); // add the vertices, indices and segment data to the vbo
+	mRenderData.clear(); // clear (now empty) batch data containers
 }
 
-void RenderBatch::Draw() {
-	mVBO.Draw(); // draw the vbo
+void RenderBatch::Draw(const unsigned int& fboID, const unsigned int& pass) {
+	mVBO.Draw(fboID, pass); // draw the vbo
+}
+
+void RenderBatch::Draw(const unsigned int& pass) {
+	mVBO.Draw(pass); // draw the vbo
 }
 }

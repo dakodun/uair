@@ -29,37 +29,78 @@
 #define UAIRPOLYGON_HPP
 
 #include <vector>
+#include <string>
 
 #include <glm/glm.hpp>
+#include <clipper.hpp>
+
+#include "transformable.hpp"
 
 namespace uair {
-// a polygon is a collection of points that form a polygon
-class Polygon {
+class Shape;
+
+enum class CoordinateSpace{
+	Local = 0u,
+	Global
+};
+
+// bezier related code based on the excellent "A Primer on Bézier Curves" (http://pomax.github.io/bezierinfo/#decasteljau) by Mike "Pomax" Kamermans
+// additional code from Bartosz Ciechanowski (http://ciechanowski.me/blog/page/2/)
+class Contour {
+	friend class Polygon;
+	friend class Shape;
+	
 	public :
-		std::vector<glm::vec2> GetPoints() const; // return the vector of relative points
-		std::vector<glm::vec2> GetAbsolutePoints() const; // return a vector of absolute points
-		void AddPoint(const glm::vec2 & point); // add a relative point to the polygon
-		void AddPoints(const std::vector<glm::vec2> & points); // add a vector of relative points to the polygon
-		void AddAbsolutePoint(const glm::vec2 & point); // add an absolute point to the polygon
-		void AddAbsolutePoints(const std::vector<glm::vec2> & points); // add a vector of absolute points to the polygon
-		void Clear(); // clear all points from the polygon and reset bounds
+		Contour() = default;
+		explicit Contour(const std::vector<glm::vec2>& points);
+		// explicit Contour(const std::string& svgPath);
+		explicit Contour(const ClipperLib::Path& clipperPath);
 		
-		glm::vec2 GetPosition() const; // return a copy of the polygon's position
-		void SetPosition(const glm::vec2 & newPos); // set the position of the polygon
+		std::vector<glm::vec2> GetPoints() const;
+		void AddPoint(const glm::vec2& point);
+		void AddPoints(const std::vector<glm::vec2>& points);
+		void AddBezier(const std::vector<glm::vec2>& controlPoints);
 		
-		// set the polygon to a pre-defined shape
-		void MakeRectangle(const glm::vec2 & position, const glm::vec2 & size);
-		void MakeCircle(const glm::vec2 & position, const float & radius, const unsigned int & numPoints);
+		std::vector<Contour> GetOffset(const float& distance, const ClipperLib::JoinType& miterType = ClipperLib::jtRound, const double& miterLimit = 2.0d);
 		
-		std::vector<glm::vec2> GetBounds() const; // return a copy of the bounds of the polygon
-		void Transform(const glm::mat3 & transform); // transform the polygon by a transformation matrix
-	private :
-		std::vector<glm::vec2> mPoints; // the relative points that make up the polygon
+		// operator std::string() const;
+		operator ClipperLib::Path() const;
+		// void FromSVGPath(const std::string& svgPath);
+		void FromClipperPath(const ClipperLib::Path& clipperPath);
+	protected :
+		void CreateBezier(const std::vector<glm::vec2>& controlPoints);
+		void UpdateBounds(const std::vector<glm::vec2>& points);
+	protected :
+		std::vector<glm::vec2> mPoints;
+		std::vector<glm::vec2> mBounds;
+};
+
+class Polygon : public Transformable {
+	public :
+		Polygon() = default;
+		explicit Polygon(const std::vector<Contour>& contours, const CoordinateSpace& coordinateSpace = CoordinateSpace::Local);
+		explicit Polygon(const ClipperLib::Paths& clipperPaths);
 		
-		// the bounds of the shape (top-left and bottom-right)
-		std::vector<glm::vec2> mBounds = {glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 0.0f)};
+		void AddContour(const Contour& contour, const CoordinateSpace& coordinateSpace = CoordinateSpace::Local);
+		void AddContours(const std::vector<Contour>& contours, const CoordinateSpace& coordinateSpace = CoordinateSpace::Local);
+		const std::vector<Contour>& GetContours() const;
 		
-		glm::vec2 mPosition; // the position of the polygon (essentially it's first point)
+		void Offset(const float& distance, const ClipperLib::JoinType& miterType = ClipperLib::jtRound, const double& miterLimit = 2.0d);
+		
+		operator ClipperLib::Paths() const;
+		void FromClipperPaths(const ClipperLib::Paths& clipperPaths);
+		
+		// return a copy of this polygon with its transformations applied directly to its contours (transformations of new polygon are reset back to default)
+		Polygon GetTransformed() const;
+	protected :
+		void UpdateGlobalBoundingBox();
+		void UpdateGlobalMask();
+		void CreateLocalMask();
+		
+		void UpdateBounds(const Contour& contour);
+	protected :
+		std::vector<Contour> mContours;
+		std::vector<glm::vec2> mBounds;
 };
 }
 

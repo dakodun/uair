@@ -25,11 +25,6 @@
 **		   source distribution.
 ** **************************************************************** */
 
-/** 
-* \file		window.hpp
-* \brief	Defines Window which inherits from the typedef WindowOS -- also defined here.
-**/
-
 #ifndef UAIRWINDOW_HPP
 #define UAIRWINDOW_HPP
 
