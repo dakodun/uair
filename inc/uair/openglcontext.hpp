@@ -41,8 +41,11 @@
 
 namespace uair {
 class OpenGLContext : public OpenGLContextOS {
+	friend class WindowOS;
+	
 	public :
 		OpenGLContext();
+		OpenGLContext(Window& window);
 		~OpenGLContext();
 };
 

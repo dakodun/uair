@@ -30,10 +30,13 @@
 #include <iostream>
 #include <vector>
 
+#include "openglcontext.hpp"
 #include "exception.hpp"
 #include "inputenums.hpp"
 
 namespace uair {
+unsigned int WindowWin32::mWindowCount = 0u;
+
 WindowWin32::WindowWin32() : WindowWin32("Uair Window", WindowDisplaySettings()) {
 	
 }
@@ -43,25 +46,25 @@ WindowWin32::WindowWin32(const std::string & windowTitle, const WindowDisplaySet
 	
 	try {
 		SetUpWindow(); // set up the window
-		SetUpOpenGL(); // set up opengl context and link it to our window
-		// [!] SET UP CONTEXT IN OWN CLASS AND LINK IT HERE
 	} catch (UairException& e) {
 		std::cout << e.what() << std::endl;
 		throw;
 	}
 }
 
-WindowWin32::~WindowWin32() {
-	if (mRenderContext) { // if we have a valid render context
-		wglMakeCurrent(0, 0); // make sure it is not current
-		wglDeleteContext(mRenderContext); // delete our render context
-		// [!] UNLINK CONTEXT HERE (NO NEED TO DELETE IT, THOUGH MAYBE MARK IT)
-		
-		mRenderContext = 0; // reset handle to 0
-	}
+WindowWin32::WindowWin32(WindowWin32&& other) : WindowWin32() {
+	swap(*this, other);
+}
 
+WindowWin32::~WindowWin32() {
 	if (mWindowHandle) { // if we have a valid window handle
 		if (mDeviceContext) { // if we have a valid device context
+			if (wglGetCurrentDC() == mDeviceContext) {
+				wglMakeCurrent(0, 0);
+				CURRENTCONTEXT = nullptr;
+				CURRENTCONTEXTWIN32 = nullptr;
+			}
+			
 			ReleaseDC(mWindowHandle, mDeviceContext); // release our dc
 		}
 		
@@ -71,8 +74,38 @@ WindowWin32::~WindowWin32() {
 		mDeviceContext = 0; // reset handle to 0
 		mOpen = false; // indicate window is now closed
 		
-		UnregisterClassW(L"UairGLWindow", GetModuleHandle(0)); // unregister our window class
+		--mWindowCount;
+		if (mWindowCount == 0u) {
+			UnregisterClassW(L"UairGLWindow", GetModuleHandle(0)); // unregister our window class
+		}
 	}
+}
+
+WindowWin32& WindowWin32::operator=(WindowWin32 other) {
+	swap(*this, other);
+	
+	return *this;
+}
+
+void swap(WindowWin32& first, WindowWin32& second) {
+	std::swap(first.mWindowHandle, second.mWindowHandle);
+	std::swap(first.mDeviceContext, second.mDeviceContext);
+	
+	std::swap(first.mEventQueue, second.mEventQueue);
+	
+	std::swap(first.mOpen, second.mOpen);
+	std::swap(first.mWinTitle, second.mWinTitle);
+	std::swap(first.mWinDS, second.mWinDS);
+	std::swap(first.mWinSize, second.mWinSize);
+	std::swap(first.mActualSize, second.mActualSize);
+	std::swap(first.mWinPos, second.mWinPos);
+	std::swap(first.mWinStyle, second.mWinStyle);
+	
+	std::swap(first.mHasFocus, second.mHasFocus);
+	std::swap(first.mCaptureCount, second.mCaptureCount);
+	
+	std::swap(first.storedGlobalMouse, second.storedGlobalMouse);
+	std::swap(first.storedLocalMouse, second.storedLocalMouse);
 }
 
 void WindowWin32::Process() {
@@ -116,11 +149,13 @@ bool WindowWin32::Display() const {
 }
 
 void WindowWin32::Quit() {
-	if (mWindowHandle) {
-		if (DestroyWindow(mWindowHandle) != 0) {
+	// [!]
+	
+	// if (mWindowHandle) {
+		// if (DestroyWindow(mWindowHandle) != 0) {
 			mOpen = false;
-		}
-	}
+		// }
+	// }
 }
 
 bool WindowWin32::IsOpen() const {
@@ -178,7 +213,33 @@ unsigned int WindowWin32::GetActualHeight() const {
 	return mActualSize.y; // return the actual height of the window (including borders and titlebar)
 }
 
+void WindowWin32::MakeCurrent(OpenGLContext& context) {
+	wglMakeCurrent(mDeviceContext, context.mRenderContext);
+	CURRENTCONTEXT = &context.mGlewContext;
+	CURRENTCONTEXTWIN32 = &context.mGlewContextWin32;
+}
+
 void WindowWin32::SetUpWindow() {
+	if (mWindowCount == 0u) {
+		// create window attributes
+		WNDCLASSEXW winClassExW;
+		winClassExW.cbSize		  = sizeof(WNDCLASSEXW);
+		winClassExW.style         = CS_OWNDC | CS_DBLCLKS;
+		winClassExW.lpfnWndProc   = &WindowWin32::WndProc;
+		winClassExW.cbClsExtra    = 0;
+		winClassExW.cbWndExtra    = 0;
+		winClassExW.hInstance     = GetModuleHandle(0);
+		winClassExW.hIcon         = 0;
+		winClassExW.hCursor       = ::LoadCursor(0, IDC_ARROW);
+		winClassExW.hbrBackground = 0;
+		winClassExW.lpszMenuName  = 0;
+		winClassExW.lpszClassName = L"UairGLWindow";
+		winClassExW.hIconSm		  = 0;
+		
+		RegisterClassExW(&winClassExW); // register window class
+		++mWindowCount;
+	}
+	
 	DWORD windowsStyle = 0; // no initial style
 	
 	{ // set the basic window styles
@@ -224,23 +285,6 @@ void WindowWin32::SetUpWindow() {
 	std::vector<wchar_t> wsBuffer(dwStringSize);
 	MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, mWinTitle.c_str(), static_cast<int>(mWinTitle.size()), &wsBuffer[0], dwStringSize);
 	
-	// create window attributes
-	WNDCLASSEXW winClassExW;
-	winClassExW.cbSize		  = sizeof(WNDCLASSEXW);
-	winClassExW.style         = CS_OWNDC | CS_DBLCLKS;
-	winClassExW.lpfnWndProc   = &WindowWin32::WndProc;
-	winClassExW.cbClsExtra    = 0;
-	winClassExW.cbWndExtra    = 0;
-	winClassExW.hInstance     = GetModuleHandle(0);
-	winClassExW.hIcon         = 0;
-	winClassExW.hCursor       = ::LoadCursor(0, IDC_ARROW);
-	winClassExW.hbrBackground = 0;
-	winClassExW.lpszMenuName  = 0;
-	winClassExW.lpszClassName = L"UairGLWindow";
-	winClassExW.hIconSm		  = 0;
-	
-	RegisterClassExW(&winClassExW); // register window class
-	
 	// create window
 	mWindowHandle = CreateWindowExW(windowsStyleEx,
 		L"UairGLWindow", &wsBuffer[0], windowsStyle,
@@ -256,7 +300,50 @@ void WindowWin32::SetUpWindow() {
 		throw UairException("Unable to get a valid device context."); // throw an exception
 	}
 	
+	PIXELFORMATDESCRIPTOR pfd = {
+		sizeof(PIXELFORMATDESCRIPTOR), 								// The size of the PFD data structure
+		1,															// The version number of the pfd
+		PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER, // Bit flags specifying properties of the PFD
+		PFD_TYPE_RGBA,												// The type of pixel data
+		static_cast<unsigned char>(mWinDS.mColourDepth),				// The colour-depth of the frame buffer
+		0, 0, 0, 0, 0, 0, 											// R, G and B bit number and shift count in the frame buffer
+		0, 0,														// Alpha bit number and shift count in the frame buffer (unsupported)
+		0,															// Number of bits in the accumulation buffer
+		0, 0, 0,													// R, G and B bit number in the accumulation buffer
+		0,															// Alpha bit number in the accumulation buffer
+		24,															// Number of bits in the depth (z) buffer
+		8,															// Number of bits in the stencil buffer
+		0,															// Number of auxiliary buffers in the frame buffer (unsupported)
+		PFD_MAIN_PLANE,												// Layer type (deprecated)
+		0,															// Number of overlay/underlay planes
+		0, 0, 0														// Layer mask (deprecated), Visible mask and Damage mask (deprecated)
+	};
+	
+	// find an appropriate pixel format supported by the device context that matches the given PFD
+	int indPixelFormat = ChoosePixelFormat(mDeviceContext, &pfd);
+	if (indPixelFormat == 0) {
+		throw UairException("No appropiate Pixel Format was found."); // an error has occured
+	}
+	
+	// set the pixel format of the device context to the pixel format found previously (indPixelFormat)
+	if (SetPixelFormat(mDeviceContext, indPixelFormat, &pfd) == false) {
+		throw UairException("Unable to set Pixel Format."); // an error has occured
+	}
+	
 	mOpen = true; // indicate window is now created and open
+	
+	{
+		RECT windowSize;
+		GetClientRect(mWindowHandle, &windowSize);
+		mWinSize.x = windowSize.right - windowSize.left;
+		mWinSize.y = windowSize.bottom - windowSize.top;
+		
+		POINT clientPos;
+		clientPos.x = windowSize.left;
+		clientPos.y = windowSize.top;
+		ClientToScreen(mWindowHandle, &clientPos);
+		mWinPos = glm::ivec2(clientPos.x, clientPos.y);
+	}
 	
 	{ // set initial mouse cursor position
 		POINT globalMouse;
@@ -280,243 +367,13 @@ void WindowWin32::SetUpWindow() {
 	}
 }
 
-void WindowWin32::SetUpOpenGL() {
-	try {
-		CreateContext();
-	} catch (UairException& e) {
-		throw;
-	}
+/* void WindowWin32::LinkContext(OpenGLContextWin32& context) {
+	mContextPtr = &context;
+	mContextPtr->mWindowPtr = this;
 	
-	{
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LEQUAL);
-		
-		glEnable(GL_CULL_FACE);
-		glFrontFace(GL_CW);
-		glCullFace(GL_BACK);
-		
-		glActiveTexture(GL_TEXTURE0);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD);
-		
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		
-		glClearDepth(1.0f);
-	}
-	
-	RECT windowSize;
-    GetClientRect(mWindowHandle, &windowSize);
-    mWinSize.x = windowSize.right - windowSize.left;
-    mWinSize.y = windowSize.bottom - windowSize.top;
-	
-	POINT clientPos;
-	clientPos.x = windowSize.left;
-	clientPos.y = windowSize.top;
-	ClientToScreen(mWindowHandle, &clientPos);
-	mWinPos = glm::ivec2(clientPos.x, clientPos.y);
-	
-	GLint width = static_cast<GLint>(mWinSize.x);
-	GLint height = static_cast<GLint>(mWinSize.y);
-	if (height == 0) {
-		height = 1;
-	}
-	
-	glViewport(0, 0, width, height);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
-void WindowWin32::CreateContext() {
-	HWND dummyWindowHandle;
-	{ // create a dummy window
-		std::string dummyTitle = "Dummy";
-		DWORD windowsStyle = WS_DISABLED;
-		DWORD windowsStyleEx = 0;
-		
-		RECT winRect;
-		winRect.left = static_cast<long>(0); winRect.right = static_cast<long>(1);
-		winRect.top = static_cast<long>(0); winRect.bottom = static_cast<long>(1);
-		
-		DWORD dwStringSize = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, dummyTitle.c_str(), -1, 0, 0);
-		std::vector<wchar_t> wsBuffer(dwStringSize);
-		MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, dummyTitle.c_str(), static_cast<int>(dummyTitle.size()), &wsBuffer[0], dwStringSize);
-		
-		// define a lambda as the WndProc since this window is only used during initialisation and then destroyed
-		/* auto wndProcLambda = [](HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)->LRESULT {
-			return DefWindowProcW(hWnd, message, wParam, lParam);
-		}; */
-		
-		WNDCLASSEXW winClassExW;
-		winClassExW.cbSize		  = sizeof(WNDCLASSEXW);
-		winClassExW.style         = CS_OWNDC | CS_DBLCLKS;
-		winClassExW.lpfnWndProc   = DefWindowProcW;
-		winClassExW.cbClsExtra    = 0;
-		winClassExW.cbWndExtra    = 0;
-		winClassExW.hInstance     = GetModuleHandle(0);
-		winClassExW.hIcon         = 0;
-		winClassExW.hCursor       = ::LoadCursor(0, IDC_ARROW);
-		winClassExW.hbrBackground = 0;
-		winClassExW.lpszMenuName  = 0;
-		winClassExW.lpszClassName = L"UairDummyWindow";
-		winClassExW.hIconSm		  = 0;
-		
-		RegisterClassExW(&winClassExW);
-		dummyWindowHandle = CreateWindowExW(windowsStyleEx, 
-			L"UairDummyWindow", &wsBuffer[0], windowsStyle,
-			0, 0, winRect.right - winRect.left, winRect.bottom - winRect.top,
-			0, 0, GetModuleHandle(0), this);
-		
-		if (!dummyWindowHandle) {
-			UnregisterClassW(L"UairDummyWindow", GetModuleHandle(0));
-			
-			throw UairException("Unable to create dummy window for proper context creation.");
-		}
-	}
-	
-	HDC dummyDeviceContext = GetDC(dummyWindowHandle);
-	{
-		// set the PFD for the DC
-		PIXELFORMATDESCRIPTOR pfd = {
-			sizeof(PIXELFORMATDESCRIPTOR), 								// The size of the PFD data structure
-			1,															// The version number of the pfd
-			PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER, // Bit flags specifying properties of the PFD
-			PFD_TYPE_RGBA,												// The type of pixel data
-			static_cast<unsigned char>(mWinDS.mColourDepth),			// The colour-depth of the frame buffer
-			0, 0, 0, 0, 0, 0, 											// R, G and B bit number and shift count in the frame buffer
-			0, 0,														// Alpha bit number and shift count in the frame buffer (unsupported)
-			0,															// Number of bits in the accumulation buffer
-			0, 0, 0,													// R, G and B bit number in the accumulation buffer
-			0,															// Alpha bit number in the accumulation buffer
-			24,															// Number of bits in the depth (z) buffer
-			8,															// Number of bits in the stencil buffer
-			0,															// Number of auxiliary buffers in the frame buffer (unsupported)
-			PFD_MAIN_PLANE,												// Layer type (deprecated)
-			0,															// Number of overlay/underlay planes
-			0, 0, 0														// Layer mask (deprecated), Visible mask and Damage mask (deprecated)
-		};
-		
-		// find an appropriate pixel format supported by the device context that matches the given PFD
-		int dummyIndPixelFormat = ChoosePixelFormat(dummyDeviceContext, &pfd);
-		if (dummyIndPixelFormat == 0) {
-			throw UairException("No appropiate Pixel Format was found."); // an error eccoured
-		}
-		
-		// set the pixel format of the dummy device context to the pixel format found previously (dummyIndPixelFormat)
-		if (SetPixelFormat(dummyDeviceContext, dummyIndPixelFormat, &pfd) == false) {
-			throw UairException("Unable to set Pixel Format."); // an error eccoured
-		}
-	}
-	
-	// create a dummy RC and set it as the current RC
-	HGLRC dummyRenderContext = wglCreateContext(dummyDeviceContext);
-	wglMakeCurrent(dummyDeviceContext, dummyRenderContext);
-	
-	if (!dummyRenderContext) { // 
-		throw UairException("Error creating dummy rendering context."); // throw exception if there was a problem
-	}
-	
-	bool supported = false;
-	
-	{
-		// initialise GLEW
-		GLenum err = glewInit();
-		if (err != GLEW_OK) { // if initialisation wasn't successful
-			std::string glewError = reinterpret_cast<const char*>(glewGetErrorString(err));
-			throw UairException(glewError);
-		}
-		
-		if (WGLEW_ARB_create_context) { // if we are able to create a 4.3 style RC
-			supported = true;
-		}
-		else { // otherwise 4.3 style RC is not supported
-			supported = false;
-		}
-	}
-	
-	{ // create our actual render context using our dummy context
-		if (mDeviceContext) {
-			// set the PFD for the DC
-			PIXELFORMATDESCRIPTOR pfd = {
-				sizeof(PIXELFORMATDESCRIPTOR), 								// The size of the PFD data structure
-				1,															// The version number of the pfd
-				PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER, // Bit flags specifying properties of the PFD
-				PFD_TYPE_RGBA,												// The type of pixel data
-				static_cast<unsigned char>(mWinDS.mColourDepth),			// The colour-depth of the frame buffer
-				0, 0, 0, 0, 0, 0, 											// R, G and B bit number and shift count in the frame buffer
-				0, 0,														// Alpha bit number and shift count in the frame buffer (unsupported)
-				0,															// Number of bits in the accumulation buffer
-				0, 0, 0,													// R, G and B bit number in the accumulation buffer
-				0,															// Alpha bit number in the accumulation buffer
-				24,															// Number of bits in the depth (z) buffer
-				8,															// Number of bits in the stencil buffer
-				0,															// Number of auxiliary buffers in the frame buffer (unsupported)
-				PFD_MAIN_PLANE,												// Layer type (deprecated)
-				0,															// Number of overlay/underlay planes
-				0, 0, 0														// Layer mask (deprecated), Visible mask and Damage mask (deprecated)
-			};
-			
-			// find an appropriate pixel format supported by the device context that matches the given PFD
-			int indPixelFormat = ChoosePixelFormat(mDeviceContext, &pfd);
-			if (indPixelFormat == 0) {
-				throw UairException("No appropiate Pixel Format was found."); // an error has occured
-			}
-			
-			// set the pixel format of the device context to the pixel format found previously (indPixelFormat)
-			if (SetPixelFormat(mDeviceContext, indPixelFormat, &pfd) == false) {
-				throw UairException("Unable to set Pixel Format."); // an error has occured
-			}
-			
-			if (supported == true) { // if we are able to create a 4.3 style RC
-				int attr[] = { // set attributes of RC for use with a 4.3 style RC
-					WGL_CONTEXT_MAJOR_VERSION_ARB, 4, // OpenGL major version number
-					WGL_CONTEXT_MINOR_VERSION_ARB, 3, // OpenGL minor version number
-					WGL_CONTEXT_PROFILE_MASK_ARB, 2, // Compatibility profile
-					0
-				};
-				
-				mRenderContext = wglCreateContextAttribsARB(mDeviceContext, 0, attr); // create 4.3 style RC
-			}
-			else { // otherwise 4.3 style RC is not supported
-				mRenderContext = wglCreateContext(mDeviceContext); // default to 2.1 style RC
-			}
-			
-			wglMakeCurrent(0, 0); // set current RC to 0
-			
-			if (!mRenderContext) { // if we failed to create a valid render context
-				throw UairException("Error creating rendering context."); // throw exception if there was a problem
-			}
-			
-			wglMakeCurrent(mDeviceContext, mRenderContext); // set our render context as current
-			
-			// initialise GLEW
-			GLenum err = glewInit();
-			if (err != GLEW_OK) { // if initialisation wasn't successful
-				std::string glewError = reinterpret_cast<const char*>(glewGetErrorString(err));
-				throw UairException(glewError);
-			}
-		}
-		else {
-			throw UairException("Unable to link contexts.");
-		}
-	}
-	
-	if (dummyWindowHandle) { // if we have a valid dummy window handle
-		if (dummyDeviceContext) {  // if we have a valid dummy device context
-			ReleaseDC(dummyWindowHandle, dummyDeviceContext); // release our dummy device context
-		}
-		
-		DestroyWindow(dummyWindowHandle); // destroy our dummy window
-		UnregisterClassW(L"UairDummyWindow", GetModuleHandle(0)); // unregister dummy window class
-	}
-	
-	if (dummyRenderContext) { // if we have a valid dummy window handle
-		wglDeleteContext(dummyRenderContext); // delete our dummy RC
-	}
-	
-	// set all of our handles to 0
-	dummyWindowHandle = 0;
-	dummyDeviceContext = 0;
-	dummyRenderContext = 0;
-}
+	context.Create(mDeviceContext, mWinDS);
+	context.SetUp(mWinSize);
+} */
 
 LRESULT CALLBACK WindowWin32::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	if (message == WM_NCCREATE) {
@@ -590,7 +447,7 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND & hWnd, const UINT & messa
 			return 0;
 		}
 		case WM_SETFOCUS : {
-			wglMakeCurrent(mDeviceContext, mRenderContext);
+			// wglMakeCurrent(mDeviceContext, mRenderContext);
 			
 			WindowEvent e;
 			e.type = WindowEvent::GainedFocusType;

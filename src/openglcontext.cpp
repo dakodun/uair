@@ -32,6 +32,10 @@ OpenGLContext::OpenGLContext() : OpenGLContextOS() {
 	
 }
 
+OpenGLContext::OpenGLContext(Window& window) : OpenGLContextOS(window) {
+	
+}
+
 OpenGLContext::~OpenGLContext() {
 	
 }

@@ -49,6 +49,8 @@ class ResourceManager {
 		ResourcePtr<Texture> AddTexture(const std::string& name, Texture&& res);
 		void RemoveTexture(const std::string& name);
 		ResourcePtr<Texture> GetTexture(const std::string& name);
+		
+		void Clear();
 	public :
 		ResourceStore<Texture> mTextureStore;
 };

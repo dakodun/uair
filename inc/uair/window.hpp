@@ -41,6 +41,8 @@
 
 namespace uair {
 class Window : public WindowOS {
+	friend class OpenGLContextOS;
+	
 	public :
 		Window();
 		Window(const std::string & windowTitle, const WindowDisplaySettings & settings,

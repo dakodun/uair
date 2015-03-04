@@ -25,42 +25,17 @@
 **		   source distribution.
 ** **************************************************************** */
 
-#ifndef UAIROPENGLCONTEXTWIN32_HPP
-#define UAIROPENGLCONTEXTWIN32_HPP
-
-#include <glm/glm.hpp>
-
 #include "init.hpp"
 
-namespace uair {
-class Window;
+#include <iostream>
 
-class OpenGLContextWin32 {
-	friend class Game;
-	friend class WindowWin32;
-	
-	public :
-		OpenGLContextWin32();
-		OpenGLContextWin32(Window& window);
-		OpenGLContextWin32(const OpenGLContextWin32& other) = delete;
-		OpenGLContextWin32(OpenGLContextWin32&& other);
-		virtual ~OpenGLContextWin32();
-		
-		OpenGLContextWin32& operator=(OpenGLContextWin32 other);
-		
-		friend void swap(OpenGLContextWin32& first, OpenGLContextWin32& second);
-		
-		void MakeCurrent(Window& window);
-	private :
-		void SetUpContext();
-		void SetUpContext(Window& window);
-		
-		void InitGlew(HDC& deviceContext, HGLRC& renderContext, GLEWContext& glewContext, WGLEWContext& glewContextWin32);
-	private :
-		HGLRC mRenderContext = 0;
-		GLEWContext mGlewContext;
-		WGLEWContext mGlewContextWin32;
-};
+WGLEWContext* CURRENTCONTEXTWIN32 = nullptr;
+GLEWContext* CURRENTCONTEXT = nullptr;
+
+extern GLEWContext* glewGetContext() {
+	return CURRENTCONTEXT;
 }
 
-#endif
+extern WGLEWContext* wglewGetContext() {
+	return CURRENTCONTEXTWIN32;
+}

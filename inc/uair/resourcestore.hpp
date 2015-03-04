@@ -82,6 +82,10 @@ class ResourceStore {
 			
 			throw std::runtime_error("error: resource with name " + name + " doesn't exist");
 		}
+		
+		void Clear() {
+			mStore.clear();
+		}
 	private :
 		std::map<std::string, T> mStore;
 };

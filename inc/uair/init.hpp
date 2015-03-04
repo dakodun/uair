@@ -25,11 +25,6 @@
 **		   source distribution.
 ** **************************************************************** */
 
-/** 
-* \file		init.hpp
-* \brief	Handles OS specific set up.
-**/
-
 #ifndef UAIRINIT_HPP
 #define UAIRINIT_HPP
 
@@ -46,13 +41,19 @@
 	
 	#include <windows.h>
 	#include <windowsx.h>
-	#include "glew.h"
-	#include "wglew.h"
+	
+	#include "GL/glew.h"
+	extern GLEWContext* glewGetContext();
+	extern GLEWContext* CURRENTCONTEXT;
+	
+	#include "GL/wglew.h"
+	extern WGLEWContext* wglewGetContext();
+	extern WGLEWContext* CURRENTCONTEXTWIN32;
 #elif defined(linux) || defined(__linux)
 	#define UAIRLINUX
 	
-	#include "glew.h"
-	#include "glxew.h"
+	#include "GL/glew.h"
+	#include "GL/glxew.h"
 #else
 	#error Unsupported OS
 #endif

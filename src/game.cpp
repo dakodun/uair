@@ -32,6 +32,8 @@
 #include "openglstates.hpp"
 
 namespace uair {
+bool Game::mDefaultShaderExists = false;
+
 Game::Game() {
 	mSceneManager = std::make_shared<SceneManager>();
 	mInputManager = std::make_shared<InputManager>();
@@ -44,8 +46,7 @@ Game::Game() {
 }
 
 Game::~Game() {
-	mSceneManager->mStore.clear();
-	mWindow.reset();
+	Clear();
 }
 
 void Game::Run() {
@@ -88,7 +89,9 @@ void Game::Run() {
 				mAccumulator -= mFrameLowerLimit; // decrease the accumulated time
 				
 				if (mOpen == false) { // if we are to quit the game...
-					break; // stop processing this scene
+					mWindow->Quit();
+					Clear();
+					break;
 				}
 				
 				if (mSceneManager->mNextScene) { // if there is a scene change waiting...
@@ -111,8 +114,9 @@ void Game::Run() {
 				mOpen = !(mSceneManager->mCurrScene->OnQuit()); // handle scene quitting logic, and see if we are still to quit
 				
 				if (mOpen == false) { // if we are still to quit...
-					mWindow->Quit(); // destroy the window
-					// mWindow.reset(); // remove the window
+					mWindow->Quit();
+					Clear();
+					break;
 				}
 			}
 		}
@@ -145,26 +149,64 @@ void Game::Render(const unsigned int & pass) {
 	glFlush();
 }
 
-bool Game::AddWindow() {
-	mWindow.reset();
-	mWindow = WindowPtr(new Window);
-	CreateDefaultShader();
-	
-	return true;
+void Game::Init() {
+	AddWindow(); // add a default window
+	AddContext(mWindow); // add a context using the window
+	MakeCurrent(mWindow, mContext); // make the window/context combo current
 }
 
-bool Game::AddWindow(const std::string & windowTitle, const WindowDisplaySettings & settings,
+void Game::Init(const std::string & windowTitle, const WindowDisplaySettings & settings,
 		const unsigned long & windowStyle) {
 	
-	mWindow.reset();
-	mWindow = WindowPtr(new Window(windowTitle, settings, windowStyle));
-	CreateDefaultShader();
+	AddWindow(windowTitle, settings, windowStyle); // add a custom window
+	AddContext(mWindow); // add a context using the window
+	MakeCurrent(mWindow, mContext); // make the window/context combo current
+}
+
+void Game::AddWindow() {
+	mWindow.reset(); // remove any current window
+	mWindow = WindowPtr(new Window); // add a new default window
+}
+
+void Game::AddWindow(const std::string & windowTitle, const WindowDisplaySettings & settings,
+		const unsigned long & windowStyle) {
 	
-	return true;
+	mWindow.reset(); // remove any current window
+	mWindow = WindowPtr(new Window(windowTitle, settings, windowStyle)); // add a new custom window
+}
+
+void Game::AddContext() {
+	mContext.reset(); // remove any current context
+	mContext = OpenGLContextPtr(new OpenGLContext()); // add a new default context
+}
+
+void Game::AddContext(WindowPtr windowPtr) {
+	mContext.reset(); // remove any current context
+	mContext = OpenGLContextPtr(new OpenGLContext(*windowPtr)); // add a new custom context
+}
+
+void Game::MakeCurrent(WindowPtr windowPtr, OpenGLContextPtr contextPtr) {
+	if (windowPtr && contextPtr) { // if we have a window and a context...
+		windowPtr->MakeCurrent(*contextPtr); // make the window/context combo current
+		
+		if (mDefaultShaderExists == false) { // if we don't yet have a default shader...
+			CreateDefaultShader(); // create a default shader
+			mDefaultShaderExists = true; // indicate that a default shader now exists
+		}
+	}
 }
 
 void Game::Quit() {
 	mOpen = false;
+}
+
+void Game::Clear() {
+	mDefaultShader.Clear(); // remove the default shader
+	mSceneManager->Clear(); // clear the scene manager
+	mResourceManager->Clear(); // clear the resource manager
+	
+	mContext.reset(); // remove the context
+	mWindow.reset(); // remove the window
 }
 
 void Game::CreateDefaultShader() {

@@ -27,6 +27,8 @@
 
 #include "scenemanager.hpp"
 
+#include <iostream>
+
 namespace uair {
 bool SceneManager::RequestSceneChange(Scene* newScene, const bool & restore) {
 	bool found = false; // indicates if we've found a stored scene or not
@@ -110,5 +112,11 @@ bool SceneManager::ChangeScene() {
 	}
 	
 	return false;
+}
+
+void SceneManager::Clear() {
+	mStore.clear();
+	mCurrScene.reset();
+	mNextScene.reset();
 }
 }

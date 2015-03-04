@@ -39,4 +39,8 @@ void ResourceManager::RemoveTexture(const std::string& name) {
 ResourcePtr<Texture> ResourceManager::GetTexture(const std::string& name) {
 	return mTextureStore.GetResource(name);
 }
+
+void ResourceManager::Clear() {
+	mTextureStore.Clear();
+}
 }

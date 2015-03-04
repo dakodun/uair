@@ -56,6 +56,8 @@ class SceneManager {
 			
 			throw std::runtime_error("invalid scene conversion");
 		}
+		
+		void Clear();
 	private :
 		bool ChangeScene();
 	private :

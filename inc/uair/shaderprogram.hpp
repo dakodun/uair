@@ -40,6 +40,7 @@
 namespace uair {
 class ShaderProgram {
 	public :
+		// [!] update copy/move/destruct/assign/swap
 		ShaderProgram() = default;
 		ShaderProgram(const ShaderProgram & copyFrom) = delete;
 		~ShaderProgram();
@@ -48,8 +49,6 @@ class ShaderProgram {
 		
 		void LinkProgram();
 		void UseProgram();
-		
-		GLint GetProgramID() const;
 		
 		void SetVertexShaderFromFile(const std::string & vertexShaderFile);
 		void VertexFromFile(const std::string & vertexShaderFile);
@@ -62,6 +61,9 @@ class ShaderProgram {
 		void FragmentFromString(const std::string & fragmentShaderString);
 		
 		void EnsureInitialised();
+		void Clear();
+		
+		GLint GetProgramID() const;
 	private :
 		GLuint mProgramID = 0;
 		

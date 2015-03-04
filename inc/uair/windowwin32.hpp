@@ -45,19 +45,26 @@
 #include "windowdisplaysettings.hpp"
 #include "windowevent.hpp"
 #include "windowstyles.hpp"
+#include "openglcontextwin32.hpp"
 
 namespace uair {
+class OpenGLContext;
+
 class WindowWin32 {
 	friend class Game;
+	friend class OpenGLContextWin32;
 	
 	public :
 		WindowWin32();
 		WindowWin32(const std::string & windowTitle, const WindowDisplaySettings & settings,
 				const unsigned long & windowStyle = WindowStyles::Visible | WindowStyles::Titlebar | WindowStyles::Close);
+		WindowWin32(const WindowWin32& other) = delete;
+		WindowWin32(WindowWin32&& other);
 		virtual ~WindowWin32();
 		
-		WindowWin32(const WindowWin32& copyFrom) = delete;
-		WindowWin32& operator=(const WindowWin32& other) = delete;
+		WindowWin32& operator=(WindowWin32 other);
+		
+		friend void swap(WindowWin32& first, WindowWin32& second);
 		
 		void Process();
 		bool Display() const;
@@ -73,21 +80,22 @@ class WindowWin32 {
 		
 		unsigned int GetActualWidth() const;
 		unsigned int GetActualHeight() const;
-	private :
-		void SetUpWindow();
 		
-		void SetUpOpenGL();
-		void CreateContext();
+		void MakeCurrent(OpenGLContext& context);
+	protected :
+		void SetUpWindow();
+		// void LinkContext(OpenGLContextWin32& context);
 		
 		LRESULT CALLBACK HandleEvents(const HWND & hWnd, const UINT & message, const WPARAM & wParam, const LPARAM & lParam);
 		
 		static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 		
 		Keyboard ToKeyboard(const WPARAM & code, const LPARAM & flags) const;
-	private :
+	protected :
+		static unsigned int mWindowCount;
+		
 		HWND mWindowHandle = 0;
 		HDC mDeviceContext = 0;
-		HGLRC mRenderContext = 0;
 		
 		std::deque<WindowEvent> mEventQueue;
 		

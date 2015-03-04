@@ -39,6 +39,7 @@
 #include "shaderprogram.hpp"
 #include "timer.hpp"
 #include "window.hpp"
+#include "openglcontext.hpp"
 
 namespace uair {
 class Game {
@@ -53,11 +54,12 @@ class Game {
 		void PostProcess(const unsigned int & processed);
 		void Render(const unsigned int & pass);
 		
-		bool AddWindow();
-		bool AddWindow(const std::string & windowTitle, const WindowDisplaySettings & settings,
+		void Init();
+		void Init(const std::string & windowTitle, const WindowDisplaySettings & settings,
 				const unsigned long & windowStyle = WindowStyles::Visible);
 		
 		void Quit();
+		void Clear();
 		
 		void CreateDefaultShader();
 		void SetShader();
@@ -146,18 +148,27 @@ class Game {
 		unsigned int mRenderPasses = 1u;
 	private :
 		void HandleEventQueue(const WindowEvent & e);
+		
+		void AddWindow();
+		void AddWindow(const std::string & windowTitle, const WindowDisplaySettings & settings,
+				const unsigned long & windowStyle = WindowStyles::Visible);
+		void AddContext();
+		void AddContext(WindowPtr windowPtr);
+		void MakeCurrent(WindowPtr windowPtr, OpenGLContextPtr contextPtr);
 	private :
 		float mTotalFrameTime = 0.0f;
 		float mAccumulator = 0.0f;
 		Timer mTimer;
 		
 		WindowPtr mWindow;
+		OpenGLContextPtr mContext;
 		bool mOpen = true;
 		
 		SceneManagerPtr mSceneManager;
 		InputManagerPtr mInputManager;
 		ResourceManagerPtr mResourceManager;
 		
+		static bool mDefaultShaderExists;
 		ShaderProgram mDefaultShader;
 		
 		FT_Library mFTLibrary;

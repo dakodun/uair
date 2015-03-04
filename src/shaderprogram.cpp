@@ -40,15 +40,7 @@
 
 namespace uair {
 ShaderProgram::~ShaderProgram() {
-	if (mProgramID != 0) {
-		if (OpenGLStates::mCurrentProgram == mProgramID) { // if our program is in use
-			glUseProgram(0);
-			OpenGLStates::mCurrentProgram = 0;
-		}
-		
-		glDeleteProgram(mProgramID); // destroy our glsl shader program
-		mProgramID = 0;
-	}
+	Clear();
 }
 
 void ShaderProgram::LinkProgram() {
@@ -136,10 +128,6 @@ void ShaderProgram::UseProgram() {
 	glUseProgram(mProgramID);
 }
 
-GLint ShaderProgram::GetProgramID() const {
-	return mProgramID;
-}
-
 void ShaderProgram::SetVertexShaderFromFile(const std::string & vertexShaderFile) {
 	// read the shader from the file into the buffer
 	std::ifstream vertShaderFile(vertexShaderFile.c_str());
@@ -198,5 +186,21 @@ void ShaderProgram::EnsureInitialised() {
 	if (mProgramID == 0) {
 		mProgramID = glCreateProgram(); // create a glsl shader program and store the id
 	}
+}
+
+void ShaderProgram::Clear() {
+	if (mProgramID != 0) {
+		if (OpenGLStates::mCurrentProgram == mProgramID) { // if our program is in use
+			glUseProgram(0);
+			OpenGLStates::mCurrentProgram = 0;
+		}
+		
+		glDeleteProgram(mProgramID); // destroy our glsl shader program
+		mProgramID = 0;
+	}
+}
+
+GLint ShaderProgram::GetProgramID() const {
+	return mProgramID;
 }
 }
