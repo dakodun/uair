@@ -46,6 +46,8 @@ namespace uair {
 namespace util {
 static const float EPSILON = 1e-6f;
 static const double PI = 3.1415926535897;
+extern unsigned int LOGLEVEL;
+extern std::string LOGLOCATION;
 
 enum {
 	LessThan = 0u,
@@ -65,6 +67,8 @@ extern int IsConvex(const glm::vec2& pointA, const glm::vec2& pointB, const glm:
 extern glm::vec2 ReflectPointByLine(const glm::vec2& pointA, const glm::vec2& pointB, const glm::vec2& pointC);
 
 extern std::string GetGLErrorStatus();
+extern void LogMessage(const unsigned int& level, const std::string& message);
+extern void LogMessage(const unsigned int& level, const std::string& message, const std::string& filename);
 
 template<typename T>
 extern int SignOf(const T& input) {

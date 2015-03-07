@@ -29,9 +29,13 @@
 
 #include <algorithm>
 #include <iostream>
+#include <fstream>
 
 namespace uair {
 namespace util {
+unsigned int LOGLEVEL = 0u;
+std::string LOGLOCATION = "";
+
 extern bool CompareFloats(const float& first, const unsigned int& comparison, const float& second, const float& variance) {
 	switch (comparison) {
 		case 0 : { // less than
@@ -174,6 +178,28 @@ extern std::string GetGLErrorStatus() {
 			return "our of memory";
 		default :
 			return "no error";
+	}
+}
+
+extern void LogMessage(const unsigned int& level, const std::string& message) {
+	if (level <= LOGLEVEL) {
+		std::cerr << message << '\n';
+	}
+}
+
+extern void LogMessage(const unsigned int& level, const std::string& message, const std::string& filename) {
+	if (level <= LOGLEVEL) {
+		std::streambuf *storedBuffer;
+		std::ofstream file;
+		file.open(filename.c_str(), std::ios::out | std::ios_base::app);
+		
+		if (file.is_open()) {
+			storedBuffer = std::cerr.rdbuf();
+			
+			std::cerr.rdbuf(file.rdbuf());
+			std::cerr << message << '\n';
+			std::cerr.rdbuf(storedBuffer);
+		}
 	}
 }
 
