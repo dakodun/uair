@@ -25,16 +25,13 @@
 **		   source distribution.
 ** **************************************************************** */
 
-/** 
-* \file		scene.hpp
-* \brief	Scene.
-**/
-
 #ifndef UAIRSCENE_HPP
 #define UAIRSCENE_HPP
 
 #include <string>
 #include <memory>
+
+#include "windowevent.hpp"
 
 namespace uair {
 class Scene {
@@ -45,10 +42,11 @@ class Scene {
 		
 		virtual ~Scene() = default;
 		
+		virtual void HandleEventQueue(const WindowEvent& e) = 0;
 		virtual void Input() = 0;
 		virtual void Process() = 0;
-		virtual void PostProcess(const unsigned int & processed) = 0;
-		virtual void Render(const unsigned int & pass) = 0;
+		virtual void PostProcess(const unsigned int& processed) = 0;
+		virtual void Render(const unsigned int& pass) = 0;
 		
 		virtual void OnEnter() = 0;
 		virtual void OnLeave() = 0;

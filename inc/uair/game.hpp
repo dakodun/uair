@@ -140,14 +140,14 @@ class Game {
 			return mFTLibrary;
 		}
 	public :
-		std::vector<WindowEvent> mEventQueue;
+		// std::vector<WindowEvent> mEventQueue;
 		
 		float mFrameLowerLimit = 0.02f;
 		float mFrameUpperLimit = 1.0f;
 		
 		unsigned int mRenderPasses = 1u;
 	private :
-		void HandleEventQueue(const WindowEvent & e);
+		void HandleEventQueue(const WindowEvent& e);
 		
 		void AddWindow();
 		void AddWindow(const std::string & windowTitle, const WindowDisplaySettings & settings,

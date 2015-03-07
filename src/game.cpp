@@ -54,11 +54,14 @@ void Game::Run() {
 		mWindow->Process(); // process the window
 		
 		while (!mWindow->mEventQueue.empty()) { // whilst there are events waiting in the queue...
-			WindowEvent e = mWindow->mEventQueue.front(); // get the event at the front of the window's queue
+			/* WindowEvent e = mWindow->mEventQueue.front(); // get the event at the front of the window's queue
 			mEventQueue.push_back(e); // add to our event queue
 			mWindow->mEventQueue.pop_front(); // remove it from the window's queue
 			
-			HandleEventQueue(e); // handle the event queue
+			HandleEventQueue(e); // handle the event queue */
+			
+			HandleEventQueue(mWindow->mEventQueue.front());
+			mWindow->mEventQueue.pop_front();
 		}
 		
 		for (unsigned int i = 0u; i < mRenderPasses; ++i) {
@@ -349,7 +352,7 @@ glm::ivec2 Game::GetGlobalMouseCoords() const {
 	return mInputManager->GetGlobalMouseCoords();
 }
 
-void Game::HandleEventQueue(const WindowEvent & e) {
+void Game::HandleEventQueue(const WindowEvent& e) {
 	switch (e.type) {
 		case WindowEvent::CloseType : {
 			mOpen = false;
@@ -382,6 +385,10 @@ void Game::HandleEventQueue(const WindowEvent & e) {
 		}
 		default :
 			break;
+	}
+	
+	if (mSceneManager->mCurrScene) {
+		mSceneManager->mCurrScene->HandleEventQueue(e);
 	}
 }
 
