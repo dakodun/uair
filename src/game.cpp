@@ -156,6 +156,14 @@ void Game::Init() {
 	AddWindow(); // add a default window
 	AddContext(mWindow); // add a context using the window
 	MakeCurrent(mWindow, mContext); // make the window/context combo current
+	
+	GLint width = static_cast<GLint>(mWindow->GetWidth());
+	GLint height = static_cast<GLint>(mWindow->GetWidth());
+	if (height == 0) {
+		height = 1;
+	}
+	
+	glViewport(0, 0, width, height);
 }
 
 void Game::Init(const std::string & windowTitle, const WindowDisplaySettings & settings,
@@ -164,6 +172,22 @@ void Game::Init(const std::string & windowTitle, const WindowDisplaySettings & s
 	AddWindow(windowTitle, settings, windowStyle); // add a custom window
 	AddContext(mWindow); // add a context using the window
 	MakeCurrent(mWindow, mContext); // make the window/context combo current
+	
+	GLint width = static_cast<GLint>(mWindow->GetWidth());
+	GLint height = static_cast<GLint>(mWindow->GetWidth());
+	if (height == 0) {
+		height = 1;
+	}
+	
+	glViewport(0, 0, width, height);
+}
+
+WindowPtr Game::GetWindow() {
+	return mWindow;
+}
+
+OpenGLContextPtr Game::GetContext() {
+	return mContext;
 }
 
 void Game::AddWindow() {

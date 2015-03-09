@@ -422,7 +422,7 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND & hWnd, const UINT & messa
 				mActualSize.y = winRect.bottom - winRect.top;
 			}
 			
-			{
+			if (wglGetCurrentContext() != 0) {
 				GLint width = static_cast<GLint>(e.size.width);
 				GLint height = static_cast<GLint>(e.size.height);
 				if (height == 0) {

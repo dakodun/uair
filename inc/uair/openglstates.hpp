@@ -25,11 +25,6 @@
 **		   source distribution.
 ** **************************************************************** */
 
-/** 
-* \file		openglstates.hpp
-* \brief	
-**/
-
 #ifndef UAIROPENGLSTATES_HPP
 #define UAIROPENGLSTATES_HPP
 
@@ -40,6 +35,13 @@
 namespace uair {
 class OpenGLStates {
 	public :
+		static bool BindArrayBuffer(const GLuint& id);
+		static bool BindElementArrayBuffer(const GLuint& id);
+		static bool UseProgram(const GLuint& id);
+		static bool BindTexture(const GLuint& id);
+		static bool BindFBO(const GLuint& id);
+		static bool BindRenderBuffer(const GLuint& id);
+		
 		static GLint mVertexLocation;
 		static GLint mNormalLocation;
 		static GLint mColourLocation;

@@ -57,6 +57,8 @@ class Game {
 		void Init();
 		void Init(const std::string & windowTitle, const WindowDisplaySettings & settings,
 				const unsigned long & windowStyle = WindowStyles::Visible);
+		WindowPtr GetWindow();
+		OpenGLContextPtr GetContext();
 		
 		void Quit();
 		void Clear();

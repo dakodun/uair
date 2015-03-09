@@ -25,11 +25,6 @@
 **		   source distribution.
 ** **************************************************************** */
 
-/** 
-* \file		shaderprogram.cpp
-* \brief	ShaderProgram.
-**/
-
 #include "shaderprogram.hpp"
 
 #include <iostream>
@@ -125,7 +120,7 @@ void ShaderProgram::LinkProgram() {
 }
 
 void ShaderProgram::UseProgram() {
-	glUseProgram(mProgramID);
+	OpenGLStates::UseProgram(mProgramID);
 }
 
 void ShaderProgram::SetVertexShaderFromFile(const std::string & vertexShaderFile) {
