@@ -148,6 +148,24 @@ void OpenGLContextWin32::SetUpContext(Window& window) {
 	
 	InitGlew(window.mDeviceContext, mRenderContext, mGlewContext, mGlewContextWin32); // initialise glew for the actual context
 	
+	{
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LEQUAL);
+		
+		glEnable(GL_CULL_FACE);
+		glFrontFace(GL_CW);
+		glCullFace(GL_BACK);
+		
+		glActiveTexture(GL_TEXTURE0);
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD);
+		
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		
+		glClearDepth(1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+	
 	wglMakeCurrent(storedDeviceContext, storedRenderContext); // restore the previous dc/rc combo
 	CURRENTCONTEXT = storedGlewContext; // restore the previous glew context
 	CURRENTCONTEXTWIN32 = storedGlewContextWin32; // restore the previous wglew context

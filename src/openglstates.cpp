@@ -25,14 +25,75 @@
 **		   source distribution.
 ** **************************************************************** */
 
-/** 
-* \file		openglstates.cpp
-* \brief	
-**/
-
 #include "openglstates.hpp"
 
 namespace uair {
+bool BindArrayBuffer(const GLuint& id) {
+	if (OpenGLStates::mCurrentArrayBuffer != id) {
+		glBindBuffer(GL_ARRAY_BUFFER, id);
+		OpenGLStates::mCurrentArrayBuffer = id;
+		
+		return true;
+	}
+	
+	return false;
+}
+
+bool BindElementArrayBuffer(const GLuint& id) {
+	if (OpenGLStates::mCurrentElementArrayBuffer != id) {
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
+		OpenGLStates::mCurrentElementArrayBuffer = id;
+		
+		return true;
+	}
+	
+	return false;
+}
+
+bool UseProgram(const GLuint& id) {
+	if (OpenGLStates::mCurrentProgram != id) {
+		glUseProgram(id);
+		OpenGLStates::mCurrentProgram = id;
+		
+		return true;
+	}
+	
+	return false;
+}
+
+bool BindTexture(const GLuint& id) {
+	if (OpenGLStates::mCurrentTexture != id) {
+		glBindTexture(GL_TEXTURE_2D_ARRAY, id);
+		OpenGLStates::mCurrentTexture = id;
+		
+		return true;
+	}
+	
+	return false;
+}
+
+bool OpenGLStates::BindFBO(const GLuint& id) {
+	if (OpenGLStates::mCurrentFBO != id) {
+		glBindFramebuffer(GL_FRAMEBUFFER, id);
+		OpenGLStates::mCurrentFBO = id;
+		
+		return true;
+	}
+	
+	return false;
+}
+
+bool BindRenderBuffer(const GLuint& id) {
+	if (OpenGLStates::mCurrentRenderBuffer != id) {
+		glBindRenderbuffer(GL_RENDERBUFFER, id);
+		OpenGLStates::mCurrentRenderBuffer = id;
+		
+		return true;
+	}
+	
+	return false;
+}
+
 GLint OpenGLStates::mVertexLocation = -1;
 GLint OpenGLStates::mNormalLocation = -1;
 GLint OpenGLStates::mColourLocation = -1;
