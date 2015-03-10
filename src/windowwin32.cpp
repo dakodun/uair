@@ -149,13 +149,7 @@ bool WindowWin32::Display() const {
 }
 
 void WindowWin32::Quit() {
-	// [!]
-	
-	// if (mWindowHandle) {
-		// if (DestroyWindow(mWindowHandle) != 0) {
-			mOpen = false;
-		// }
-	// }
+	mOpen = false;
 }
 
 bool WindowWin32::IsOpen() const {
