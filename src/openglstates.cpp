@@ -28,7 +28,7 @@
 #include "openglstates.hpp"
 
 namespace uair {
-bool BindArrayBuffer(const GLuint& id) {
+bool OpenGLStates::BindArrayBuffer(const GLuint& id) {
 	if (OpenGLStates::mCurrentArrayBuffer != id) {
 		glBindBuffer(GL_ARRAY_BUFFER, id);
 		OpenGLStates::mCurrentArrayBuffer = id;
@@ -39,7 +39,7 @@ bool BindArrayBuffer(const GLuint& id) {
 	return false;
 }
 
-bool BindElementArrayBuffer(const GLuint& id) {
+bool OpenGLStates::BindElementArrayBuffer(const GLuint& id) {
 	if (OpenGLStates::mCurrentElementArrayBuffer != id) {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
 		OpenGLStates::mCurrentElementArrayBuffer = id;
@@ -50,7 +50,7 @@ bool BindElementArrayBuffer(const GLuint& id) {
 	return false;
 }
 
-bool UseProgram(const GLuint& id) {
+bool OpenGLStates::UseProgram(const GLuint& id) {
 	if (OpenGLStates::mCurrentProgram != id) {
 		glUseProgram(id);
 		OpenGLStates::mCurrentProgram = id;
@@ -61,7 +61,7 @@ bool UseProgram(const GLuint& id) {
 	return false;
 }
 
-bool BindTexture(const GLuint& id) {
+bool OpenGLStates::BindTexture(const GLuint& id) {
 	if (OpenGLStates::mCurrentTexture != id) {
 		glBindTexture(GL_TEXTURE_2D_ARRAY, id);
 		OpenGLStates::mCurrentTexture = id;
@@ -83,7 +83,7 @@ bool OpenGLStates::BindFBO(const GLuint& id) {
 	return false;
 }
 
-bool BindRenderBuffer(const GLuint& id) {
+bool OpenGLStates::BindRenderBuffer(const GLuint& id) {
 	if (OpenGLStates::mCurrentRenderBuffer != id) {
 		glBindRenderbuffer(GL_RENDERBUFFER, id);
 		OpenGLStates::mCurrentRenderBuffer = id;
