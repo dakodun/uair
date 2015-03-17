@@ -44,65 +44,74 @@ Shape::Shape(const ClipperLib::Paths& clipperPaths) {
 }
 
 void Shape::AddContour(const Contour& contour, const CoordinateSpace& coordinateSpace) {
-	Polygon::AddContour(contour, coordinateSpace);
+	Polygon::AddContour(contour, coordinateSpace); // add contour to shape using parent function
 	
-	for (auto iter = mIndices.begin(); iter != mIndices.end(); ++iter) { // for all index groups...
-		iter->clear(); // clear the now invalidated indices
-	}
+	// reset invalid indices, extra triangulation vertices, colours and tex coords
+	std::vector< std::vector<VBOIndex> > indices = {{}, {}, {}, {}, {}};
+	std::vector<Triangulate::Vertex> vertices;
+	std::vector<glm::vec4> colourArrayExtra;
 	
-	mVertices.clear();
+	std::swap(mIndices, indices);
+	std::swap(mVertices, vertices);
+	std::swap(mColourArrayExtra, colourArrayExtra);
 	
-	for (auto frame = mFrames.begin(); frame != mFrames.end(); ++frame) {
-		frame->mTexCoords.clear();
-		frame->mTexCoordsExtra.clear();
-		
-		for (auto contour = mContours.begin(); contour != mContours.end(); ++contour) {
-			CalculateTexCoords(contour->GetPoints(), {frame->mMinST, frame->mMaxST}, frame->mTexCoords);
-		}
+	for (auto frame = mFrames.begin(); frame < mFrames.end(); ++frame) {
+		std::vector<glm::vec2> texCoordsExtra;
+		std::swap(frame->mTexCoordsExtra, texCoordsExtra);
 	}
 }
 
 void Shape::AddContours(const std::vector<Contour>& contours, const CoordinateSpace& coordinateSpace) {
-	Polygon::AddContours(contours, coordinateSpace);
+	Polygon::AddContours(contours, coordinateSpace); // add contours to shape using parent function
 	
-	for (auto iter = mIndices.begin(); iter != mIndices.end(); ++iter) { // for all index groups...
-		iter->clear(); // clear the now invalidated indices
-	}
+	// reset invalid indices, extra triangulation vertices, colours and tex coords
+	std::vector< std::vector<VBOIndex> > indices = {{}, {}, {}, {}, {}};
+	std::vector<Triangulate::Vertex> vertices;
+	std::vector<glm::vec4> colourArrayExtra;
 	
-	mVertices.clear();
+	std::swap(mIndices, indices);
+	std::swap(mVertices, vertices);
+	std::swap(mColourArrayExtra, colourArrayExtra);
 	
-	for (auto frame = mFrames.begin(); frame != mFrames.end(); ++frame) {
-		frame->mTexCoords.clear();
-		frame->mTexCoordsExtra.clear();
-		
-		for (auto contour = mContours.begin(); contour != mContours.end(); ++contour) {
-			CalculateTexCoords(contour->GetPoints(), {frame->mMinST, frame->mMaxST}, frame->mTexCoords);
-		}
+	for (auto frame = mFrames.begin(); frame < mFrames.end(); ++frame) {
+		std::vector<glm::vec2> texCoordsExtra;
+		std::swap(frame->mTexCoordsExtra, texCoordsExtra);
 	}
 }
 
 void Shape::Offset(const float& distance, const ClipperLib::JoinType& miterType, const double& miterLimit) {
 	std::vector<Contour> outContours;
-	for (auto contour = mContours.begin(); contour != mContours.end(); ++contour) {
-		std::vector<Contour> offsetContours = contour->GetOffset(distance, miterType, miterLimit);
-		outContours.insert(outContours.end(), offsetContours.begin(), offsetContours.end());
+	for (auto contour = mContours.begin(); contour != mContours.end(); ++contour) { // for all contours in shape...
+		std::vector<Contour> offsetContours = contour->GetOffset(distance, miterType, miterLimit); // offset contour
+		outContours.insert(outContours.end(), offsetContours.begin(), offsetContours.end()); // store new contour(s) (possible that a single contour produces multiple)
 	}
 	
-	mContours.clear();
-	mBounds.clear();
-	AddContours(outContours);
+	{ // clear invalid contours and bounds
+		std::vector<Contour> contours;
+		std::vector<glm::vec2> bounds;
+		
+		std::swap(mContours, contours);
+		std::swap(mBounds, bounds);
+	}
+	
+	AddContours(outContours); // add new offset contours to shape
 }
 
 void Shape::FromClipperPaths(const ClipperLib::Paths& clipperPaths) {
-	mContours.clear();
-	mBounds.clear();
-	
-	std::vector<Contour> contours;
-	for (auto path = clipperPaths.begin(); path != clipperPaths.end(); ++path) {
-		contours.emplace_back(*path);
+	{ // clear invalid contours and bounds
+		std::vector<Contour> contours;
+		std::vector<glm::vec2> bounds;
+		
+		std::swap(mContours, contours);
+		std::swap(mBounds, bounds);
 	}
 	
-	AddContours(contours);
+	std::vector<Contour> contours;
+	for (auto path = clipperPaths.begin(); path != clipperPaths.end(); ++path) { // for all clipper paths...
+		contours.emplace_back(*path); // convert to contours and store
+	}
+	
+	AddContours(contours); // add new contours to shape
 }
 
 Shape Shape::GetTransformed() const {
@@ -120,11 +129,14 @@ Shape Shape::GetTransformed() const {
 		trans *= util::GetTranslationMatrix(-mOrigin);
 	}
 	
-	{ // copy the mask and the animation data and properties (unchanged)
+	{ // copy the mask, per-vertex colouring, and animation data and properties (unchanged)
 		newShape.mLocalMask = mLocalMask;
 		newShape.mGlobalMask = mLocalMask;
 		
 		newShape.mWindingRule = mWindingRule;
+		
+		newShape.mColourArray = mColourArray;
+		newShape.mColourArrayExtra = mColourArrayExtra;
 		
 		newShape.mFrames = mFrames;
 		newShape.mCurrentFrame = mCurrentFrame;
@@ -163,19 +175,20 @@ std::string Shape::GetTag() const {
 }
 
 void Shape::Process() {
-	if (mIsAnimated) {
-		int currentFrame = mCurrentFrame;
-		while (mAnimationTimer >= mAnimationLimit) {
-			mAnimationTimer -= mAnimationLimit;
-			currentFrame += mAnimationDirection;
+	if (mIsAnimated) { // if shape is animated...
+		int currentFrame = mCurrentFrame; // get current animation frame
+		while (mAnimationTimer >= mAnimationLimit) { // while the animation timer eclipses the limit (speed)...
+			mAnimationTimer -= mAnimationLimit; // remove the limit (speed) from the timer
+			currentFrame += mAnimationDirection; // move the current frame one in the animation direction
 			
+			// if current frame is outwith defined bounds...
 			if (currentFrame < 0 || currentFrame >= static_cast<int>(mFrames.size()) || currentFrame == static_cast<int>(mAnimationEndFrame) + mAnimationDirection) {
-				currentFrame = mAnimationStartFrame;
+				currentFrame = mAnimationStartFrame; // reset to initial frame
 			}
 		}
 		
-		mCurrentFrame = currentFrame;
-		mAnimationTimer += GAME.mFrameLowerLimit;
+		mCurrentFrame = currentFrame; // set current animation frame
+		mAnimationTimer += GAME.mFrameLowerLimit; // increment animation timer
 	}
 }
 
@@ -183,16 +196,79 @@ void Shape::SetWindingRule(const WindingRule& windingRule) {
 	if (mWindingRule != windingRule) { // if winding rule is not already set (prevents unneccesary retriangulation)...
 		mWindingRule = windingRule; // set the winding rule
 		
-		std::vector<VBOIndex> indices; // create empty index array
-		std::vector<glm::vec2> vertices; // create empty vertex array
+		// reset invalid indices ('filled' rendering style only), extra triangulation vertices, colours and tex coords
+		std::vector<VBOIndex> indices;
+		std::vector<Triangulate::Vertex> vertices;
+		std::vector<glm::vec4> colourArrayExtra;
 		
-		// replace current arrays with the empty arrays
-		std::swap(indices, mIndices[4]);
-		std::swap(vertices, mVertices);
+		std::swap(mIndices[4], indices);
+		std::swap(mVertices, vertices);
+		std::swap(mColourArrayExtra, colourArrayExtra);
+		
+		for (auto frame = mFrames.begin(); frame < mFrames.end(); ++frame) {
+			std::vector<glm::vec2> texCoordsExtra;
+			std::swap(frame->mTexCoordsExtra, texCoordsExtra);
+		}
 	}
 }
 
-void Shape::AddFrame(ResourcePtr<Texture> texture, const unsigned int& layer, const std::vector<glm::vec2>& textureRect) {
+void Shape::AddColour(const std::vector<glm::vec4>& colour) {
+	mColourArray.insert(mColourArray.end(), colour.begin(), colour.end()); // add per-vertex colouring to store
+	CalculateExtraColour(); // recalculate colouring for any extra triangulation vertices
+}
+
+void Shape::AddFrame(ResourcePtr<Texture> texture, const unsigned int& layer) {
+	Texture* tex = texture.GetResource();
+	
+	if (tex) {
+		if (layer < tex->GetDepth()) {
+			const TextureData& texData = tex->GetData(layer);
+			
+			// set default values for the texture ST coordinate bounds
+			glm::vec2 min = glm::vec2(0.0f, 0.0f); // top-left of texture
+			glm::vec2 max = glm::vec2(texData.mSMax, texData.mTMax); // bottom-right of texture
+			
+			AnimationFrame frame; // create a new frame
+			frame.mTexture = texture; // set the texture pointer of the frame
+			frame.mMinST = min; frame.mMaxST = max; // set the ST coordinate limits
+			
+			for (auto contour = mContours.begin(); contour != mContours.end(); ++contour) { // for all contours in the shape...
+				CalculateTexCoords(contour->GetPoints(), {frame.mMinST, frame.mMaxST}, frame.mTexCoords); // calculate the texture coordinates for the contour for the current frame
+			}
+			
+			CalculateExtraTexCoords(frame); // recalculate texture coords for any extra triangulation vertices
+			frame.mLayer = layer;
+			mFrames.push_back(std::move(frame));
+		}
+	}
+}
+
+void Shape::AddFrameCoords(ResourcePtr<Texture> texture, const unsigned int& layer, const std::vector<glm::vec2>& textureCoords) {
+	Texture* tex = texture.GetResource();
+	
+	if (tex) {
+		if (layer < tex->GetDepth()) {
+			AnimationFrame frame; // create a new frame
+			frame.mTexture = texture; // set the texture pointer of the frame
+			
+			if (!textureCoords.empty()) {
+				frame.mMinST = textureCoords.front(); frame.mMaxST = textureCoords.front();
+				for (auto coord = textureCoords.begin() + 1; coord != textureCoords.end(); ++coord) {
+					frame.mMinST.x = std::min(frame.mMinST.x, coord->x); frame.mMinST.y = std::min(frame.mMinST.y, coord->y);
+					frame.mMaxST.x = std::min(frame.mMaxST.x, coord->x); frame.mMaxST.y = std::min(frame.mMaxST.y, coord->y);
+				}
+			}
+			
+			frame.mTexCoords = textureCoords;
+			
+			CalculateExtraTexCoords(frame); // recalculate texture coords for any extra triangulation vertices
+			frame.mLayer = layer;
+			mFrames.push_back(std::move(frame));
+		}
+	}
+}
+
+void Shape::AddFrameRect(ResourcePtr<Texture> texture, const unsigned int& layer, const std::vector<glm::vec2>& textureRect) {
 	Texture* tex = texture.GetResource();
 	
 	if (tex) {
@@ -217,19 +293,14 @@ void Shape::AddFrame(ResourcePtr<Texture> texture, const unsigned int& layer, co
 				CalculateTexCoords(contour->GetPoints(), {frame.mMinST, frame.mMaxST}, frame.mTexCoords); // calculate the texture coordinates for the contour for the current frame
 			}
 			
-			CalculateTexCoords(mVertices, {frame.mMinST, frame.mMaxST}, frame.mTexCoordsExtra);// calculate the texture coordinates for the extra triangulation vertices for the current frame
-			
+			CalculateExtraTexCoords(frame); // recalculate texture coords for any extra triangulation vertices
 			frame.mLayer = layer;
 			mFrames.push_back(std::move(frame));
 		}
 	}
 }
 
-void Shape::AddFrame(Texture* texture, const unsigned int& layer, const std::vector<glm::vec2>& textureRect) {
-	AddFrame(ResourcePtr<Texture>(texture), layer, textureRect);
-}
-
-void Shape::AddFrames(ResourcePtr<Texture> texture, const unsigned int& layer, const unsigned int& numFrames, const unsigned int& numPerRow,
+void Shape::AddFrameStrip(ResourcePtr<Texture> texture, const unsigned int& layer, const unsigned int& numFrames, const unsigned int& numPerRow,
 		const unsigned int& numPerCol, const glm::ivec2& offset) {
 	
 	Texture* tex = texture.GetResource();
@@ -260,8 +331,7 @@ void Shape::AddFrames(ResourcePtr<Texture> texture, const unsigned int& layer, c
 					CalculateTexCoords(contour->GetPoints(), {frame.mMinST, frame.mMaxST}, frame.mTexCoords); // calculate the texture coordinates for the contour for the current frame
 				}
 				
-				CalculateTexCoords(mVertices, {frame.mMinST, frame.mMaxST}, frame.mTexCoordsExtra);// calculate the texture coordinates for the extra triangulation vertices for the current frame
-				
+				CalculateExtraTexCoords(frame); // recalculate texture coords for any extra triangulation vertices
 				frame.mLayer = layer;
 				mFrames.push_back(std::move(frame));
 			}
@@ -269,54 +339,53 @@ void Shape::AddFrames(ResourcePtr<Texture> texture, const unsigned int& layer, c
 	}
 }
 
-void Shape::AddFrames(Texture* texture, const unsigned int& layer, const unsigned int& numFrames, const unsigned int& numPerRow,
+void Shape::AddFrame(Texture* texture, const unsigned int& layer) {
+	AddFrame(ResourcePtr<Texture>(texture), layer); // add naked pointer to resource pointer and call parent function
+}
+
+void Shape::AddFrameCoords(Texture* texture, const unsigned int& layer, const std::vector<glm::vec2>& textureCoords) {
+	AddFrameCoords(ResourcePtr<Texture>(texture), layer, textureCoords); // add naked pointer to resource pointer and call parent function
+}
+
+void Shape::AddFrameRect(Texture* texture, const unsigned int& layer, const std::vector<glm::vec2>& textureRect) {
+	AddFrameRect(ResourcePtr<Texture>(texture), layer, textureRect); // add naked pointer to resource pointer and call parent function
+}
+
+void Shape::AddFrameStrip(Texture* texture, const unsigned int& layer, const unsigned int& numFrames, const unsigned int& numPerRow,
 		const unsigned int& numPerCol, const glm::ivec2& offset) {
 	
-	AddFrames(ResourcePtr<Texture>(texture), layer, numFrames, numPerRow, numPerCol, offset);
+	AddFrameStrip(ResourcePtr<Texture>(texture), layer, numFrames, numPerRow, numPerCol, offset); // add naked pointer to resource pointer and call parent function
 }
 
 void Shape::SetAnimation(const float& speed, const unsigned int& start, const unsigned int& end, const int& loops) {
-	size_t frameCount = mFrames.size();
+	size_t frameCount = mFrames.size(); // get the frame count
 	
-	if (frameCount > 0) {
-		if (std::abs(speed) <= util::EPSILON) {
-			mIsAnimated = false;
-			mAnimationLimit = 0.0f;
+	if (frameCount > 0) { // if shape has any animation frames...
+		if (std::abs(speed) <= util::EPSILON) { // if the animation speed is zero...
+			mIsAnimated = false; // set shape as static
+			mAnimationLimit = 0.0f; // unset animation limit (speed)
 		}
-		else {
-			mIsAnimated = true;
-			mAnimationLimit = (1 / std::abs(speed));
-		}
-		
-		mAnimationDirection = util::SignOf(speed);
-		
-		mAnimationStartFrame = start;
-		if (mAnimationStartFrame < 0) {
-			mAnimationStartFrame = 0;
-		}
-		else if (mAnimationStartFrame >= frameCount) {
-			mAnimationStartFrame = frameCount - 1;
+		else { // otherwise shape animation speed is non-zero...
+			mIsAnimated = true; // set shape as animated
+			mAnimationLimit = (1 / std::abs(speed)); // set animation limit (speed)
 		}
 		
-		mAnimationEndFrame = end;
-		if (mAnimationEndFrame < 0) {
-			mAnimationEndFrame = 0;
-		}
-		else if (mAnimationEndFrame >= mFrames.size()) {
-			mAnimationEndFrame = frameCount - 1;
-		}
+		mAnimationDirection = util::SignOf(speed); // set direction of animation
 		
-		mAnimationLoopCount = loops;
+		mAnimationStartFrame = std::min(frameCount - 1, static_cast<size_t>(start)); // set the start frame
+		mAnimationEndFrame = std::min(frameCount - 1, static_cast<size_t>(end)); // set the end frame
 		
-		mAnimationTimer = 0.0f;
-		mCurrentFrame = mAnimationStartFrame;
+		mAnimationLoopCount = loops; // set the number of loops
+		
+		mAnimationTimer = 0.0f; // reset the current animation timer
+		mCurrentFrame = mAnimationStartFrame; // set the current frame to the initial frame
 	}
 }
 
 RenderBatchData Shape::Upload() {
-	RenderBatchData rbd;
+	RenderBatchData rbd; // rendering data struct
 	
-	glm::mat3 trans = mTransformation;
+	glm::mat3 trans = mTransformation; // get the transform matrix for shape
 	trans *= util::GetTranslationMatrix(mPosition - mOrigin);
 	
 	trans *= util::GetTranslationMatrix(mOrigin);
@@ -325,92 +394,94 @@ RenderBatchData Shape::Upload() {
 	trans *= util::GetScalingMatrix(mScale);
 	trans *= util::GetTranslationMatrix(-mOrigin);
 	
-	std::vector<unsigned int> vertCounts;
-	std::vector<glm::vec2> vertices;
-	for (auto iter = mContours.begin(); iter != mContours.end(); ++iter) {
-		const std::vector<glm::vec2>& points = iter->GetPoints();
-		vertCounts.push_back(points.size());
-		vertices.insert(vertices.end(), points.begin(), points.end());
+	std::vector<unsigned int> vertCounts; // count of vertices in each contour
+	std::vector<glm::vec2> vertices; // all vertices in shape (from each contour)
+	for (auto iter = mContours.begin(); iter != mContours.end(); ++iter) { // for all contours...
+		const std::vector<glm::vec2>& points = iter->GetPoints(); // get const reference to vertices in countour
+		vertCounts.push_back(points.size()); // store count of vertices
+		vertices.insert(vertices.end(), points.begin(), points.end()); // add vertices to vertex array
 	}
 	
-	std::vector<glm::vec2> texCoords;
-	if (mCurrentFrame < mFrames.size()) {
-		texCoords.insert(texCoords.end(), mFrames.at(mCurrentFrame).mTexCoords.begin(), mFrames.at(mCurrentFrame).mTexCoords.end());
+	{ // create rendering data for regular vertices
+		std::vector<glm::vec2> texCoords;
+		if (mCurrentFrame < mFrames.size()) {
+			texCoords.insert(texCoords.end(), mFrames.at(mCurrentFrame).mTexCoords.begin(), mFrames.at(mCurrentFrame).mTexCoords.end());
+		}
+		
+		CreateVBOVertices(vertices, trans, rbd, texCoords, mColourArray);
 	}
 	
-	CreateVBOVertices(vertices, trans, rbd, texCoords);
-	
-	size_t indexType = 0u;
-	if (mIndices.size() >= 5) {
+	size_t indexType = 0u; // type of indices for current render mode
+	if (mIndices.size() >= 5) { // if index array is valid...
 		switch (mRenderMode) { // depending on render mode...
 			case 0 : { // GL_POINTS
-				indexType = 0u;
+				indexType = 0u; // set index type to match render mode
 				
 				if (mIndices.at(indexType).empty()) { // if indices haven't been calculated yet...
-					unsigned int count = 0u;
-					for (auto iter = vertCounts.begin(); iter != vertCounts.end(); ++iter) {
-						for (unsigned int i = 0u; i < *iter; ++i) {
-							mIndices.at(indexType).emplace_back(i + count);
+					unsigned int count = 0u; // current index count
+					for (auto iter = vertCounts.begin(); iter != vertCounts.end(); ++iter) { // for all vertex counts...
+						for (unsigned int i = 0u; i < *iter; ++i) { // for 0 to vertex count...
+							mIndices.at(indexType).emplace_back(i + count); // add index to array
 						}
 						
-						count += *iter;
+						count += *iter; // increment index count
 					}
 				}
 				
 				break;
 			}
 			case 1 : { // GL_LINES
-				indexType = 1u;
+				indexType = 1u; // set index type to match render mode
 				
 				if (mIndices.at(indexType).empty()) { // if indices haven't been calculated yet...
-					unsigned int count = 0u;
-					for (auto iter = vertCounts.begin(); iter != vertCounts.end(); ++iter) {
-						for (unsigned int i = 0u; i < *iter - 1; i += 2) {
-							mIndices.at(indexType).emplace_back(i + count);
-							mIndices.at(indexType).emplace_back((i + 1) + count);
+					unsigned int count = 0u; // current index count
+					for (auto iter = vertCounts.begin(); iter != vertCounts.end(); ++iter) { // for all vertex counts...
+						for (unsigned int i = 0u; i < *iter - 1; i += 2) { // for 0 to vertex count (2 at a time to create seperated lines)...
+							mIndices.at(indexType).emplace_back(i + count); // add current index to array
+							mIndices.at(indexType).emplace_back((i + 1) + count); // add next index to array
 						}
 						
-						count += *iter;
+						count += *iter; // increment index count
 					}
 				}
 				
 				break;
 			}
 			case 2 : { // GL_LINE_LOOP
-				indexType = 2u;
+				indexType = 2u; // set index type to match render mode
 				
 				if (mIndices.at(indexType).empty()) { // if indices haven't been calculated yet...
-					mRenderMode = GL_LINES;
+					mRenderMode = GL_LINES; // set render mode to lines (we'll loop manually)
 					
-					unsigned int count = 0u;
-					for (auto iter = vertCounts.begin(); iter != vertCounts.end(); ++iter) {
-						for (unsigned int i = 0u; i < *iter - 1; ++i) {
-							mIndices.at(indexType).emplace_back(i + count);
-							mIndices.at(indexType).emplace_back((i + 1) + count);
+					unsigned int count = 0u; // current index count
+					for (auto iter = vertCounts.begin(); iter != vertCounts.end(); ++iter) { // for all vertex counts...
+						for (unsigned int i = 0u; i < *iter - 1; ++i) { // for 0 to vertex count...
+							mIndices.at(indexType).emplace_back(i + count); // add current index to array
+							mIndices.at(indexType).emplace_back((i + 1) + count); // add next index to array
 						}
 						
-						mIndices.at(indexType).emplace_back((*iter - 1) + count);
-						mIndices.at(indexType).emplace_back(count);
-						count += *iter;
+						mIndices.at(indexType).emplace_back((*iter - 1) + count); // add second last index
+						mIndices.at(indexType).emplace_back(count); // add last index to close the loop
+						count += *iter; // increment index count
 					}
 				}
 				
 				break;
 			}
 			case 3 : { // GL_LINE_STRIP
-				indexType = 3u;
+				indexType = 3u; // set index type to match render mode
 				
 				if (mIndices.at(indexType).empty()) { // if indices haven't been calculated yet...
-					mRenderMode = GL_LINES;
+					mRenderMode = GL_LINES; // set render mode to lines (we'll strip manually)
 					
-					unsigned int count = 0u;
-					for (auto iter = vertCounts.begin(); iter != vertCounts.end(); ++iter) {
-						for (unsigned int i = 0u; i < *iter - 1; ++i) {
-							mIndices.at(indexType).emplace_back(i + count);
-							mIndices.at(indexType).emplace_back((i + 1) + count);
+					unsigned int count = 0u; // current index count
+					for (auto iter = vertCounts.begin(); iter != vertCounts.end(); ++iter) { // for all vertex counts...
+						for (unsigned int i = 0u; i < *iter - 1; ++i) { // for 0 to vertex count...
+							mIndices.at(indexType).emplace_back(i + count); // add current index to array
+							mIndices.at(indexType).emplace_back((i + 1) + count); // add next index to array
 						}
 						
-						count += *iter;
+						count += *iter; // increment index count
 					}
 				}
 				
@@ -419,42 +490,49 @@ RenderBatchData Shape::Upload() {
 			case 4 : // GL_TRIANGLES
 			case 5 : // GL_TRIANGLE_STRIP
 			case 6 : { // GL_TRIANGLE_FAN
-				indexType = 4u;
+				indexType = 4u; // set index type to match render mode
 				
 				if (mIndices.at(indexType).empty() && mVertices.empty()) { // if indices and vertices haven't been calculated yet...
-					uair::Triangulate triangulate;
+					uair::Triangulate triangulate; // get a triangulator instance
 					
-					for (auto iter = mContours.begin(); iter != mContours.end(); ++iter) {
-						triangulate.AddContour(std::move(iter->GetPoints()));
+					for (auto iter = mContours.begin(); iter != mContours.end(); ++iter) { // for all contours that make the shape...
+						triangulate.AddContour(std::move(iter->GetPoints())); // add the contour to the triangulator
 					}
 					
-					Triangulate::Result result = triangulate.Process(mWindingRule);
-					mIndices.at(indexType) = result.second;
-					for (auto vertex = result.first.begin(); vertex != result.first.end(); ++vertex) {
-						mVertices.push_back(vertex->mPoint);
-						
-						for (auto frame = mFrames.begin(); frame != mFrames.end(); ++frame) {
-							glm::vec2 texCoord;
-							for (unsigned int i = 0u; i < vertex->mNeighbourIndices.size(); ++i) {
-								texCoord += frame->mTexCoords.at(vertex->mNeighbourIndices.at(i)) * vertex->mNeighbourWeights.at(i);
-							}
-							
-							frame->mTexCoordsExtra.push_back(std::move(texCoord));
-						}
-					}
+					Triangulate::Result result = triangulate.Process(mWindingRule); // triangulate using current winding rule and store the results
+					mVertices = result.first; // store any new vertices
+					mIndices.at(indexType) = result.second; // set the indices for regular and new vertices
 				}
 				
-				std::vector<glm::vec2> texCoords;
-				if (mCurrentFrame < mFrames.size()) {
-					texCoords.insert(texCoords.end(), mFrames.at(mCurrentFrame).mTexCoordsExtra.begin(), mFrames.at(mCurrentFrame).mTexCoordsExtra.end());
-				}
+				CalculateExtraColour(); // calculate per-vertex colouring for new vertices
 				
-				CreateVBOVertices(mVertices, trans, rbd, texCoords);
+				for (auto frame = mFrames.begin(); frame != mFrames.end(); ++frame) { // for all animation frames...
+					CalculateExtraTexCoords(*frame); // calculate texture coords for new vertices
+				}
 				
 				break;
 			}
 			default :
 				break;
+		}
+	}
+	
+	{ // create rendering data for extra vertices added during triangulation
+		std::vector<glm::vec2> texCoords;
+		if (mCurrentFrame < mFrames.size()) {
+			texCoords.insert(texCoords.end(), mFrames.at(mCurrentFrame).mTexCoordsExtra.begin(), mFrames.at(mCurrentFrame).mTexCoordsExtra.end());
+		}
+		
+		std::vector<glm::vec4> colours;
+		colours.insert(colours.end(), mColourArrayExtra.begin(), mColourArrayExtra.end());
+		
+		{
+			std::vector<glm::vec2> vertices;
+			for (auto vertex = mVertices.begin(); vertex != mVertices.end(); ++vertex) {
+				vertices.push_back(vertex->mPoint);
+			}
+			
+			CreateVBOVertices(vertices, trans, rbd, texCoords, colours);
 		}
 	}
 	
@@ -471,7 +549,7 @@ RenderBatchData Shape::Upload() {
 	return rbd; // return batch data
 }
 
-void Shape::CalculateTexCoords(const std::vector<glm::vec2>& points, const std::vector<glm::vec2>& texCoordsMax, std::vector<glm::vec2>& texCoordsLocation) {
+void Shape::CalculateTexCoords(const std::vector<glm::vec2>& points, const std::vector<glm::vec2>& texRect, std::vector<glm::vec2>& texCoordsLocation) {
 	if (mBounds.size() > 1) { // if valid bounds have been set up for the shape...
 		for (auto point = points.begin(); point != points.end(); ++point) { // for all points in the shape...
 			// get the ratio of the current point in regards to the bounds
@@ -479,37 +557,95 @@ void Shape::CalculateTexCoords(const std::vector<glm::vec2>& points, const std::
 					(point->y - mBounds.at(0).y) / (mBounds.at(1).y - mBounds.at(0).y));
 			
 			// calculate the texture coordinates in regards to the ratio of the current point and the texture rectangle of the current frame's texture
-			texCoordsLocation.emplace_back(((1 - ratio.x) * texCoordsMax.at(0).x) + (ratio.x * texCoordsMax.at(1).x),
-					((1 - ratio.y) * texCoordsMax.at(0).y) + (ratio.y * texCoordsMax.at(1).y));
+			texCoordsLocation.emplace_back(((1 - ratio.x) * texRect.at(0).x) + (ratio.x * texRect.at(1).x),
+					((1 - ratio.y) * texRect.at(0).y) + (ratio.y * texRect.at(1).y));
 		}
 	}
 }
 
-void Shape::CreateVBOVertices(const std::vector<glm::vec2>& points, const glm::mat3& transform, RenderBatchData& batchData, std::vector<glm::vec2> texCoords) {
-	float texAvailable = 0.0f;
-	float texLayer = 0.0f;
+void Shape::CreateVBOVertices(const std::vector<glm::vec2>& points, const glm::mat3& transform, RenderBatchData& batchData, std::vector<glm::vec2> texCoords, std::vector<glm::vec4> colours) {
+	float texAvailable = 0.0f; // is shape textured
+	float texLayer = 0.0f; // layer of current frame texture
 	
-	if (mCurrentFrame < mFrames.size()) {
-		texAvailable = 1.0f;
-		texLayer = mFrames.at(mCurrentFrame).mLayer;
+	if (mCurrentFrame < mFrames.size()) { // if shape is textured...
+		texAvailable = 1.0f; // shape is textured
+		texLayer = mFrames.at(mCurrentFrame).mLayer; // store layer of current frame texture
 	}
 	
-	int difference = points.size() - texCoords.size();
-	if (difference > 0) {
-		texCoords.insert(texCoords.end(), difference, glm::vec2(0.0f, 0.0f));
+	int difference = points.size() - texCoords.size(); // difference in count of texture coords
+	if (difference > 0) { // if a difference exists...
+		texCoords.insert(texCoords.end(), difference, glm::vec2(0.0f, 0.0f)); // add default texture coords to array
 	}
 	
-	for (unsigned int i = 0; i < points.size(); ++i) {
-		glm::vec3 pos = transform * glm::vec3(points.at(i), 1.0f);
+	difference = points.size() - colours.size(); // difference in count of colours
+	if (difference > 0) { // if a difference exists...
+		colours.insert(colours.end(), difference, glm::vec4(mColour, mAlpha)); // add default colours to array
+	}
+	
+	for (unsigned int i = 0; i < points.size(); ++i) { // for all vertices...
+		glm::vec3 pos = transform * glm::vec3(points.at(i), 1.0f); // get position of transformed vertex
 		
-		VBOVertex vert;
+		VBOVertex vert; // create vertex suitable for rendering
 		vert.mX = pos.x; vert.mY = pos.y; vert.mZ = mDepth + 1000.5f;
 		vert.mNX = 0.0f; vert.mNY = 0.0f; vert.mNZ = 1.0f;
 		vert.mS = texCoords.at(i).x; vert.mT = texCoords.at(i).y; vert.mLayer = texLayer;
-		vert.mR = mColour.x; vert.mG = mColour.y; vert.mB = mColour.z; vert.mA = mAlpha;
+		vert.mR = colours.at(i).x; vert.mG = colours.at(i).y; vert.mB = colours.at(i).z; vert.mA = colours.at(i).w;
 		vert.mTex = texAvailable;
 		
-		batchData.mVertData.push_back(vert);
+		batchData.mVertData.push_back(vert); // add rendering vertex to rendering data
+	}
+}
+
+void Shape::CalculateExtraColour() {
+	mColourArrayExtra.clear(); // clear any existing colours
+	
+	for (auto vertex = mVertices.begin(); vertex != mVertices.end(); ++vertex) { // for all extra vertices...
+		glm::vec4 colour; // new colour
+		
+		for (unsigned int i = 0u; i < vertex->mNeighbourIndices.size(); ++i) { // for all neighbouring vertices...
+			unsigned int index = vertex->mNeighbourIndices.at(i); // get neighbouring index
+			
+			if (index >= mColourArray.size()) { // if the neighbouring index is NOT a regular vertex... 
+				index -= mColourArray.size(); // adjust the neighbouring index
+				
+				if (index < mColourArrayExtra.size()) { // if the neighbouring index is valid...
+					colour += mColourArrayExtra.at(index) * vertex->mNeighbourWeights.at(i); // add weighted colour (and alpha)
+				}
+				else { // otherwise neighbouring index is not valid...
+					colour += glm::vec4(mColour, mAlpha) * vertex->mNeighbourWeights.at(i); // add standard colour (and alpha)
+				}
+			}
+			else { // otherwise neighbouring index is regular...
+				colour += mColourArray.at(index) * vertex->mNeighbourWeights.at(i); // add weighted colour (and alpha)
+			}
+		}
+		
+		mColourArrayExtra.push_back(std::move(colour)); // add new colour to array
+	}
+}
+
+void Shape::CalculateExtraTexCoords(AnimationFrame& frame) {
+	frame.mTexCoordsExtra.clear(); // clear any existing extra texture coords
+	
+	for (auto vertex = mVertices.begin(); vertex != mVertices.end(); ++vertex) { // for all extra vertices...
+		glm::vec2 texCoord; // new texture coord
+		
+		for (unsigned int i = 0u; i < vertex->mNeighbourIndices.size(); ++i) { // for all neighbouring vertices...
+			unsigned int index = vertex->mNeighbourIndices.at(i); // get the neighbouring index
+			
+			if (index >= frame.mTexCoords.size()) { // if the neighbouring index is NOT a regular vertex...
+				index -= frame.mTexCoords.size(); // adjust the neighbouring index
+				
+				if (index < frame.mTexCoordsExtra.size()) { // if the neighbouring index is valid...
+					texCoord += frame.mTexCoordsExtra.at(index) * vertex->mNeighbourWeights.at(i); // add the weighted texture coordinate
+				} // otherwise assumed default
+			}
+			else { // otherwise neighbouring index is regular...
+				texCoord += frame.mTexCoords.at(index) * vertex->mNeighbourWeights.at(i); // add the weighted texture coordinate
+			}
+		}
+		
+		frame.mTexCoordsExtra.push_back(std::move(texCoord)); // add new texture coord to array
 	}
 }
 }
