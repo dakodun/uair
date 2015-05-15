@@ -49,6 +49,9 @@ class FBO {
 		void AddTexture(const std::vector<GLenum>& attachments, const unsigned int& width, const unsigned int& height); // add a texture to the fbo and attach to specified points (a layer each)
 		void AddRenderBuffer(const GLenum& attachment, const GLenum& internalFormat, const unsigned int& width, const unsigned int& height); // add a render buffer to the fbo and attach to specified point
 		
+		std::vector< ResourcePtr<Texture> > GetTextures();
+		std::vector< ResourcePtr<RenderBuffer> > GetRenderBuffers();
+		
 		void EnsureInitialised(); // ensure the fbo is properly initialised before use
 		void Clear(); // clear the resources used by the fbo
 		

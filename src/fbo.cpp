@@ -99,6 +99,26 @@ void FBO::AddRenderBuffer(const GLenum& attachment, const GLenum& internalFormat
 	}
 }
 
+std::vector< ResourcePtr<Texture> > FBO::GetTextures() {
+	std::vector< ResourcePtr<Texture> > textures;
+	
+	for (auto texture = mTextures.begin(); texture != mTextures.end(); ++texture) {
+		textures.emplace_back(&(*texture));
+	}
+	
+	return textures;
+}
+
+std::vector< ResourcePtr<RenderBuffer> > FBO::GetRenderBuffers() {
+	std::vector< ResourcePtr<RenderBuffer> > renderBuffers;
+	
+	for (auto renderBuffer = mRenderBuffers.begin(); renderBuffer!= mRenderBuffers.end(); ++renderBuffer) {
+		renderBuffers.emplace_back(&(*renderBuffer));
+	}
+	
+	return renderBuffers;
+}
+
 void FBO::EnsureInitialised() {
 	if (mFBOID == 0) { // if no id has been assigned...
 		glGenFramebuffers(1, &mFBOID); // create this fbo and store assigned id
