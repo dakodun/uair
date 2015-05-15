@@ -39,9 +39,14 @@
 namespace uair {
 class Shape;
 
-enum class CoordinateSpace{
+enum class CoordinateSpace {
 	Local = 0u,
 	Global
+};
+
+enum class Winding {
+	CW = 0u,
+	CCW
 };
 
 // bezier related code based on the excellent "A Primer on Bézier Curves" (http://pomax.github.io/bezierinfo/#decasteljau) by Mike "Pomax" Kamermans
@@ -61,7 +66,9 @@ class Contour {
 		void AddPoints(const std::vector<glm::vec2>& points);
 		void AddBezier(const std::vector<glm::vec2>& controlPoints);
 		
-		std::vector<Contour> GetOffset(const float& distance, const ClipperLib::JoinType& miterType = ClipperLib::jtRound, const double& miterLimit = 2.0d);
+		std::vector<Contour> GetOffset(float distance, const ClipperLib::JoinType& miterType = ClipperLib::jtRound, const double& miterLimit = 2.0d);
+		Winding GetWinding() const;
+		Winding ReverseWinding();
 		
 		// operator std::string() const;
 		operator ClipperLib::Path() const;
@@ -85,7 +92,8 @@ class Polygon : public Transformable {
 		void AddContours(const std::vector<Contour>& contours, const CoordinateSpace& coordinateSpace = CoordinateSpace::Local);
 		const std::vector<Contour>& GetContours() const;
 		
-		void Offset(const float& distance, const ClipperLib::JoinType& miterType = ClipperLib::jtRound, const double& miterLimit = 2.0d);
+		void Offset(float distance, const ClipperLib::JoinType& miterType = ClipperLib::jtRound, const double& miterLimit = 2.0d);
+		void ReverseWinding();
 		
 		operator ClipperLib::Paths() const;
 		void FromClipperPaths(const ClipperLib::Paths& clipperPaths);

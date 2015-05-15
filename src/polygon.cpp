@@ -83,7 +83,11 @@ void Contour::AddBezier(const std::vector<glm::vec2>& controlPoints) {
 	}
 }
 
-std::vector<Contour> Contour::GetOffset(const float& distance, const ClipperLib::JoinType& miterType, const double& miterLimit) {
+std::vector<Contour> Contour::GetOffset(float distance, const ClipperLib::JoinType& miterType, const double& miterLimit) {
+	if (GetWinding() == Winding::CCW) { // reverse the offset direction if contour is ccw
+		distance = -distance;
+	}
+	
 	ClipperLib::ClipperOffset clipperOffset;
 	ClipperLib::Path inPath = static_cast<ClipperLib::Path>(*this);
 	ClipperLib::Paths outPaths;
@@ -98,6 +102,32 @@ std::vector<Contour> Contour::GetOffset(const float& distance, const ClipperLib:
 	}
 	
 	return outContours;
+}
+
+Winding Contour::GetWinding() const {
+	float area = 0.0f;
+	for (unsigned int i = 0u; i < mPoints.size(); ++i) {
+		area += (mPoints.at((i + 1) % mPoints.size()).x - mPoints.at(i).x) * (mPoints.at((i + 1) % mPoints.size()).x + mPoints.at(i).y);
+	}
+	
+	if (area >= 0.0f) {
+		return Winding::CCW;
+	}
+	
+	return Winding::CW;
+}
+
+Winding Contour::ReverseWinding() {
+	Winding result = Winding::CW;
+	if (GetWinding() == result) {
+		result = Winding::CCW;
+	}
+	
+	if (!mPoints.empty()) {
+		std::reverse(mPoints.begin() + 1, mPoints.end());
+	}
+	
+	return result;
 }
 
 Contour::operator ClipperLib::Path() const {
@@ -219,16 +249,37 @@ const std::vector<Contour>& Polygon::GetContours() const {
 	return mContours;
 }
 
-void Polygon::Offset(const float& distance, const ClipperLib::JoinType& miterType, const double& miterLimit) {
-	std::vector<Contour> outContours;
+void Polygon::Offset(float distance, const ClipperLib::JoinType& miterType, const double& miterLimit) {
+	ClipperLib::ClipperOffset clipperOffset;
+	ClipperLib::Paths outPaths;
+	clipperOffset.MiterLimit = miterLimit;
+	
 	for (auto contour = mContours.begin(); contour != mContours.end(); ++contour) {
-		std::vector<Contour> offsetContours = contour->GetOffset(distance, miterType, miterLimit);
-		outContours.insert(outContours.end(), offsetContours.begin(), offsetContours.end());
+		clipperOffset.AddPath(static_cast<ClipperLib::Path>(*contour), miterType, ClipperLib::etClosedPolygon);
 	}
 	
-	mContours.clear();
-	mBounds.clear();
-	AddContours(outContours);
+    clipperOffset.Execute(outPaths, distance);
+	
+	std::vector<Contour> outContours;
+	for (auto path = outPaths.begin(); path != outPaths.end(); ++path) {
+		outContours.emplace_back(*path);
+	}
+	
+	{ // clear invalid contours and bounds
+		std::vector<Contour> contours;
+		std::vector<glm::vec2> bounds;
+		
+		std::swap(mContours, contours);
+		std::swap(mBounds, bounds);
+	}
+	
+	AddContours(outContours); // add new offset contours to shape
+}
+
+void Polygon::ReverseWinding() {
+	for (auto contour = mContours.begin(); contour != mContours.end(); ++contour) {
+		contour->ReverseWinding();
+	}
 }
 
 Polygon::operator ClipperLib::Paths() const {
@@ -372,10 +423,10 @@ void Polygon::CreateLocalMask() {
 }
 
 void Polygon::UpdateBounds(const Contour& contour) {
-	if (!contour.mBounds.empty()) {
+	if (contour.mBounds.size() > 1) {
 		bool adjusted = false;
 		
-		if (mBounds.empty()) {
+		if (mBounds.size() < 2) {
 			mBounds.push_back(contour.mBounds.front());
 			mBounds.push_back(contour.mBounds.front());
 			adjusted = true;
