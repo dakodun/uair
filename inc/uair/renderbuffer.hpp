@@ -29,9 +29,10 @@
 #define UAIRRENDERBUFFER_HPP
 
 #include "init.hpp"
+#include "resource.hpp"
 
 namespace uair {
-class RenderBuffer {
+class RenderBuffer : public Resource<RenderBuffer> {
 	public :
 		RenderBuffer() = default;
 		RenderBuffer(const RenderBuffer& other) = delete;
