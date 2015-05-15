@@ -301,7 +301,6 @@ void Game::SetShader() {
 	OpenGLStates::mTexCoordLocation = glGetAttribLocation(mDefaultShader.GetProgramID(), "texCoordIn");
 	OpenGLStates::mTexExistsLocation = glGetAttribLocation(mDefaultShader.GetProgramID(), "textureExistsIn");
 	OpenGLStates::mTexLocation = glGetUniformLocation(mDefaultShader.GetProgramID(), "baseTex");
-	glUniform1i(OpenGLStates::mTexLocation, 0);
 	
 	OpenGLStates::mProjectionMatrixLocation = glGetUniformLocation(mDefaultShader.GetProgramID(), "vProj");
 	OpenGLStates::mViewMatrixLocation = glGetUniformLocation(mDefaultShader.GetProgramID(), "vView");
@@ -310,6 +309,7 @@ void Game::SetShader() {
 	glBindFragDataLocation(mDefaultShader.GetProgramID(), 0, "fragColour");
 	
 	mDefaultShader.UseProgram();
+	glUniform1i(OpenGLStates::mTexLocation, 0);
 }
 
 SceneManagerPtr Game::GetSceneManager() {
