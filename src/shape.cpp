@@ -79,11 +79,20 @@ void Shape::AddContours(const std::vector<Contour>& contours, const CoordinateSp
 	}
 }
 
-void Shape::Offset(const float& distance, const ClipperLib::JoinType& miterType, const double& miterLimit) {
+void Shape::Offset(float distance, const ClipperLib::JoinType& miterType, const double& miterLimit) {
+	ClipperLib::ClipperOffset clipperOffset;
+	ClipperLib::Paths outPaths;
+	clipperOffset.MiterLimit = miterLimit;
+	
+	for (auto contour = mContours.begin(); contour != mContours.end(); ++contour) {
+		clipperOffset.AddPath(static_cast<ClipperLib::Path>(*contour), miterType, ClipperLib::etClosedPolygon);
+	}
+	
+    clipperOffset.Execute(outPaths, distance);
+	
 	std::vector<Contour> outContours;
-	for (auto contour = mContours.begin(); contour != mContours.end(); ++contour) { // for all contours in shape...
-		std::vector<Contour> offsetContours = contour->GetOffset(distance, miterType, miterLimit); // offset contour
-		outContours.insert(outContours.end(), offsetContours.begin(), offsetContours.end()); // store new contour(s) (possible that a single contour produces multiple)
+	for (auto path = outPaths.begin(); path != outPaths.end(); ++path) {
+		outContours.emplace_back(*path);
 	}
 	
 	{ // clear invalid contours and bounds
@@ -384,22 +393,28 @@ void Shape::SetAnimation(const float& speed, const unsigned int& start, const un
 
 RenderBatchData Shape::Upload() {
 	RenderBatchData rbd; // rendering data struct
-	
-	glm::mat3 trans = mTransformation; // get the transform matrix for shape
-	trans *= util::GetTranslationMatrix(mPosition - mOrigin);
-	
-	trans *= util::GetTranslationMatrix(mOrigin);
-	trans *= util::GetRotationMatrix(mRotation);
-	trans *= util::GetSkewingMatrix(mSkew);
-	trans *= util::GetScalingMatrix(mScale);
-	trans *= util::GetTranslationMatrix(-mOrigin);
-	
 	std::vector<unsigned int> vertCounts; // count of vertices in each contour
-	std::vector<glm::vec2> vertices; // all vertices in shape (from each contour)
-	for (auto iter = mContours.begin(); iter != mContours.end(); ++iter) { // for all contours...
-		const std::vector<glm::vec2>& points = iter->GetPoints(); // get const reference to vertices in countour
-		vertCounts.push_back(points.size()); // store count of vertices
-		vertices.insert(vertices.end(), points.begin(), points.end()); // add vertices to vertex array
+	std::vector<glm::vec2> vertices; // all transformed vertices in shape (from each contour)
+	
+	{ // create arrays of transformed vertices and vertex counts
+		glm::mat3 transMat = mTransformation; // get the transform matrix for shape
+		transMat *= util::GetTranslationMatrix(mPosition - mOrigin); // translate by position offset (take into account origin offset)
+		
+		transMat *= util::GetTranslationMatrix(mOrigin); // translate to origin...
+		transMat *= util::GetRotationMatrix(mRotation); // ...rotate...
+		transMat *= util::GetSkewingMatrix(mSkew); // ...skew...
+		transMat *= util::GetScalingMatrix(mScale); // ...scale...
+		transMat *= util::GetTranslationMatrix(-mOrigin); // ...and then translate back from origin
+		
+		for (auto contour = mContours.begin(); contour != mContours.end(); ++contour) { // for all contours...
+			const std::vector<glm::vec2>& points = contour->GetPoints(); // get const reference to vertices in countour
+			vertCounts.push_back(points.size()); // store count of vertices
+			
+			for (auto vertex = points.begin(); vertex != points.end(); ++vertex) { // for all vertices in contour...
+				glm::vec3 pos = transMat * glm::vec3(*vertex, 1.0f); // get position of transformed vertex
+				vertices.emplace_back(pos.x, pos.y); // add transformed vertex
+			}
+		}
 	}
 	
 	{ // create rendering data for regular vertices
@@ -408,10 +423,11 @@ RenderBatchData Shape::Upload() {
 			texCoords.insert(texCoords.end(), mFrames.at(mCurrentFrame).mTexCoords.begin(), mFrames.at(mCurrentFrame).mTexCoords.end());
 		}
 		
-		CreateVBOVertices(vertices, trans, rbd, texCoords, mColourArray);
+		CreateVBOVertices(rbd, vertices, texCoords, mColourArray);
 	}
 	
 	size_t indexType = 0u; // type of indices for current render mode
+	GLenum renderMode = mRenderMode; // make a copy of the current render mode
 	if (mIndices.size() >= 5) { // if index array is valid...
 		switch (mRenderMode) { // depending on render mode...
 			case 0 : { // GL_POINTS
@@ -449,10 +465,9 @@ RenderBatchData Shape::Upload() {
 			}
 			case 2 : { // GL_LINE_LOOP
 				indexType = 2u; // set index type to match render mode
+				renderMode = GL_LINES; // set render mode to lines (we'll loop manually)
 				
 				if (mIndices.at(indexType).empty()) { // if indices haven't been calculated yet...
-					mRenderMode = GL_LINES; // set render mode to lines (we'll loop manually)
-					
 					unsigned int count = 0u; // current index count
 					for (auto iter = vertCounts.begin(); iter != vertCounts.end(); ++iter) { // for all vertex counts...
 						for (unsigned int i = 0u; i < *iter - 1; ++i) { // for 0 to vertex count...
@@ -470,10 +485,9 @@ RenderBatchData Shape::Upload() {
 			}
 			case 3 : { // GL_LINE_STRIP
 				indexType = 3u; // set index type to match render mode
+				renderMode = GL_LINES; // set render mode to lines (we'll strip manually)
 				
 				if (mIndices.at(indexType).empty()) { // if indices haven't been calculated yet...
-					mRenderMode = GL_LINES; // set render mode to lines (we'll strip manually)
-					
 					unsigned int count = 0u; // current index count
 					for (auto iter = vertCounts.begin(); iter != vertCounts.end(); ++iter) { // for all vertex counts...
 						for (unsigned int i = 0u; i < *iter - 1; ++i) { // for 0 to vertex count...
@@ -491,12 +505,17 @@ RenderBatchData Shape::Upload() {
 			case 5 : // GL_TRIANGLE_STRIP
 			case 6 : { // GL_TRIANGLE_FAN
 				indexType = 4u; // set index type to match render mode
+				renderMode = GL_TRIANGLES; // set render mode to triangles
 				
 				if (mIndices.at(indexType).empty() && mVertices.empty()) { // if indices and vertices haven't been calculated yet...
 					uair::Triangulate triangulate; // get a triangulator instance
 					
-					for (auto iter = mContours.begin(); iter != mContours.end(); ++iter) { // for all contours that make the shape...
-						triangulate.AddContour(std::move(iter->GetPoints())); // add the contour to the triangulator
+					size_t offset = 0u;
+					for (auto count = vertCounts.begin(); count != vertCounts.end(); ++count) {
+						std::vector<glm::vec2> contour(vertices.begin() + offset, vertices.begin() + offset + *count);
+						offset += *count;
+						
+						triangulate.AddContour(contour);
 					}
 					
 					Triangulate::Result result = triangulate.Process(mWindingRule); // triangulate using current winding rule and store the results
@@ -527,19 +546,19 @@ RenderBatchData Shape::Upload() {
 		colours.insert(colours.end(), mColourArrayExtra.begin(), mColourArrayExtra.end());
 		
 		{
-			std::vector<glm::vec2> vertices;
+			std::vector<glm::vec2> verticesExtra;
 			for (auto vertex = mVertices.begin(); vertex != mVertices.end(); ++vertex) {
-				vertices.push_back(vertex->mPoint);
+				verticesExtra.push_back(vertex->mPoint);
 			}
 			
-			CreateVBOVertices(vertices, trans, rbd, texCoords, colours);
+			CreateVBOVertices(rbd, verticesExtra, texCoords, colours);
 		}
 	}
 	
 	rbd.mIndData.insert(rbd.mIndData.end(), mIndices.at(indexType).begin(), mIndices.at(indexType).end()); // copy indices into render batch data
 	
 	rbd.mTexID = 0; // set texture id
-	rbd.mRenderMode = mRenderMode; // set render mode
+	rbd.mRenderMode = renderMode; // set render mode
 	rbd.mTag = GetTag(); // set renderables tag
 	
 	if (mCurrentFrame < mFrames.size()) { // if shape is textured...
@@ -563,7 +582,9 @@ void Shape::CalculateTexCoords(const std::vector<glm::vec2>& points, const std::
 	}
 }
 
-void Shape::CreateVBOVertices(const std::vector<glm::vec2>& points, const glm::mat3& transform, RenderBatchData& batchData, std::vector<glm::vec2> texCoords, std::vector<glm::vec4> colours) {
+void Shape::CreateVBOVertices(RenderBatchData& batchData, const std::vector<glm::vec2>& vertices, std::vector<glm::vec2> texCoords,
+		std::vector<glm::vec4> colours) {
+	
 	float texAvailable = 0.0f; // is shape textured
 	float texLayer = 0.0f; // layer of current frame texture
 	
@@ -572,23 +593,21 @@ void Shape::CreateVBOVertices(const std::vector<glm::vec2>& points, const glm::m
 		texLayer = mFrames.at(mCurrentFrame).mLayer; // store layer of current frame texture
 	}
 	
-	int difference = points.size() - texCoords.size(); // difference in count of texture coords
+	int difference = vertices.size() - texCoords.size(); // difference in count of texture coords
 	if (difference > 0) { // if a difference exists...
 		texCoords.insert(texCoords.end(), difference, glm::vec2(0.0f, 0.0f)); // add default texture coords to array
 	}
 	
-	difference = points.size() - colours.size(); // difference in count of colours
+	difference = vertices.size() - colours.size(); // difference in count of colours
 	if (difference > 0) { // if a difference exists...
 		colours.insert(colours.end(), difference, glm::vec4(mColour, mAlpha)); // add default colours to array
 	}
 	
-	for (unsigned int i = 0; i < points.size(); ++i) { // for all vertices...
-		glm::vec3 pos = transform * glm::vec3(points.at(i), 1.0f); // get position of transformed vertex
-		
+	for (unsigned int i = 0; i < vertices.size(); ++i) { // for all vertices...
 		VBOVertex vert; // create vertex suitable for rendering
-		vert.mX = pos.x; vert.mY = pos.y; vert.mZ = mDepth + 1000.5f;
+		vert.mX = vertices.at(i).x; vert.mY = vertices.at(i).y; vert.mZ = mDepth + 1000.5f;
 		vert.mNX = 0.0f; vert.mNY = 0.0f; vert.mNZ = 1.0f;
-		vert.mS = texCoords.at(i).x; vert.mT = texCoords.at(i).y; vert.mLayer = texLayer;
+		vert.mS = texCoords.at(i).x; vert.mT = 1.0f - texCoords.at(i).y; vert.mLayer = texLayer;
 		vert.mR = colours.at(i).x; vert.mG = colours.at(i).y; vert.mB = colours.at(i).z; vert.mA = colours.at(i).w;
 		vert.mTex = texAvailable;
 		

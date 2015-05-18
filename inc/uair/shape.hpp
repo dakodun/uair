@@ -61,7 +61,7 @@ class Shape : public Polygon, public Renderable {
 		void AddContours(const std::vector<Contour>& contours, const CoordinateSpace& coordinateSpace = CoordinateSpace::Local);
 		
 		// offset the shape by an amount (in/out)
-		void Offset(const float& distance, const ClipperLib::JoinType& miterType = ClipperLib::jtRound, const double& miterLimit = 2.0d);
+		void Offset(float distance, const ClipperLib::JoinType& miterType = ClipperLib::jtRound, const double& miterLimit = 2.0d);
 		
 		// create the shape from paths from the external clipper library
 		void FromClipperPaths(const ClipperLib::Paths& clipperPaths);
@@ -104,7 +104,8 @@ class Shape : public Polygon, public Renderable {
 		void CalculateTexCoords(const std::vector<glm::vec2>& points, const std::vector<glm::vec2>& texRect, std::vector<glm::vec2>& texCoordsLocation);
 		
 		// create vertices for rendering from the vertices, transform matrix, and texture coords and colours supplied
-		void CreateVBOVertices(const std::vector<glm::vec2>& points, const glm::mat3& transform, RenderBatchData& batchData, std::vector<glm::vec2> texCoords, std::vector<glm::vec4> colours);
+		void CreateVBOVertices(RenderBatchData& batchData, const std::vector<glm::vec2>& vertices, std::vector<glm::vec2> texCoords,
+				std::vector<glm::vec4> colours);
 		
 		// recalculate the colours for extra vertices added during triangulation
 		void CalculateExtraColour();
