@@ -30,32 +30,29 @@
 
 #include <string>
 #include <vector>
+#include <list>
 
 #include <glm/glm.hpp>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
 
-#include "resource.hpp"
-#include "texture.hpp"
-
-// LOAD FONT VECTORS FROM FILE <-- IN PROGRESS: IS DONE? [X]
-// CREATE OUTLINE SHAPES OF THEM <-- IN PROGRESS: IS DONE? [X]
-	// SIDE: ADD SUPPORT FOR HOLES IN SHAPES <-- IN PROGRESS: IS DONE? [X]
-// TEST VIA DRAWING THE GLYPHS <-- IN PROGRESS: IS DONE? [X]
-	// SIDE: ADD TRIANGULATION/TESSELATION <-- IN PROGRESS: IS DONE? [X]
-	// SIDE: ADD SUPPORT FOR INSETTING/OUTSETTING SHAPE <-- IN PROGRESS: IS DONE? [X]
-// OUTSET AND INSET THE GLYPHS TO CREATE A GRADIENT AT THE EDGES <-- IN PROGRESS: IS DONE? [ ]
-// DRAW TO TEXTURE AS A SIGNED DISTANCE FIELD
-// ADD SUPPORT FOR RENDERING VIA SIGNED DISTANCE FIELD
-// CLEAN UP
+#include "fbo.hpp"
 
 namespace uair {
+class RenderBatch;
 class Polygon;
+class Shape;
 
 class Font : public Resource<Font> {
 	public :
-		Font() = default;
+		struct Glyph { // associated with charcode in a map
+			// tex coords in texture
+			// font metrics (kerning, drop, ...)
+		};
+		
+		Font(const unsigned int& textureSize);
+		Font();
 		Font(const Font& other) = delete;
 		Font(Font&& other);
 		~Font();
@@ -65,12 +62,24 @@ class Font : public Resource<Font> {
 		friend void swap(Font& first, Font& second);
 		
 		bool LoadFromFile(const std::string& filename, const unsigned int& pointSize = 36u);
-		Polygon LoadGlyph(const char& charCode);
+		void LoadGlyph(const char& charCode);
+		void LoadGlyphs(const std::vector<char>& charCodes);
+	private :
+		Shape CreateGlyphShape(const char& charCode);
+		void UpdateTexture(const std::vector<Shape>& newShapes);
+		
+		void Pack(Shape& shape);
+		void PositionBase(Shape& baseShape, const unsigned int& outerOffsetCount, const float& offsetInc);
+		std::vector<Shape> CreateGradient(const Shape& baseShape, const unsigned int& innerOffsetCount, const unsigned int& outerOffsetCount, const float& offsetInc);
+		void RenderToFBO(FBO& fbo, RenderBatch& batch, const unsigned int& width, const unsigned int& height);
 	private :
 		FT_Face mFTFace = nullptr;
 		
-		// std::string mCharMap;
-		// Texture mTex;
+		unsigned int mTextureSize;
+		FBO mFBO;
+		
+		typedef std::pair<glm::ivec2, glm::ivec2> Rectangle;
+		std::list<Rectangle> mRectangles;
 };
 }
 
