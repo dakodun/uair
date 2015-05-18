@@ -72,6 +72,17 @@ bool Texture::AddFromFile(const std::string & fileName) {
 		mIsTextureNull = false; // indicate texture is no longer null
 	}
 	
+	{
+		std::vector<unsigned char> newData;
+		size_t increment = tempData.mWidth * 4u;
+		
+		for (unsigned int i = 0u; i < tempData.mHeight; ++i) {
+			newData.insert(newData.begin(), tempData.mData.begin() + (increment * i), tempData.mData.begin() + (increment * (i + 1)));
+		}
+		
+		std::swap(tempData.mData, newData);
+	}
+	
 	mData.push_back(std::move(tempData)); // move the temporary into the texture data store
 	return true;
 }
@@ -117,6 +128,13 @@ bool Texture::CreateTexture() {
 		iter->mTMax = static_cast<float>(iter->mHeight) / mHeight; // calculate the max t coordinate without padding
 		
 		if (!mIsTextureNull) { // if the texture isn't null...
+			for (unsigned int i = 0; i < padHeight; ++i) { // for all height padding...
+				for (unsigned int j = 0; j < iter->mWidth + padWidth; ++j) { // for the width of a row...
+					data.emplace_back(255); data.emplace_back(255); // add a white, transparent texel
+					data.emplace_back(255); data.emplace_back(0);
+				}
+			}
+			
 			for (unsigned int i = 0; i < iter->mHeight; ++i) { // for all rows
 				std::size_t max = (count + (iter->mWidth * 4)); // calculate the position of the end of the row
 				data.insert(data.end(), iter->mData.begin() + count, iter->mData.begin() + max); // add the row data for the current layer
@@ -127,13 +145,6 @@ bool Texture::CreateTexture() {
 				}
 				
 				count += iter->mWidth * 4; // update the row start position to the next row
-			}
-			
-			for (unsigned int i = 0; i < padHeight; ++i) { // for all height padding...
-				for (unsigned int j = 0; j < iter->mWidth + padWidth; ++j) { // for the width of a row...
-					data.emplace_back(255); data.emplace_back(255); // add a white, transparent texel
-					data.emplace_back(255); data.emplace_back(0);
-				}
 			}
 		}
 	}
@@ -169,10 +180,7 @@ void Texture::EnsureInitialised() {
 
 void Texture::Clear() {
 	if (mTextureID != 0) { // if texture has an assigned id...
-		if (OpenGLStates::mCurrentTexture == mTextureID) { // if texture is currently bound...
-			glBindTexture(GL_TEXTURE_2D, 0); // unbind texture
-			OpenGLStates::mCurrentTexture = 0; // set currently bound texture to none
-		}
+		OpenGLStates::BindTexture(0); // unbind texture
 		
 		glDeleteTextures(1, &mTextureID); // delete texture
 	}
