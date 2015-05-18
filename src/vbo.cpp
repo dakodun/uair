@@ -31,6 +31,7 @@
 
 #include "openglstates.hpp"
 #include "renderbatch.hpp"
+#include "fbo.hpp"
 
 namespace uair {
 VBO::~VBO() {
@@ -87,19 +88,30 @@ void VBO::AddData(const std::vector<VBOVertex>& vertData, const std::vector<VBOI
 	mSegmentInfo.insert(segmentInfo.begin(), segmentInfo.end());
 }
 
-void VBO::Draw(const unsigned int& fboID, const unsigned int& pass) {
+void VBO::Draw(const unsigned int& pass) {
+	Draw(0, pass);
+}
+
+void VBO::Draw(const FBO& fbo, const unsigned int& pass) {
+	Draw(fbo.GetFBOID(), pass);
+}
+
+void VBO::EnsureInitialised() {
+	if (mVertVBOID == 0) {
+		glGenBuffers(1, &mVertVBOID);
+	}
+	
+	if (mIndVBOID == 0) {
+		glGenBuffers(1, &mIndVBOID);
+	}
+}
+
+void VBO::Draw(const unsigned int& targetID, const unsigned int& pass) {
 	std::vector<SegmentInfo>& segmentInfo = ((mSegmentInfo.insert(IndexedSegmentInfo(pass, {}))).first)->second; // either create a new segment info vector or get the existing one
 	
 	if (!segmentInfo.empty()) { // if we have something to render this pass...
-		if (OpenGLStates::mCurrentArrayBuffer != mVertVBOID) {
-			glBindBuffer(GL_ARRAY_BUFFER, mVertVBOID);
-			OpenGLStates::mCurrentArrayBuffer = mVertVBOID;
-		}
-		
-		if (OpenGLStates::mCurrentElementArrayBuffer != mIndVBOID) {
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndVBOID);
-			OpenGLStates::mCurrentElementArrayBuffer = mIndVBOID;
-		}
+		OpenGLStates::BindArrayBuffer(mVertVBOID);
+		OpenGLStates::BindElementArrayBuffer(mIndVBOID);
 		
 		glUniformMatrix4fv(uair::OpenGLStates::mViewMatrixLocation, 1, GL_FALSE, &uair::OpenGLStates::mViewMatrix[0][0]);
 		glUniformMatrix4fv(uair::OpenGLStates::mModelMatrixLocation, 1, GL_FALSE, &uair::OpenGLStates::mModelMatrix[0][0]);
@@ -117,17 +129,13 @@ void VBO::Draw(const unsigned int& fboID, const unsigned int& pass) {
 		glVertexAttribPointer(uair::OpenGLStates::mTexCoordLocation, 3, GL_FLOAT, GL_TRUE, sizeof(uair::VBOVertex), (void*)(offsetof(uair::VBOVertex, mS)));
 		glVertexAttribPointer(uair::OpenGLStates::mTexExistsLocation, 1, GL_FLOAT, GL_TRUE, sizeof(uair::VBOVertex), (void*)(offsetof(uair::VBOVertex, mTex)));
 		
-		if (OpenGLStates::mCurrentFBO != fboID) {
-			glBindFramebuffer(GL_FRAMEBUFFER, fboID);
-			OpenGLStates::mCurrentFBO = fboID;
+		if (OpenGLStates::mCurrentFBO != targetID) {
+			glBindFramebuffer(GL_FRAMEBUFFER, targetID);
+			OpenGLStates::mCurrentFBO = targetID;
 		}
 		
 		for (unsigned int i = 0u; i < segmentInfo.size(); ++i) {
-			if (OpenGLStates::mCurrentTexture != segmentInfo[i].mTexID) {
-				glBindTexture(GL_TEXTURE_2D, segmentInfo[i].mTexID);
-				OpenGLStates::mCurrentTexture = segmentInfo[i].mTexID;
-			}
-			
+			OpenGLStates::BindTexture(segmentInfo[i].mTexID);
 			glDrawRangeElements(segmentInfo[i].mRenderMode, segmentInfo[i].mMinIndex, segmentInfo[i].mMaxIndex, segmentInfo[i].mIndicesCount, GL_UNSIGNED_INT, (const GLuint*)(0) + segmentInfo[i].mIndicesOffset);
 		}
 		
@@ -136,20 +144,6 @@ void VBO::Draw(const unsigned int& fboID, const unsigned int& pass) {
 		glDisableVertexAttribArray(uair::OpenGLStates::mColourLocation);
 		glDisableVertexAttribArray(uair::OpenGLStates::mNormalLocation);
 		glDisableVertexAttribArray(uair::OpenGLStates::mVertexLocation);
-	}
-}
-
-void VBO::Draw(const unsigned int& pass) {
-	Draw(0, pass);
-}
-
-void VBO::EnsureInitialised() {
-	if (mVertVBOID == 0) {
-		glGenBuffers(1, &mVertVBOID);
-	}
-	
-	if (mIndVBOID == 0) {
-		glGenBuffers(1, &mIndVBOID);
 	}
 }
 }

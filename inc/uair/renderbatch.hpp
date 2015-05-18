@@ -70,8 +70,8 @@ class RenderBatch {
 	public :
 		void Add(Renderable& renderable, const unsigned int& pass = 0); // add a renderable to the batch for the specified render pass
 		void Upload(); // upload the batch to vbo
-		void Draw(const unsigned int& fboID, const unsigned int& pass); // draw the specified pass to the specified framebuffer
 		void Draw(const unsigned int& pass = 0); // draw the specified pass to the default framebuffer
+		void Draw(const FBO& fbo, const unsigned int& pass); // draw the specified pass to the specified framebuffer
 	private :
 		typedef std::pair< unsigned int, std::vector<RenderBatchData> > IndexedRenderBatchData; // unsigned int/render batch data vector pair
 		typedef std::pair< unsigned int, std::vector<SegmentInfo> > IndexedSegmentInfo; // unsigned int/segment info vector pair

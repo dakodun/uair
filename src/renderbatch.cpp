@@ -107,11 +107,11 @@ void RenderBatch::Upload() {
 	mRenderData.clear(); // clear (now empty) batch data containers
 }
 
-void RenderBatch::Draw(const unsigned int& fboID, const unsigned int& pass) {
-	mVBO.Draw(fboID, pass); // draw the vbo
-}
-
 void RenderBatch::Draw(const unsigned int& pass) {
 	mVBO.Draw(pass); // draw the vbo
+}
+
+void RenderBatch::Draw(const FBO& fbo, const unsigned int& pass) {
+	mVBO.Draw(fbo, pass); // draw the vbo
 }
 }

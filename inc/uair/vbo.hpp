@@ -35,6 +35,7 @@
 
 namespace uair {
 class SegmentInfo;
+class FBO;
 
 typedef unsigned int VBOIndex;
 
@@ -57,10 +58,12 @@ class VBO {
 		
 		void AddData(const std::vector<VBOVertex>& vertData, const std::vector<VBOIndex>& indData);
 		void AddData(const std::vector<VBOVertex>& vertData, const std::vector<VBOIndex>& indData, const std::map< unsigned int, std::vector<SegmentInfo> >& segmentInfo);
-		void Draw(const unsigned int& fboID, const unsigned int& pass);
-		void Draw(const unsigned int& pass = 0);
+		void Draw(const unsigned int& pass = 0u);
+		void Draw(const FBO& fbo, const unsigned int& pass = 0u);
 		
 		void EnsureInitialised();
+	private :
+		void Draw(const unsigned int& targetID, const unsigned int& pass);
 	public :
 		GLenum mType = GL_DYNAMIC_DRAW;
 		std::size_t mMinimumSize = 0;
