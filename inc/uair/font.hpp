@@ -77,6 +77,8 @@ class Font : public Resource<Font> {
 		
 		unsigned int mTextureSize;
 		FBO mFBO;
+		Texture mTexture;
+		RenderBuffer mRenderBuffer;
 		
 		typedef std::pair<glm::ivec2, glm::ivec2> Rectangle;
 		std::list<Rectangle> mRectangles;

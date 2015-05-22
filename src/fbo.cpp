@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 2014 Iain M. Crawford
+**	Copyright (c) 20XX Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -49,74 +49,58 @@ FBO& FBO::operator=(FBO other) {
 
 void swap(FBO& first, FBO& second) {
 	std::swap(first.mFBOID, second.mFBOID);
-	
-	std::swap(first.mTextures, second.mTextures);
-	std::swap(first.mRenderBuffers, second.mRenderBuffers);
 }
 
-void FBO::AddTexture(const std::vector<GLenum>& attachments, const unsigned int& width, const unsigned int& height) {
-	glGetError();
+bool FBO::AttachTexture(ResourcePtr<Texture> texture, const GLenum& attachmentPoint, const GLint& textureLayer, const GLint& mipmapLevel) {
+	return AttachTexture(texture.GetResource(), attachmentPoint, textureLayer, mipmapLevel); // call member function with raw pointer
+}
+
+bool FBO::AttachTexture(Texture* texture, const GLenum& attachmentPoint, const GLint& textureLayer, const GLint& mipmapLevel) {
+	if (!texture) { // if pointer isn't valid...
+		util::LogMessage(1, "invalid texture pointer"); // log an error message
+		return false; // return failure
+	}
+	
 	EnsureInitialised(); // ensure this fbo has been set up properly
+	OpenGLStates::BindFBO(mFBOID); // bind the fbo as current
 	
-	if (OpenGLStates::mCurrentFBO != mFBOID) {
-		glBindFramebuffer(GL_FRAMEBUFFER, mFBOID);
-		OpenGLStates::mCurrentFBO = mFBOID;
+	glFramebufferTexture3D(GL_FRAMEBUFFER, attachmentPoint, GL_TEXTURE_2D_ARRAY, texture->GetTextureID(), mipmapLevel, textureLayer); // attach the texture to the specified point
+	
+	GLenum err = glCheckFramebufferStatus(GL_FRAMEBUFFER); // check status of the fbo
+	if (err != GL_FRAMEBUFFER_COMPLETE) { // if an error occured...
+		util::LogMessage(1, util::ToString(err)); // log the error message
+		return false; // return failure
 	}
 	
-	mTextures.emplace_back(); // add a new texture to the store
-	
-	for (unsigned int i = 0; i < attachments.size(); ++i) { // for all requested attachment points...
-		mTextures.back().AddFromMemory({}, width, height); // add a new empty layer to the texture
-	}
-	
-	mTextures.back().CreateTexture(); // set up the new texture
-	
-	for (unsigned int i = 0; i < attachments.size(); ++i) { // for all requested attachment points...
-		glFramebufferTexture3D(GL_FRAMEBUFFER, attachments.at(i), GL_TEXTURE_2D_ARRAY, mTextures.back().GetTextureID(), 0, i); // attach the layer of the new texture to the specified point
-	}
-	
-	GLenum err = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	if (err != GL_FRAMEBUFFER_COMPLETE) {
-		std::clog << err << '\n';
-	}
+	return true; // return success
 }
 
-void FBO::AddRenderBuffer(const GLenum& attachment, const GLenum& internalFormat, const unsigned int& width, const unsigned int& height) {
+bool FBO::AttachRenderBuffer(ResourcePtr<RenderBuffer> renderBuffer, const GLenum& attachmentPoint) {
+	return AttachRenderBuffer(renderBuffer.GetResource(), attachmentPoint); // call member function with raw pointer
+}
+
+bool FBO::AttachRenderBuffer(RenderBuffer* renderBuffer, const GLenum& attachmentPoint) {
+	if (!renderBuffer) { // if pointer isn't valid...
+		util::LogMessage(1, "invalid render buffer pointer"); // log an error message
+		return false; // return failure
+	}
+	
 	EnsureInitialised(); // ensure this fbo has been set up properly
-	if (OpenGLStates::mCurrentFBO != mFBOID) {
-		glBindFramebuffer(GL_FRAMEBUFFER, mFBOID);
-		OpenGLStates::mCurrentFBO = mFBOID;
+	OpenGLStates::BindFBO(mFBOID); // bind the fbo as current
+	
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachmentPoint, GL_RENDERBUFFER, renderBuffer->GetRenderBufferID()); // attach the render buffer to the specified point
+	
+	GLenum err = glCheckFramebufferStatus(GL_FRAMEBUFFER); // check status of the fbo
+	if (err != GL_FRAMEBUFFER_COMPLETE) { // if an error occured...
+		util::LogMessage(1, util::ToString(err)); // log the error message
+		return false; // return failure
 	}
 	
-	mRenderBuffers.emplace_back(); // add a new render buffer to the store
-	mRenderBuffers.back().CreateRenderBuffer(internalFormat, width, height); // set up the new render buffer using supplied data
-	
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, mRenderBuffers.back().GetRenderBufferID()); // attach the new render buffer to the specified point
-	
-	GLenum err = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	if (err != GL_FRAMEBUFFER_COMPLETE) {
-		std::clog << err << '\n';
-	}
+	return true; // return success
 }
 
-std::vector< ResourcePtr<Texture> > FBO::GetTextures() {
-	std::vector< ResourcePtr<Texture> > textures;
-	
-	for (auto texture = mTextures.begin(); texture != mTextures.end(); ++texture) {
-		textures.emplace_back(&(*texture));
-	}
-	
-	return textures;
-}
-
-std::vector< ResourcePtr<RenderBuffer> > FBO::GetRenderBuffers() {
-	std::vector< ResourcePtr<RenderBuffer> > renderBuffers;
-	
-	for (auto renderBuffer = mRenderBuffers.begin(); renderBuffer!= mRenderBuffers.end(); ++renderBuffer) {
-		renderBuffers.emplace_back(&(*renderBuffer));
-	}
-	
-	return renderBuffers;
+void FBO::MapBuffers(const std::vector<GLuint> attachmentPoints) {
+	glDrawBuffers(attachmentPoints.size(), attachmentPoints.data()); // set the assign the buffers for fragment shader output
 }
 
 void FBO::EnsureInitialised() {
@@ -131,9 +115,6 @@ void FBO::Clear() {
 			glBindFramebuffer(GL_FRAMEBUFFER, 0); // unbind this fbo
 			OpenGLStates::mCurrentFBO = 0; // set the currently bound fbo to 'none'
 		}
-		
-		mTextures.clear(); // remove attached textures
-		mRenderBuffers.clear(); // remove attached render buffers
 		
 		glDeleteFramebuffers(1, &mFBOID); // delete this fbo
 		mFBOID = 0; // reset the assigned id

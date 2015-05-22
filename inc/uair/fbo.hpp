@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 2014 Iain M. Crawford
+**	Copyright (c) 20XX Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -46,21 +46,27 @@ class FBO {
 		
 		friend void swap(FBO& first, FBO& second);
 		
-		void AddTexture(const std::vector<GLenum>& attachments, const unsigned int& width, const unsigned int& height); // add a texture to the fbo and attach to specified points (a layer each)
-		void AddRenderBuffer(const GLenum& attachment, const GLenum& internalFormat, const unsigned int& width, const unsigned int& height); // add a render buffer to the fbo and attach to specified point
+		// attach a texture via a pointer to the frame buffer
+		bool AttachTexture(ResourcePtr<Texture> texture, const GLenum& attachmentPoint, const GLint& textureLayer, const GLint& mipmapLevel = 0);
+		bool AttachTexture(Texture* texture, const GLenum& attachmentPoint, const GLint& textureLayer, const GLint& mipmapLevel = 0);
 		
-		std::vector< ResourcePtr<Texture> > GetTextures();
-		std::vector< ResourcePtr<RenderBuffer> > GetRenderBuffers();
+		// attach a render buffer via a pointer to the frame buffer
+		bool AttachRenderBuffer(ResourcePtr<RenderBuffer> renderBuffer, const GLenum& attachmentPoint);
+		bool AttachRenderBuffer(RenderBuffer* renderBuffer, const GLenum& attachmentPoint);
 		
-		void EnsureInitialised(); // ensure the fbo is properly initialised before use
-		void Clear(); // clear the resources used by the fbo
+		// map the fragment shader output to specified buffers
+		void MapBuffers(const std::vector<GLuint> attachmentPoints);
 		
-		unsigned int GetFBOID() const; // return the id assigned to the fbo
+		// ensure the fbo is properly initialised before use
+		void EnsureInitialised();
+		
+		// clear the resources used by the fbo
+		void Clear();
+		
+		// return the id assigned to the fbo
+		unsigned int GetFBOID() const; 
 	private :
 		GLuint mFBOID = 0; // the id assigned to the fbo
-		
-		std::vector<Texture> mTextures; // the textures attached to the fbo
-		std::vector<RenderBuffer> mRenderBuffers; // the render buffers attach to the fbo
 };
 }
 

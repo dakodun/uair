@@ -41,12 +41,15 @@ namespace uair {
 Font::Font(const unsigned int& textureSize) {
 	mTextureSize = util::NextPowerOf2(textureSize);
 	
-	OpenGLStates::BindFBO(mFBO.GetFBOID());
-	mFBO.AddTexture({GL_COLOR_ATTACHMENT0}, mTextureSize, mTextureSize);
-	mFBO.AddRenderBuffer(GL_DEPTH_STENCIL_ATTACHMENT, GL_DEPTH24_STENCIL8, mTextureSize, mTextureSize);
+	mTexture.AddFromMemory({}, mTextureSize, mTextureSize);
+	mTexture.CreateTexture();
 	
-	GLuint attachments[1] = {GL_COLOR_ATTACHMENT0};
-	glDrawBuffers(1, attachments);
+	mRenderBuffer.CreateRenderBuffer(GL_DEPTH24_STENCIL8, mTextureSize, mTextureSize);
+	
+	OpenGLStates::BindFBO(mFBO.GetFBOID());
+	mFBO.AttachTexture(&mTexture, GL_COLOR_ATTACHMENT0, 0);
+	mFBO.AttachRenderBuffer(&mRenderBuffer, GL_DEPTH_STENCIL_ATTACHMENT);
+	mFBO.MapBuffers({GL_COLOR_ATTACHMENT0});
 	
 	glViewport(0, 0, mTextureSize, mTextureSize); // set the viewport to match the texture dimensions...
 	OpenGLStates::mProjectionMatrix = glm::ortho(0.0f, static_cast<float>(mTextureSize), static_cast<float>(mTextureSize), 0.0f, 0.0f, -9999.0f); // ...as well as the projection matrix
@@ -229,7 +232,7 @@ Shape Font::CreateGlyphShape(const char& charCode) {
 				start = end; // update start index
 			}
 			
-			uair::Shape shp;
+			Shape shp;
 			shp.AddContours(glyphPoly.GetContours());
 			return shp;
 		}
@@ -239,7 +242,7 @@ Shape Font::CreateGlyphShape(const char& charCode) {
 }
 
 void Font::UpdateTexture(const std::vector<Shape>& newShapes) {
-	uair::RenderBatch batch; // render batch used to create individual glyph textures as well as font texture
+	RenderBatch batch; // render batch used to create individual glyph textures as well as font texture
 	typedef std::pair<Rectangle, unsigned int> RectangleIndexPair; // define a rectangle and index type
 	
 	// lambda to sort glyphs by their area (boundinx box)
@@ -258,8 +261,9 @@ void Font::UpdateTexture(const std::vector<Shape>& newShapes) {
 		pQueue.emplace(std::make_pair(rect, i)); // add it to the priority queue
 	}
 	
-	std::vector<FBO> fbos; // array of individual fbos for rendering individual glyphs
-	std::vector<uair::Shape> glyphShapes; // array of textured glyph rectangles
+	std::vector<Texture> textures; // array of individual textures for rendering glyphs
+	textures.reserve(pQueue.size()); // reserve enough space for all glyphs to avoid reallocation and invalidation of pointer
+	std::vector<Shape> glyphShapes; // array of textured glyph rectangles
 	float outerOffsetCount = 9; // number of times to offset outwards
 	float offsetInc = 2.0f; // amount to offset each time
 	
@@ -267,28 +271,35 @@ void Font::UpdateTexture(const std::vector<Shape>& newShapes) {
 		Shape shp = newShapes.at(pQueue.top().second); // get a copy of the glyph shape...
 		
 		PositionBase(shp, outerOffsetCount, 2.0f); // position the shape at the origin (0, 0) accounting for outsetting
-		std::vector<uair::Shape> shapes = CreateGradient(shp, 9, outerOffsetCount, offsetInc); // create the gradients shapes by offsetting out and in
+		std::vector<Shape> shapes = CreateGradient(shp, 9, outerOffsetCount, offsetInc); // create the gradients shapes by offsetting out and in
 		for (auto shp2 = shapes.begin(); shp2 != shapes.end(); ++shp2) { // for all gradient shapes...
 			batch.Add(*shp2); // add the gradient shape to the batch
 		}
 		
 		batch.Upload(); // upload the gradients shapes
-		fbos.emplace_back(); // add a new fbo to the array
+		
 		float offsetOffset = (outerOffsetCount * offsetInc) * 2; // calculate the outward offset distance
 		glm::ivec2 dimensions(pQueue.top().first.second - pQueue.top().first.first); // calculate the dimensions (width and height) of the base glyph
 		
+		textures.emplace_back(); // add a new texture to the array
+		
 		{ // render gradient to fbo
-			OpenGLStates::BindFBO(fbos.back().GetFBOID()); // bind the new fbo
 			unsigned int width = util::NextPowerOf2(dimensions.x + offsetOffset); // calculate the width of the base glyph plus offset rounded to nearest power of two...
-			unsigned int height = util::NextPowerOf2(dimensions.y + offsetOffset);// ...and the same for height
-			fbos.back().AddTexture({GL_COLOR_ATTACHMENT0}, width, height); // add a texture to the new fbo...
-			fbos.back().AddRenderBuffer(GL_DEPTH_STENCIL_ATTACHMENT, GL_DEPTH24_STENCIL8, width, height); // ...and a matching render buffer
+			unsigned int height = util::NextPowerOf2(dimensions.y + offsetOffset); // ...and the same for height
 			
-			// set up fbo shader attachments
-			GLuint attachments[1] = {GL_COLOR_ATTACHMENT0}; 
-			glDrawBuffers(1, attachments);
+			textures.back().AddFromMemory({}, width, height);
+			textures.back().CreateTexture();
 			
-			RenderToFBO(fbos.back(), batch, width, height); // render the gradient to the new fbo
+			RenderBuffer renderBuffer;
+			renderBuffer.CreateRenderBuffer(GL_DEPTH24_STENCIL8, width, height);
+			
+			FBO fbo;
+			OpenGLStates::BindFBO(fbo.GetFBOID()); // bind the new fbo
+			fbo.AttachTexture(&textures.back(), GL_COLOR_ATTACHMENT0, 0);
+			fbo.AttachRenderBuffer(&renderBuffer, GL_DEPTH_STENCIL_ATTACHMENT);
+			fbo.MapBuffers({GL_COLOR_ATTACHMENT0});
+			
+			RenderToFBO(fbo, batch, width, height); // render the gradient to the new fbo
 		}
 		
 		{
@@ -299,8 +310,7 @@ void Font::UpdateTexture(const std::vector<Shape>& newShapes) {
 					glm::vec2(dimensions.x + offsetOffset, dimensions.y + offsetOffset), glm::vec2(0.0f, dimensions.y + offsetOffset)}));
 			glyphShapes.back().SetScale(glm::vec2(0.25f, 0.25f)); // scale the rectangle glyph by 1/4 (linearly interpolated)
 			
-			uair::ResourcePtr<uair::Texture> texPtr = fbos.back().GetTextures().front(); // get a pointer to the gradient fbo texture
-			glyphShapes.back().AddFrameRect(texPtr, 0u, {glm::vec2(0.0f, 0.0f), glm::vec2(dimensions.x + offsetOffset, dimensions.y + offsetOffset)}); // texture the new rectangle shape
+			glyphShapes.back().AddFrameRect(&textures.back(), 0u, {glm::vec2(0.0f, 0.0f), glm::vec2(dimensions.x + offsetOffset, dimensions.y + offsetOffset)}); // texture the new rectangle shape
 		}
 		
 		Pack(glyphShapes.back()); // pack the new rectangle shape into the font's texture [!] store which layer to render to
@@ -308,6 +318,7 @@ void Font::UpdateTexture(const std::vector<Shape>& newShapes) {
 		pQueue.pop(); // remove the current glyph shape from the queue
 	}
 	
+	glColor3f(1.0f, 1.0f, 1.0f);
 	for (auto shape = glyphShapes.begin(); shape != glyphShapes.end(); ++shape) { // for all glyph rectangle shapes...
 		batch.Add(*shape); // add shape to the batch
 	}
