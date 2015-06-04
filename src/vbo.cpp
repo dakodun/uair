@@ -37,8 +37,7 @@ namespace uair {
 VBO::~VBO() {
 	if (mVertVBOID != 0) {
 		if (OpenGLStates::mCurrentArrayBuffer == mVertVBOID) {
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-			OpenGLStates::mCurrentArrayBuffer = 0;
+			OpenGLStates::BindArrayBuffer(0);
 		}
 		
 		glDeleteBuffers(1, &mVertVBOID);
@@ -47,8 +46,7 @@ VBO::~VBO() {
 	
 	if (mIndVBOID != 0) {
 		if (OpenGLStates::mCurrentElementArrayBuffer == mIndVBOID) {
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-			OpenGLStates::mCurrentElementArrayBuffer = 0;
+			OpenGLStates::BindElementArrayBuffer(0);
 		}
 		
 		glDeleteBuffers(1, &mIndVBOID);
