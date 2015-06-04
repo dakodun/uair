@@ -231,7 +231,7 @@ void Shape::AddFrame(ResourcePtr<Texture> texture, const unsigned int& layer) {
 	
 	if (tex) {
 		if (layer < tex->GetDepth()) {
-			const TextureData& texData = tex->GetData(layer);
+			const Texture::LayerData& texData = tex->GetData(layer);
 			
 			// set default values for the texture ST coordinate bounds
 			glm::vec2 min = glm::vec2(0.0f, 0.0f); // top-left of texture
@@ -282,7 +282,7 @@ void Shape::AddFrameRect(ResourcePtr<Texture> texture, const unsigned int& layer
 	
 	if (tex) {
 		if (layer < tex->GetDepth()) {
-			const TextureData& texData = tex->GetData(layer);
+			const Texture::LayerData& texData = tex->GetData(layer);
 			
 			// set default values for the texture ST coordinate bounds
 			glm::vec2 min = glm::vec2(0.0f, 0.0f); // top-left of texture
@@ -316,7 +316,7 @@ void Shape::AddFrameStrip(ResourcePtr<Texture> texture, const unsigned int& laye
 	
 	if (tex) {
 		if (layer < tex->GetDepth()) {
-			const TextureData& texData = tex->GetData(layer);
+			const Texture::LayerData& texData = tex->GetData(layer);
 			
 			float frameWidth = static_cast<float>(texData.mWidth) - (offset.x * numPerRow);
 			float frameHeight = static_cast<float>(texData.mHeight) - (offset.y * numPerCol);

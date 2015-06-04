@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 2014 Iain M. Crawford
+**	Copyright (c) 20XX Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -35,17 +35,18 @@
 #include "resource.hpp"
 
 namespace uair {
-struct TextureData {
-	std::vector<unsigned char> mData; // the data of the current layer including padding
-	unsigned int mWidth; // the width of the layer without padding
-	unsigned int mHeight; // the height of the layer without padding
-	
-	float mSMax; // the max s coordinate without padding
-	float mTMax; // the max t coordinate without padding
-};
+class FBO;
 
 class Texture : public Resource<Texture> {
 	public :
+		struct LayerData { // data relating to an individual layer in a texture array
+			unsigned int mWidth; // the width of the layer without padding
+			unsigned int mHeight; // the height of the layer without padding
+			
+			float mSMax; // the max s coordinate without padding
+			float mTMax; // the max t coordinate without padding
+		};
+		
 		Texture() = default;
 		Texture(const Texture& other) = delete;
 		Texture(Texture&& other);
@@ -67,11 +68,13 @@ class Texture : public Resource<Texture> {
 		unsigned int GetWidth() const; // return the width
 		unsigned int GetHeight() const; // return the height
 		unsigned int GetDepth() const; // return the number of layers
-		TextureData GetData(const std::size_t& index) const; // return a copy of the texture data
+		LayerData GetData(const std::size_t& index) const; // return a copy of the texture data
 	private :
 		GLuint mTextureID = 0; // the assigned id
 		
-		std::vector<TextureData> mData; // the texture data store
+		typedef std::pair< std::vector<unsigned char>, LayerData> TexelLayerPair;
+		std::vector<TexelLayerPair> mData; // texture (texel) data and associated layer data (temporary)
+		std::vector<LayerData> mLayerData; // the texture layer store
 		unsigned int mWidth; // the width of the texture
 		unsigned int mHeight; // the height of the texture
 		
