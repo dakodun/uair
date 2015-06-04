@@ -41,6 +41,8 @@ class OpenGLStates {
 		static bool BindTexture(const GLuint& id);
 		static bool BindFBO(const GLuint& id);
 		static bool BindRenderBuffer(const GLuint& id);
+		static bool BindPBOPack(const GLuint& id);
+		static bool BindPBOUnpack(const GLuint& id);
 		
 		static GLint mVertexLocation;
 		static GLint mNormalLocation;
@@ -63,6 +65,8 @@ class OpenGLStates {
 		static GLuint mCurrentTexture;
 		static GLuint mCurrentFBO;
 		static GLuint mCurrentRenderBuffer;
+		static GLuint mCurrentPBOPack;
+		static GLuint mCurrentPBOUnpack;
 };
 }
 

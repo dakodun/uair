@@ -94,6 +94,28 @@ bool OpenGLStates::BindRenderBuffer(const GLuint& id) {
 	return false;
 }
 
+bool OpenGLStates::BindPBOPack(const GLuint& id) {
+	if (OpenGLStates::mCurrentPBOPack != id) {
+		glBindBuffer(GL_PIXEL_PACK_BUFFER, id);
+		OpenGLStates::mCurrentPBOPack = id;
+		
+		return true;
+	}
+	
+	return false;
+}
+
+bool OpenGLStates::BindPBOUnpack(const GLuint& id) {
+	if (OpenGLStates::mCurrentPBOUnpack != id) {
+		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, id);
+		OpenGLStates::mCurrentPBOUnpack = id;
+		
+		return true;
+	}
+	
+	return false;
+}
+
 GLint OpenGLStates::mVertexLocation = -1;
 GLint OpenGLStates::mNormalLocation = -1;
 GLint OpenGLStates::mColourLocation = -1;
@@ -115,4 +137,6 @@ GLuint OpenGLStates::mCurrentProgram = 0;
 GLuint OpenGLStates::mCurrentTexture = 0;
 GLuint OpenGLStates::mCurrentFBO = 0;
 GLuint OpenGLStates::mCurrentRenderBuffer = 0;
+GLuint OpenGLStates::mCurrentPBOPack = 0;
+GLuint OpenGLStates::mCurrentPBOUnpack = 0;
 }
