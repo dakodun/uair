@@ -64,7 +64,8 @@ bool FBO::AttachTexture(Texture* texture, const GLenum& attachmentPoint, const G
 	EnsureInitialised(); // ensure this fbo has been set up properly
 	OpenGLStates::BindFBO(mFBOID); // bind the fbo as current
 	
-	glFramebufferTexture3D(GL_FRAMEBUFFER, attachmentPoint, GL_TEXTURE_2D_ARRAY, texture->GetTextureID(), mipmapLevel, textureLayer); // attach the texture to the specified point
+	//glFramebufferTexture3D(GL_FRAMEBUFFER, attachmentPoint, GL_TEXTURE_2D_ARRAY, texture->GetTextureID(), mipmapLevel, textureLayer); // attach the texture to the specified point
+	glFramebufferTextureLayer(GL_FRAMEBUFFER, attachmentPoint, texture->GetTextureID(), mipmapLevel, textureLayer); // attach the texture to the specified point
 	
 	GLenum err = glCheckFramebufferStatus(GL_FRAMEBUFFER); // check status of the fbo
 	if (err != GL_FRAMEBUFFER_COMPLETE) { // if an error occured...
@@ -99,8 +100,8 @@ bool FBO::AttachRenderBuffer(RenderBuffer* renderBuffer, const GLenum& attachmen
 	return true; // return success
 }
 
-void FBO::MapBuffers(const std::vector<GLuint> attachmentPoints) {
-	glDrawBuffers(attachmentPoints.size(), attachmentPoints.data()); // set the assign the buffers for fragment shader output
+void FBO::MapBuffers(const std::vector<GLuint>& attachmentPoints) {
+	glDrawBuffers(attachmentPoints.size(), attachmentPoints.data()); // assign the buffers for fragment shader output
 }
 
 void FBO::EnsureInitialised() {

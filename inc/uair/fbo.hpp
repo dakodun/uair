@@ -55,7 +55,7 @@ class FBO {
 		bool AttachRenderBuffer(RenderBuffer* renderBuffer, const GLenum& attachmentPoint);
 		
 		// map the fragment shader output to specified buffers
-		void MapBuffers(const std::vector<GLuint> attachmentPoints);
+		void MapBuffers(const std::vector<GLuint>& attachmentPoints);
 		
 		// ensure the fbo is properly initialised before use
 		void EnsureInitialised();
