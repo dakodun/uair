@@ -59,6 +59,7 @@
 #include "texture.hpp"
 #include "renderbuffer.hpp"
 #include "fbo.hpp"
+#include "pbo.hpp"
 #include "vbo.hpp"
 
 #include "game.hpp"
