@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 2013 Iain M. Crawford
+**	Copyright (c) 20XX Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -25,11 +25,6 @@
 **		   source distribution.
 ** **************************************************************** */
 
-/** 
-* \file		uair.hpp
-* \brief	Uair main include file.
-**/
-
 #ifndef UAIRUAIR_HPP
 #define UAIRUAIR_HPP
 
@@ -47,15 +42,18 @@
 #include "scenemanager.hpp"
 #include "timer.hpp"
 #include "util.hpp"
+#include "file.hpp"
 
 #include "polygon.hpp"
 #include "transformable.hpp"
 #include "triangulate.hpp"
 
 #include "font.hpp"
+#include "signeddistancefield.hpp"
 #include "renderbatch.hpp"
 #include "renderable.hpp"
 #include "shape.hpp"
+#include "renderstring.hpp"
 #include "texture.hpp"
 #include "renderbuffer.hpp"
 #include "fbo.hpp"
