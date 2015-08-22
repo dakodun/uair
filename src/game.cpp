@@ -241,29 +241,33 @@ void Game::CreateDefaultShader() {
 	std::string vertStr = R"(
 #version 330
 
-uniform mat4 vModel;
-uniform mat4 vView;
-uniform mat4 vProj;
+uniform mat4 vertModel;
+uniform mat4 vertView;
+uniform mat4 vertProj;
 
 in vec4 vertPos;
-in vec3 normalIn;
-in vec4 colourIn;
-in vec3 texCoordIn;
-in float textureExistsIn;
+in vec3 vertNormal;
+in vec4 vertColour;
+in vec3 vertTexCoord;
+in float vertType;
+in float[2] vertExtra;
 
-out vec4 colourOut;
-smooth out vec3 texCoordOut;
-out float textureExistsOut;
+flat out vec4 fragColour;
+smooth out vec3 fragTexCoord;
+flat out float fragType;
+flat out float[2] fragExtra;
 
 void main() {
-	mat4 vModelViewProj = vProj * vView * vModel;
-	gl_Position = vModelViewProj * vertPos;
+	mat4 mvp = vertProj * vertView * vertModel;
+	gl_Position = mvp * vertPos;
 	
-	vec3 normal = vec3((vView * vModel) * vec4(normalIn, 0.0));
+	vec3 normal = vec3((vertView * vertModel) * vec4(vertNormal, 0.0));
 	
-	colourOut = colourIn;
-	texCoordOut = texCoordIn;
-	textureExistsOut = textureExistsIn;
+	fragColour = vertColour;
+	fragTexCoord = vertTexCoord;
+	fragType = vertType;
+	
+	fragExtra = vertExtra;
 }
 	)";
 	mDefaultShader.VertexFromString(vertStr);
@@ -272,20 +276,54 @@ void main() {
 	std::string fragStr = R"(
 #version 330
 
-uniform sampler2DArray baseTex;
+uniform sampler2DArray fragBaseTex;
 
-in vec4 colourOut;
-smooth in vec3 texCoordOut;
-in float textureExistsOut;
+flat in vec4 fragColour;
+smooth in vec3 fragTexCoord;
+flat in float fragType;
+flat in float[2] fragExtra;
 
-out vec4 fragColour;
+vec4 finalColour;
+out vec4 fragData;
+
+const float smoothing = 64.0f;
 
 void main() {
-	vec4 texColour = clamp(texture(baseTex, texCoordOut) + (1.0 - textureExistsOut), 0.0, 1.0);
-	vec4 colColour = vec4(colourOut);
+	if (fragType < 0.5f) {
+		vec4 texColour = clamp(texture(fragBaseTex, fragTexCoord) + (1.0 - fragExtra[0]), 0.0, 1.0);
+		vec4 colColour = vec4(fragColour);
+		
+		finalColour = texColour * colColour;
+	}
+	else if (fragType < 1.5f) {
+		float mask = texture(fragBaseTex, fragTexCoord).r; // get the mask value from the red channel of the texture
+		float edgeWidth = clamp(smoothing * (abs(dFdx(fragTexCoord.x)) + abs(dFdy(fragTexCoord.y))), 0.0f, 0.5f); // get the width of the edge (for smooth edges) depending on glyph size (clamped to 0.0f ... 0.5f)
+		float alpha = smoothstep(0.5f - edgeWidth, 0.5f + edgeWidth, mask); // interpolate the mask value between the lower and upper edges
+		finalColour = vec4(fragColour.x, fragColour.y, fragColour.z, alpha);
+		
+		// outline
+		/* vec4 outlineColour = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+		if (mask < 0.5f) {
+			finalColour = mix(finalColour, outlineColour, smoothstep(0.1f, 0.3f, mask));
+		}
+		else if (mask < 0.55f) {
+			finalColour = mix(finalColour, outlineColour, smoothstep(0.1f, 0.9f, mask));
+		} */
+		
+		// drop shadow
+		/* if (finalColour.a < 0.9f) {
+			vec3 shadowColour = vec3(1.0f, 0.0f, 0.0f);
+			vec2 texel = vec2(2.0f / texture_width, 2.0f / texture_height);
+			vec3 coordOffset = vec3(fragTexCoord.x - texel.x, fragTexCoord.y + texel.y, fragTexCoord.z);
+			float maskOffset = texture(fragBaseTex, coordOffset).r;
+			if (maskOffset > 0.5f) {
+				float alphaOffset = smoothstep(0.0f, 1.0f, maskOffset);
+				finalColour = mix(vec4(shadowColour, alphaOffset), finalColour, 0.4f);
+			}
+		} */
+	}
 	
-	vec4 finalColour = texColour * colColour;
-	fragColour = finalColour;
+	fragData = finalColour;
 }
 	)";
 	mDefaultShader.FragmentFromString(fragStr);
@@ -296,17 +334,18 @@ void main() {
 
 void Game::SetShader() {
 	OpenGLStates::mVertexLocation = glGetAttribLocation(mDefaultShader.GetProgramID(), "vertPos");
-	OpenGLStates::mNormalLocation = glGetAttribLocation(mDefaultShader.GetProgramID(), "normalIn");
-	OpenGLStates::mColourLocation = glGetAttribLocation(mDefaultShader.GetProgramID(), "colourIn");
-	OpenGLStates::mTexCoordLocation = glGetAttribLocation(mDefaultShader.GetProgramID(), "texCoordIn");
-	OpenGLStates::mTexExistsLocation = glGetAttribLocation(mDefaultShader.GetProgramID(), "textureExistsIn");
-	OpenGLStates::mTexLocation = glGetUniformLocation(mDefaultShader.GetProgramID(), "baseTex");
+	OpenGLStates::mNormalLocation = glGetAttribLocation(mDefaultShader.GetProgramID(), "vertNormal");
+	OpenGLStates::mColourLocation = glGetAttribLocation(mDefaultShader.GetProgramID(), "vertColour");
+	OpenGLStates::mTexCoordLocation = glGetAttribLocation(mDefaultShader.GetProgramID(), "vertTexCoord");
+	OpenGLStates::mTypeLocation = glGetAttribLocation(mDefaultShader.GetProgramID(), "vertType");
+	OpenGLStates::mExtraLocation = glGetAttribLocation(mDefaultShader.GetProgramID(), "vertExtra");
+	OpenGLStates::mTexLocation = glGetUniformLocation(mDefaultShader.GetProgramID(), "fragBaseTex");
 	
-	OpenGLStates::mProjectionMatrixLocation = glGetUniformLocation(mDefaultShader.GetProgramID(), "vProj");
-	OpenGLStates::mViewMatrixLocation = glGetUniformLocation(mDefaultShader.GetProgramID(), "vView");
-	OpenGLStates::mModelMatrixLocation = glGetUniformLocation(mDefaultShader.GetProgramID(), "vModel");
+	OpenGLStates::mProjectionMatrixLocation = glGetUniformLocation(mDefaultShader.GetProgramID(), "vertProj");
+	OpenGLStates::mViewMatrixLocation = glGetUniformLocation(mDefaultShader.GetProgramID(), "vertView");
+	OpenGLStates::mModelMatrixLocation = glGetUniformLocation(mDefaultShader.GetProgramID(), "vertModel");
 	
-	glBindFragDataLocation(mDefaultShader.GetProgramID(), 0, "fragColour");
+	glBindFragDataLocation(mDefaultShader.GetProgramID(), 0, "fragData");
 	
 	mDefaultShader.UseProgram();
 	glUniform1i(OpenGLStates::mTexLocation, 0);

@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 2014 Iain M. Crawford
+**	Copyright (c) 20XX Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -38,17 +38,24 @@
 #include FT_GLYPH_H
 
 #include "fbo.hpp"
+#include "shape.hpp"
 
 namespace uair {
 class RenderBatch;
 class Polygon;
-class Shape;
 
 class Font : public Resource<Font> {
 	public :
-		struct Glyph { // associated with charcode in a map
-			// tex coords in texture
-			// font metrics (kerning, drop, ...)
+		struct Glyph {
+			Shape mBaseShape = Shape(); // a textured shape representing the glyph
+			
+			glm::ivec2 mDimensions = glm::ivec2(); // the width and height of the glyph
+			std::vector<glm::vec2> mTexCoords = {}; // the texture coordinates (in the font's texture) for the glyph
+			unsigned int mLayer = 0u; // the layer (in the font's texture) for the glyph
+			
+			int mAdvance = 0; // the horizontal advance metric for the character
+			int mDrop = 0; // the vertical drop metric for the character
+			glm::ivec2 mBearing = glm::ivec2(); // the x and y bearing (offset from the origin) for the character
 		};
 		
 		Font(const unsigned int& textureSize);
@@ -61,27 +68,42 @@ class Font : public Resource<Font> {
 		
 		friend void swap(Font& first, Font& second);
 		
-		bool LoadFromFile(const std::string& filename, const unsigned int& pointSize = 36u);
-		void LoadGlyph(const char& charCode);
-		void LoadGlyphs(const std::vector<char>& charCodes);
+		void CreateCache(const std::string& cacheFilename); // create a cache file of the current font
+		bool LoadFromCache(const std::string& cacheFilename); // create the font from a cache file
+		bool LoadFromFile(const std::string& filename, const unsigned int& pointSize = 72u); // load a font file for glyph loading
+		void LoadGlyph(const char32_t& charCode); // add a glyph to the font's texture
+		void LoadGlyphs(const std::vector<char32_t>& charCodes); // add glyphs to the font's texture
+		
+		Glyph GetGlyph(const char32_t& codePoint); // return the glyph object corresponding to a character
+		int GetKerning(const char32_t& firstCodePoint, const char32_t& secondCodePoint); // return the kerning value between two characters
+		
+		unsigned int GetFontSize() const; // return the base size of the font
+		int GetLineHeight() const; // return the vertical offset for a new line
+		unsigned int GetTextureID() const; // return the assigned id of the font's texture
+		unsigned int GetTextureWidth() const; // return the font's texture's width
+		unsigned int GetTextureHeight() const; // return the font's texture's height
 	private :
-		Shape CreateGlyphShape(const char& charCode);
-		void UpdateTexture(const std::vector<Shape>& newShapes);
+		Shape CreateGlyphShape(const char32_t& charCode, Glyph& glyphObject); // create a shape of a glyph from a font file
+		void UpdateTexture(const std::vector< std::pair<char32_t, Shape> >& newShapes); // update the font's texture with new glyph shapes
+		void UpdateKerningMap(const std::vector< std::pair<char32_t, Shape> >& newShapes); // updated the kerning map with new glyphs
 		
-		void Pack(Shape& shape);
-		void PositionBase(Shape& baseShape, const unsigned int& outerOffsetCount, const float& offsetInc);
-		std::vector<Shape> CreateGradient(const Shape& baseShape, const unsigned int& innerOffsetCount, const unsigned int& outerOffsetCount, const float& offsetInc);
-		void RenderToFBO(FBO& fbo, RenderBatch& batch, const unsigned int& width, const unsigned int& height);
+		Glyph Pack(Shape& shape); // pack a flyph shape into the font's texture
+		void PositionBase(Shape& baseShape, const unsigned int& padding); // position a glyph shape at the origin
 	private :
-		FT_Face mFTFace = nullptr;
+		FT_Face mFTFace = nullptr; // pointer to the face object of a font file
+		unsigned int mFontSize = 1u; // the base size of the font
+		int mLineHeight = 0; // the vertical offset of a new line
 		
-		unsigned int mTextureSize;
-		FBO mFBO;
-		Texture mTexture;
-		RenderBuffer mRenderBuffer;
+		std::map<char32_t, Glyph> mGlyphs; // glyph objects containing metrics and rendering data for a character
+		std::map<std::pair<char32_t, char32_t>, int> mKernMap; // kerning values between two characters
 		
-		typedef std::pair<glm::ivec2, glm::ivec2> Rectangle;
-		std::list<Rectangle> mRectangles;
+		unsigned int mTextureSize; // the width and height of the font's texture
+		FBO mFBO; // the fbo used to render to the font's texture
+		Texture mTexture; // the font's texture containing all loaded glyphs
+		RenderBuffer mRenderBuffer; // render buffer associated with font's texture
+		
+		typedef std::pair<glm::ivec2, glm::ivec2> Rectangle; // a pair of ivec2 representing the top-left and bottom-right coords of a rectangle
+		std::list< std::list<Rectangle> > mRectangles; // all rectangular areas that are free in the texture (used for packing)
 };
 }
 
