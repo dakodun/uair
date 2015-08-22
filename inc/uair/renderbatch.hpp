@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 2014 Iain M. Crawford
+**	Copyright (c) 20XX Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -40,8 +40,8 @@ struct RenderBatchData {
 	std::vector<VBOVertex> mVertData; // vertices to send to vbo
 	std::vector<VBOIndex> mIndData; // indices to send to vbo
 	
-	GLuint mTexID = 0; // the texture id to bind in vbo
-	GLenum mRenderMode = GL_TRIANGLE_FAN;
+	GLuint mTexID = 0u; // the texture id to bind in vbo
+	GLenum mRenderMode = GL_TRIANGLES;
 	std::string mTag = ""; // the tag (type) of the underlying renderable
 };
 
@@ -54,13 +54,13 @@ struct SegmentInfo {
 		
 	}
 	
-	GLuint mTexID = 0; // the texture id of the segment
+	GLuint mTexID = 0u; // the texture id of the segment
 	GLenum mRenderMode = GL_TRIANGLE_FAN;
 	
-	GLuint mIndicesCount = 0;
-	GLuint mIndicesOffset = 0;
-	GLuint mMinIndex = 0;
-	GLuint mMaxIndex = 0;
+	GLuint mIndicesCount = 0u;
+	GLuint mIndicesOffset = 0u;
+	GLuint mMinIndex = 0u;
+	GLuint mMaxIndex = 0u;
 };
 
 class Renderable; // forward declare the renderable class

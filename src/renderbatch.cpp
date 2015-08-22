@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 2014 Iain M. Crawford
+**	Copyright (c) 20XX Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -35,7 +35,10 @@
 namespace uair {
 void RenderBatch::Add(Renderable& renderable, const unsigned int& pass) {
 	std::vector<RenderBatchData>& vecRender = ((mRenderData.insert(IndexedRenderBatchData(pass, {}))).first)->second; // create a new vector for the specified pass, or return the existing one
-	vecRender.push_back(renderable.Upload()); // call the renderables upload function and add the result to the batch data container
+	const std::list<RenderBatchData>& rbd = renderable.Upload(); // call the renderables upload function
+	for (auto iter = rbd.begin(); iter != rbd.end(); ++iter) {
+		vecRender.push_back(*iter);
+	}
 }
 
 void RenderBatch::Upload() {
@@ -61,7 +64,7 @@ void RenderBatch::Upload() {
 			std::sort(vecRender.begin(), vecRender.end(), sortDataLambda); // sort the data by texture id
 			
 			GLuint count = 0;
-			GLuint min = UINT_MAX;
+			GLuint min = std::numeric_limits<GLuint>::max();
 			GLuint max = 0;
 			
 			for (unsigned int i = 0u; i < vecRender.size(); ++i) { // for all batches of data...
@@ -75,6 +78,7 @@ void RenderBatch::Upload() {
 				vertCount += vecRender.at(i).mVertData.size(); // add the current batches vertex count to the total
 			}
 			
+			min = std::min(min, max);
 			GLuint currentTex = vecRender.at(0).mTexID; // the current texture id we are checking
 			GLenum currentRenderMode = vecRender.at(0).mRenderMode; // the current render mode we are checking
 			for (unsigned int i = 0u; i < vecRender.size(); ++i) { // for all batches of data...
