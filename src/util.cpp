@@ -69,6 +69,15 @@ extern bool CompareFloats(const float& first, const unsigned int& comparison, co
 	return false;
 }
 
+extern int FloatToInt(const float& f) {
+	if (f < 0) {
+		return static_cast<int>(f - 0.5f);
+	}
+	else {
+		return static_cast<int>(f + 0.5f);
+	}
+}
+
 extern glm::mat3 GetTranslationMatrix(const glm::vec2& translation) {
 	glm::mat3 result;
 	result[0][0] = 1.0f; result[1][0] = 0.0f; result[2][0] = translation.x;
@@ -201,6 +210,18 @@ extern void LogMessage(const unsigned int& level, const std::string& message, co
 			std::cerr.rdbuf(storedBuffer);
 		}
 	}
+}
+
+extern std::vector<std::string> SplitString(const std::string& string, const char& delimiter) {
+	std::vector<std::string> strParts;
+	std::stringstream strStream(string);
+	std::string part;
+	
+	while(std::getline(strStream, part, delimiter)) {
+		strParts.push_back(part);
+	}
+	
+	return strParts;
 }
 
 /*

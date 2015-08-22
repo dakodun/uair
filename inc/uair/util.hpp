@@ -30,6 +30,7 @@
 
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include "init.hpp"
 
@@ -56,6 +57,7 @@ enum {
 };
 
 extern bool CompareFloats(const float& first, const unsigned int& comparison, const float& second, const float& variance = util::EPSILON);
+extern int FloatToInt(const float& f);
 
 extern glm::mat3 GetTranslationMatrix(const glm::vec2& translation);
 extern glm::mat3 GetRotationMatrix(const float& angle);
@@ -69,6 +71,8 @@ extern glm::vec2 ReflectPointByLine(const glm::vec2& pointA, const glm::vec2& po
 extern std::string GetGLErrorStatus();
 extern void LogMessage(const unsigned int& level, const std::string& message);
 extern void LogMessage(const unsigned int& level, const std::string& message, const std::string& filename);
+
+extern std::vector<std::string> SplitString(const std::string& string, const char& delimiter);
 
 template<typename T>
 extern int SignOf(const T& input) {
