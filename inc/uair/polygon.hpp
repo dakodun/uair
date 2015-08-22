@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 2014 Iain M. Crawford
+**	Copyright (c) 20XX Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -94,6 +94,7 @@ class Polygon : public Transformable {
 		
 		void Offset(float distance, const ClipperLib::JoinType& miterType = ClipperLib::jtRound, const double& miterLimit = 2.0d);
 		void ReverseWinding();
+		void PositionContoursAtOrigin();
 		
 		operator ClipperLib::Paths() const;
 		void FromClipperPaths(const ClipperLib::Paths& clipperPaths);

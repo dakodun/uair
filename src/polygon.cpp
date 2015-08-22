@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 2014 Iain M. Crawford
+**	Copyright (c) 20XX Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -282,6 +282,35 @@ void Polygon::ReverseWinding() {
 	}
 }
 
+void Polygon::PositionContoursAtOrigin() {
+	if (!mBounds.empty()) {
+		glm::vec2 lowest = mBounds.at(0);
+		
+		if (!util::CompareFloats(lowest.x, util::Equals, 0.0f) || !util::CompareFloats(lowest.y, util::Equals, 0.0f)) { // if x or y value of lowest bounds is not at origin...
+			std::vector<Contour> newContours;
+			
+			for (auto contour = mContours.begin(); contour != mContours.end(); ++contour) {
+				std::vector<glm::vec2> newPoints = contour->GetPoints();
+				for (auto point = newPoints.begin(); point != newPoints.end(); ++point) {
+					*point -= lowest;
+				}
+				
+				newContours.emplace_back(newPoints);
+			}
+			
+			{ // clear invalid contours and bounds
+				std::vector<Contour> contours;
+				std::vector<glm::vec2> bounds;
+				
+				std::swap(mContours, contours);
+				std::swap(mBounds, bounds);
+			}
+			
+			AddContours(newContours); // add new offset contours to shape
+		}
+	}
+}
+
 Polygon::operator ClipperLib::Paths() const {
 	ClipperLib::Paths clipperPaths;
 	
@@ -436,7 +465,8 @@ void Polygon::UpdateBounds(const Contour& contour) {
 			mBounds.at(0).x = contour.mBounds.at(0).x;
 			adjusted = true;
 		}
-		else if (contour.mBounds.at(1).x > mBounds.at(1).x) { // right
+		
+		if (contour.mBounds.at(1).x > mBounds.at(1).x) { // right
 			mBounds.at(1).x = contour.mBounds.at(1).x;
 			adjusted = true;
 		}
@@ -445,7 +475,8 @@ void Polygon::UpdateBounds(const Contour& contour) {
 			mBounds.at(0).y = contour.mBounds.at(0).y;
 			adjusted = true;
 		}
-		else if (contour.mBounds.at(1).y > mBounds.at(1).y) { // bottom
+		
+		if (contour.mBounds.at(1).y > mBounds.at(1).y) { // bottom
 			mBounds.at(1).y = contour.mBounds.at(1).y;
 			adjusted = true;
 		}
