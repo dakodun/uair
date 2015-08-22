@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 2014 Iain M. Crawford
+**	Copyright (c) 20XX Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -28,7 +28,7 @@
 #ifndef UAIRRENDERABLE_HPP
 #define UAIRRENDERABLE_HPP
 
-#include <vector>
+#include <list>
 #include <string>
 
 #include <glm/glm.hpp>
@@ -54,7 +54,7 @@ class Renderable {
 		float GetAlpha() const;
 		void SetAlpha(const float& newAlpha);
 	protected :
-		virtual RenderBatchData Upload() = 0;
+		virtual std::list<RenderBatchData> Upload() = 0;
 	public :
 		GLenum mRenderMode = GL_TRIANGLES;
 	protected :
