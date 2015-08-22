@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 2014 Iain M. Crawford
+**	Copyright (c) 20XX Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -106,6 +106,35 @@ void Shape::Offset(float distance, const ClipperLib::JoinType& miterType, const 
 	AddContours(outContours); // add new offset contours to shape
 }
 
+void Shape::PositionContoursAtOrigin() {
+	if (!mBounds.empty()) {
+		glm::vec2 lowest = mBounds.at(0);
+		
+		if (!util::CompareFloats(lowest.x, util::Equals, 0.0f) || !util::CompareFloats(lowest.y, util::Equals, 0.0f)) { // if x or y value of lowest bounds is not at origin...
+			std::vector<Contour> newContours;
+			
+			for (auto contour = mContours.begin(); contour != mContours.end(); ++contour) {
+				std::vector<glm::vec2> newPoints = contour->GetPoints();
+				for (auto point = newPoints.begin(); point != newPoints.end(); ++point) {
+					*point -= lowest;
+				}
+				
+				newContours.emplace_back(newPoints);
+			}
+			
+			{ // clear invalid contours and bounds
+				std::vector<Contour> contours;
+				std::vector<glm::vec2> bounds;
+				
+				std::swap(mContours, contours);
+				std::swap(mBounds, bounds);
+			}
+			
+			AddContours(newContours); // add new offset contours to shape
+		}
+	}
+}
+
 void Shape::FromClipperPaths(const ClipperLib::Paths& clipperPaths) {
 	{ // clear invalid contours and bounds
 		std::vector<Contour> contours;
@@ -124,7 +153,45 @@ void Shape::FromClipperPaths(const ClipperLib::Paths& clipperPaths) {
 }
 
 Shape Shape::GetTransformed() const {
-	Shape newShape; // the transformed shape
+	Shape transformedShape = *this;
+	std::vector<Contour> transformedContours;
+	
+	{ // create arrays of transformed vertices and vertex counts
+		glm::mat3 transMat = mTransformation; // get the transform matrix for shape
+		transMat *= util::GetTranslationMatrix(mPosition - mOrigin); // translate by position offset (take into account origin offset)
+		
+		transMat *= util::GetTranslationMatrix(mOrigin); // translate to origin...
+		transMat *= util::GetRotationMatrix(mRotation); // ...rotate...
+		transMat *= util::GetSkewingMatrix(mSkew); // ...skew...
+		transMat *= util::GetScalingMatrix(mScale); // ...scale...
+		transMat *= util::GetTranslationMatrix(-mOrigin); // ...and then translate back from origin
+		
+		for (auto contour = mContours.begin(); contour != mContours.end(); ++contour) { // for all contours...
+			std::vector<glm::vec2> vertices;
+			const std::vector<glm::vec2>& points = contour->GetPoints(); // get const reference to vertices in countour
+			
+			for (auto vertex = points.begin(); vertex != points.end(); ++vertex) { // for all vertices in contour...
+				glm::vec3 pos = transMat * glm::vec3(*vertex, 1.0f); // get position of transformed vertex
+				vertices.emplace_back(pos.x, pos.y); // add transformed vertex
+			}
+			
+			transformedContours.emplace_back(vertices);
+		}
+	}
+	
+	transformedShape.mPosition = glm::vec2();
+	transformedShape.mOrigin = glm::vec2();
+	transformedShape.mTransformation = glm::mat3();
+	transformedShape.mScale = glm::vec2(1.0f, 1.0f);
+	transformedShape.mRotation = 0;
+	transformedShape.mSkew = glm::vec2();
+	
+	transformedShape.mContours.clear();
+	transformedShape.AddContours(transformedContours);
+	
+	return transformedShape;
+	
+	/* Shape newShape; // the transformed shape
 	glm::mat3 trans = mTransformation; // the complete transofrmation matrix (initially the custom transform matrix)
 	std::vector<Contour> newContours; // the transformed contours array
 	
@@ -176,7 +243,7 @@ Shape Shape::GetTransformed() const {
 	}
 	
 	newShape.Polygon::AddContours(newContours); // add the transformed contours to the new shape (call the base method directly to avoid messing with any texturing)
-	return newShape; // return the new shape
+	return newShape; // return the new shape */
 }
 
 std::string Shape::GetTag() const {
@@ -264,7 +331,7 @@ void Shape::AddFrameCoords(ResourcePtr<Texture> texture, const unsigned int& lay
 				frame.mMinST = textureCoords.front(); frame.mMaxST = textureCoords.front();
 				for (auto coord = textureCoords.begin() + 1; coord != textureCoords.end(); ++coord) {
 					frame.mMinST.x = std::min(frame.mMinST.x, coord->x); frame.mMinST.y = std::min(frame.mMinST.y, coord->y);
-					frame.mMaxST.x = std::min(frame.mMaxST.x, coord->x); frame.mMaxST.y = std::min(frame.mMaxST.y, coord->y);
+					frame.mMaxST.x = std::max(frame.mMaxST.x, coord->x); frame.mMaxST.y = std::max(frame.mMaxST.y, coord->y);
 				}
 			}
 			
@@ -391,40 +458,44 @@ void Shape::SetAnimation(const float& speed, const unsigned int& start, const un
 	}
 }
 
-RenderBatchData Shape::Upload() {
+std::list<RenderBatchData> Shape::Upload() {
 	RenderBatchData rbd; // rendering data struct
 	std::vector<unsigned int> vertCounts; // count of vertices in each contour
 	std::vector<glm::vec2> vertices; // all transformed vertices in shape (from each contour)
 	
 	{ // create arrays of transformed vertices and vertex counts
-		glm::mat3 transMat = mTransformation; // get the transform matrix for shape
+		// [!]
+		/* glm::mat3 transMat = mTransformation; // get the transform matrix for shape
 		transMat *= util::GetTranslationMatrix(mPosition - mOrigin); // translate by position offset (take into account origin offset)
 		
 		transMat *= util::GetTranslationMatrix(mOrigin); // translate to origin...
 		transMat *= util::GetRotationMatrix(mRotation); // ...rotate...
 		transMat *= util::GetSkewingMatrix(mSkew); // ...skew...
 		transMat *= util::GetScalingMatrix(mScale); // ...scale...
-		transMat *= util::GetTranslationMatrix(-mOrigin); // ...and then translate back from origin
+		transMat *= util::GetTranslationMatrix(-mOrigin); // ...and then translate back from origin */
 		
 		for (auto contour = mContours.begin(); contour != mContours.end(); ++contour) { // for all contours...
 			const std::vector<glm::vec2>& points = contour->GetPoints(); // get const reference to vertices in countour
+			vertices.insert(vertices.end(), points.begin(), points.end());
 			vertCounts.push_back(points.size()); // store count of vertices
 			
-			for (auto vertex = points.begin(); vertex != points.end(); ++vertex) { // for all vertices in contour...
+			// [!]
+			/* for (auto vertex = points.begin(); vertex != points.end(); ++vertex) { // for all vertices in contour...
 				glm::vec3 pos = transMat * glm::vec3(*vertex, 1.0f); // get position of transformed vertex
 				vertices.emplace_back(pos.x, pos.y); // add transformed vertex
-			}
+			} */
 		}
 	}
 	
-	{ // create rendering data for regular vertices
+	// [!]
+	/* { // create rendering data for regular vertices
 		std::vector<glm::vec2> texCoords;
 		if (mCurrentFrame < mFrames.size()) {
 			texCoords.insert(texCoords.end(), mFrames.at(mCurrentFrame).mTexCoords.begin(), mFrames.at(mCurrentFrame).mTexCoords.end());
 		}
 		
 		CreateVBOVertices(rbd, vertices, texCoords, mColourArray);
-	}
+	} */
 	
 	size_t indexType = 0u; // type of indices for current render mode
 	GLenum renderMode = mRenderMode; // make a copy of the current render mode
@@ -536,7 +607,44 @@ RenderBatchData Shape::Upload() {
 		}
 	}
 	
-	{ // create rendering data for extra vertices added during triangulation
+	{
+		std::vector<glm::vec2> verticesTransformed;
+		std::vector<glm::vec2> texCoords;
+		std::vector<glm::vec4> colours;
+		
+		{
+			glm::mat3 transMat = mTransformation; // get the transform matrix for shape
+			transMat *= util::GetTranslationMatrix(mPosition - mOrigin); // translate by position offset (take into account origin offset)
+			
+			transMat *= util::GetTranslationMatrix(mOrigin); // translate to origin...
+			transMat *= util::GetRotationMatrix(mRotation); // ...rotate...
+			transMat *= util::GetSkewingMatrix(mSkew); // ...skew...
+			transMat *= util::GetScalingMatrix(mScale); // ...scale...
+			transMat *= util::GetTranslationMatrix(-mOrigin); // ...and then translate back from origin
+			
+			for (auto vertex = vertices.begin(); vertex != vertices.end(); ++vertex) {
+				glm::vec3 pos = transMat * glm::vec3(*vertex, 1.0f); // get position of transformed vertex
+				verticesTransformed.emplace_back(pos.x, pos.y); // add transformed vertex
+			}
+			
+			for (auto vertex = mVertices.begin(); vertex != mVertices.end(); ++vertex) {
+				glm::vec3 pos = transMat * glm::vec3(vertex->mPoint, 1.0f); // get position of transformed vertex
+				verticesTransformed.emplace_back(pos.x, pos.y); // add transformed vertex
+			}
+			
+			if (mCurrentFrame < mFrames.size()) {
+				texCoords.insert(texCoords.end(), mFrames.at(mCurrentFrame).mTexCoords.begin(), mFrames.at(mCurrentFrame).mTexCoords.end());
+				texCoords.insert(texCoords.end(), mFrames.at(mCurrentFrame).mTexCoordsExtra.begin(), mFrames.at(mCurrentFrame).mTexCoordsExtra.end());
+			}
+			
+			colours.insert(colours.end(), mColourArray.begin(), mColourArray.end());
+			colours.insert(colours.end(), mColourArrayExtra.begin(), mColourArrayExtra.end());
+		}
+		
+		CreateVBOVertices(rbd, verticesTransformed, texCoords, colours);
+	}
+	
+	/* { // create rendering data for extra vertices added during triangulation
 		std::vector<glm::vec2> texCoords;
 		if (mCurrentFrame < mFrames.size()) {
 			texCoords.insert(texCoords.end(), mFrames.at(mCurrentFrame).mTexCoordsExtra.begin(), mFrames.at(mCurrentFrame).mTexCoordsExtra.end());
@@ -553,19 +661,24 @@ RenderBatchData Shape::Upload() {
 			
 			CreateVBOVertices(rbd, verticesExtra, texCoords, colours);
 		}
-	}
+	} */
 	
 	rbd.mIndData.insert(rbd.mIndData.end(), mIndices.at(indexType).begin(), mIndices.at(indexType).end()); // copy indices into render batch data
+	if (util::CompareFloats(mScale.x, util::LessThan, 0.0f) ^ util::CompareFloats(mScale.y, util::LessThan, 0.0f)) { // if ONE of the x or y scales is negative...
+		std::reverse(rbd.mIndData.begin(), rbd.mIndData.end());
+	}
 	
 	rbd.mTexID = 0; // set texture id
 	rbd.mRenderMode = renderMode; // set render mode
 	rbd.mTag = GetTag(); // set renderables tag
 	
 	if (mCurrentFrame < mFrames.size()) { // if shape is textured...
-		rbd.mTexID = mFrames.at(mCurrentFrame).mTexture.GetResource()->GetTextureID(); // set texture id
+		if (mFrames.at(mCurrentFrame).mTexture.IsValid()) {
+			rbd.mTexID = mFrames.at(mCurrentFrame).mTexture.GetResource()->GetTextureID(); // set texture id
+		}
 	}
 	
-	return rbd; // return batch data
+	return {rbd}; // return batch data
 }
 
 void Shape::CalculateTexCoords(const std::vector<glm::vec2>& points, const std::vector<glm::vec2>& texRect, std::vector<glm::vec2>& texCoordsLocation) {
@@ -609,7 +722,7 @@ void Shape::CreateVBOVertices(RenderBatchData& batchData, const std::vector<glm:
 		vert.mNX = 0.0f; vert.mNY = 0.0f; vert.mNZ = 1.0f;
 		vert.mS = texCoords.at(i).x; vert.mT = 1.0f - texCoords.at(i).y; vert.mLayer = texLayer;
 		vert.mR = colours.at(i).x; vert.mG = colours.at(i).y; vert.mB = colours.at(i).z; vert.mA = colours.at(i).w;
-		vert.mTex = texAvailable;
+		vert.mType = 0.0f; vert.mExtra[0] = texAvailable; vert.mExtra[1] = 0.0f;
 		
 		batchData.mVertData.push_back(vert); // add rendering vertex to rendering data
 	}

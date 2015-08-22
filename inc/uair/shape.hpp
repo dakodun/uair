@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 2014 Iain M. Crawford
+**	Copyright (c) 20XX Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -50,6 +50,7 @@ struct AnimationFrame {
 
 class Shape : public Polygon, public Renderable {
 	friend class RenderBatch;
+	friend class RenderString;
 	
 	public :
 		Shape() = default;
@@ -62,6 +63,9 @@ class Shape : public Polygon, public Renderable {
 		
 		// offset the shape by an amount (in/out)
 		void Offset(float distance, const ClipperLib::JoinType& miterType = ClipperLib::jtRound, const double& miterLimit = 2.0d);
+		
+		// adjust the contours so the lower bound is at the origin (0, 0)
+		void PositionContoursAtOrigin();
 		
 		// create the shape from paths from the external clipper library
 		void FromClipperPaths(const ClipperLib::Paths& clipperPaths);
@@ -98,7 +102,7 @@ class Shape : public Polygon, public Renderable {
 		void SetAnimation(const float& speed, const unsigned int& start, const unsigned int& end, const int& loops = -1);
 	protected :
 		// transform the shape into the correct format for rendering
-		RenderBatchData Upload();
+		std::list<RenderBatchData> Upload();
 	private :
 		// calculate the texture coordinates of vertices from supplied texture rectangle (min and max st coordinates) and store result in supplied array
 		void CalculateTexCoords(const std::vector<glm::vec2>& points, const std::vector<glm::vec2>& texRect, std::vector<glm::vec2>& texCoordsLocation);
