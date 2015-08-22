@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 2014 Iain M. Crawford
+**	Copyright (c) 20XX Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -44,8 +44,8 @@ struct VBOVertex {
 	float mNX, mNY, mNZ;
 	float mS, mT, mLayer;
 	float mR, mG, mB, mA;
-	float mTex;
-	float mPadding[2];
+	float mType;
+	float mExtra[2];
 };
 
 class VBO {

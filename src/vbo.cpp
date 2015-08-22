@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 2014 Iain M. Crawford
+**	Copyright (c) 20XX Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -119,13 +119,15 @@ void VBO::Draw(const unsigned int& targetID, const unsigned int& pass) {
 		glEnableVertexAttribArray(uair::OpenGLStates::mNormalLocation);
 		glEnableVertexAttribArray(uair::OpenGLStates::mColourLocation);
 		glEnableVertexAttribArray(uair::OpenGLStates::mTexCoordLocation);
-		glEnableVertexAttribArray(uair::OpenGLStates::mTexExistsLocation);
+		glEnableVertexAttribArray(uair::OpenGLStates::mTypeLocation);
+		glEnableVertexAttribArray(uair::OpenGLStates::mExtraLocation);
 		
 		glVertexAttribPointer(uair::OpenGLStates::mVertexLocation, 3, GL_FLOAT, GL_TRUE, sizeof(uair::VBOVertex), (void*)(offsetof(uair::VBOVertex, mX)));
 		glVertexAttribPointer(uair::OpenGLStates::mNormalLocation, 3, GL_FLOAT, GL_TRUE, sizeof(uair::VBOVertex), (void*)(offsetof(uair::VBOVertex, mNX)));
 		glVertexAttribPointer(uair::OpenGLStates::mColourLocation, 4, GL_FLOAT, GL_TRUE, sizeof(uair::VBOVertex), (void*)(offsetof(uair::VBOVertex, mR)));
 		glVertexAttribPointer(uair::OpenGLStates::mTexCoordLocation, 3, GL_FLOAT, GL_TRUE, sizeof(uair::VBOVertex), (void*)(offsetof(uair::VBOVertex, mS)));
-		glVertexAttribPointer(uair::OpenGLStates::mTexExistsLocation, 1, GL_FLOAT, GL_TRUE, sizeof(uair::VBOVertex), (void*)(offsetof(uair::VBOVertex, mTex)));
+		glVertexAttribPointer(uair::OpenGLStates::mTypeLocation, 1, GL_FLOAT, GL_TRUE, sizeof(uair::VBOVertex), (void*)(offsetof(uair::VBOVertex, mType)));
+		glVertexAttribPointer(uair::OpenGLStates::mExtraLocation, 2, GL_FLOAT, GL_TRUE, sizeof(uair::VBOVertex), (void*)(offsetof(uair::VBOVertex, mExtra)));
 		
 		if (OpenGLStates::mCurrentFBO != targetID) {
 			glBindFramebuffer(GL_FRAMEBUFFER, targetID);
@@ -137,7 +139,8 @@ void VBO::Draw(const unsigned int& targetID, const unsigned int& pass) {
 			glDrawRangeElements(segmentInfo[i].mRenderMode, segmentInfo[i].mMinIndex, segmentInfo[i].mMaxIndex, segmentInfo[i].mIndicesCount, GL_UNSIGNED_INT, (const GLuint*)(0) + segmentInfo[i].mIndicesOffset);
 		}
 		
-		glDisableVertexAttribArray(uair::OpenGLStates::mTexExistsLocation);
+		glDisableVertexAttribArray(uair::OpenGLStates::mExtraLocation);
+		glDisableVertexAttribArray(uair::OpenGLStates::mTypeLocation);
 		glDisableVertexAttribArray(uair::OpenGLStates::mTexCoordLocation);
 		glDisableVertexAttribArray(uair::OpenGLStates::mColourLocation);
 		glDisableVertexAttribArray(uair::OpenGLStates::mNormalLocation);
