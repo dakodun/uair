@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 2013 Iain M. Crawford
+**	Copyright (c) 20XX Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -121,7 +121,8 @@ GLint OpenGLStates::mNormalLocation = -1;
 GLint OpenGLStates::mColourLocation = -1;
 GLint OpenGLStates::mTexCoordLocation = -1;
 GLint OpenGLStates::mTexLocation = -1;
-GLint OpenGLStates::mTexExistsLocation = -1;
+GLint OpenGLStates::mTypeLocation = -1;
+GLint OpenGLStates::mExtraLocation = -1;
 
 GLint OpenGLStates::mProjectionMatrixLocation = -1;
 GLint OpenGLStates::mViewMatrixLocation = -1;

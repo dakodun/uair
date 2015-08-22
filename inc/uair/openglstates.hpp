@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 2013 Iain M. Crawford
+**	Copyright (c) 20XX Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -35,6 +35,7 @@
 namespace uair {
 class OpenGLStates {
 	public :
+		// bind and store currently bound target
 		static bool BindArrayBuffer(const GLuint& id);
 		static bool BindElementArrayBuffer(const GLuint& id);
 		static bool UseProgram(const GLuint& id);
@@ -44,21 +45,25 @@ class OpenGLStates {
 		static bool BindPBOPack(const GLuint& id);
 		static bool BindPBOUnpack(const GLuint& id);
 		
+		// shader variable locations
 		static GLint mVertexLocation;
 		static GLint mNormalLocation;
 		static GLint mColourLocation;
 		static GLint mTexCoordLocation;
 		static GLint mTexLocation;
-		static GLint mTexExistsLocation;
+		static GLint mTypeLocation;
+		static GLint mExtraLocation;
 		
 		static GLint mProjectionMatrixLocation;
 		static GLint mViewMatrixLocation;
 		static GLint mModelMatrixLocation;
 		
+		// matrices for rendering
 		static glm::mat4 mProjectionMatrix;
 		static glm::mat4 mViewMatrix;
 		static glm::mat4 mModelMatrix;
 		
+		// currently bound target
 		static GLuint mCurrentArrayBuffer;
 		static GLuint mCurrentElementArrayBuffer;
 		static GLuint mCurrentProgram;
