@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 2014 Iain M. Crawford
+**	Copyright (c) 20XX Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -45,13 +45,6 @@ class ResourcePtr {
 			AddReference();
 		}
 		
-		/* ResourcePtr(const ResourcePtr<T>& other) {
-			// RemoveReference();
-			
-			mPtr = other.mPtr;
-			AddReference();
-		} */
-		
 		ResourcePtr(ResourcePtr<T>&& other) : ResourcePtr() {
 			mPtr = other.mPtr;
 			other.mPtr = nullptr;
@@ -61,16 +54,6 @@ class ResourcePtr {
 			
 			AddReference(mID);
 		}
-		
-		/* ResourcePtr(ResourcePtr<T>&& other) {
-			// RemoveReference();
-			
-			mPtr = other.mPtr;
-			AddReference(other.mID);
-			
-			other.mPtr = nullptr;
-			other.mID = 0u;
-		} */
 		
 		~ResourcePtr() {
 			RemoveReference();
@@ -83,31 +66,6 @@ class ResourcePtr {
 			
 			return *this;
 		}
-		
-		/* ResourcePtr<T>& operator=(const ResourcePtr<T>& other) {
-			if (mPtr != other.mPtr || mID != other.mID) {
-				RemoveReference();
-				
-				mPtr = other.mPtr;
-				AddReference();
-			}
-			
-			return *this;
-		} */
-		
-		/* ResourcePtr<T>& operator=(ResourcePtr<T>&& other) {
-			if (mPtr != other.mPtr || mID != other.mID) {
-				RemoveReference();
-				
-				mPtr = other.mPtr;
-				AddReference(other.mID);
-				
-				other.mPtr = nullptr;
-				other.mID = 0u;
-			}
-			
-			return *this;
-		} */
 		
 		void swap(ResourcePtr<T>& first, ResourcePtr<T>& second) {
 			std::swap(first.mPtr, second.mPtr);
@@ -154,6 +112,14 @@ class ResourcePtr {
 		
 		unsigned int GetID() const {
 			return mID;
+		}
+		
+		bool IsValid() {
+			if (mPtr) {
+				return true;
+			}
+			
+			return false;
 		}
 	private :
 		T* mPtr = nullptr;
