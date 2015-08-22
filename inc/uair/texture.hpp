@@ -56,8 +56,8 @@ class Texture : public Resource<Texture> {
 		
 		friend void swap(Texture& first, Texture& second);
 		
-		bool AddFromFile(const std::string& filename); // add a layer to the texture from an image file
-		bool AddFromMemory(std::vector<unsigned char> data, const unsigned int& width, const unsigned int& height); // add a layer to the texture from memory
+		bool AddFromFile(const std::string& filename, const bool& flip = true); // add a layer to the texture from an image file
+		bool AddFromMemory(std::vector<unsigned char> data, const unsigned int& width, const unsigned int& height, const bool& flip = true); // add a layer to the texture from memory
 		
 		bool CreateTexture(); // create the texture with the added layers
 		

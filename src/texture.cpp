@@ -58,7 +58,7 @@ void swap(Texture& first, Texture& second) {
 	std::swap(first.mIsTextureNull, second.mIsTextureNull);
 }
 
-bool Texture::AddFromFile(const std::string & fileName) {
+bool Texture::AddFromFile(const std::string & fileName, const bool& flip) {
 	TexelLayerPair tempData;
 	std::vector<unsigned char> buffer; // create a buffer for the texture data from the image file
 	
@@ -73,7 +73,7 @@ bool Texture::AddFromFile(const std::string & fileName) {
 		mIsTextureNull = false; // indicate texture is no longer null
 	}
 	
-	{
+	if (flip) { // flip texture in memory
 		std::vector<unsigned char> newData;
 		size_t increment = tempData.second.mWidth * 4u;
 		
@@ -88,24 +88,49 @@ bool Texture::AddFromFile(const std::string & fileName) {
 	return true;
 }
 
-bool Texture::AddFromMemory(std::vector<unsigned char> data, const unsigned int& width, const unsigned int& height) {
-	TexelLayerPair tempData;
+bool Texture::AddFromMemory(std::vector<unsigned char> data, const unsigned int& width, const unsigned int& height, const bool& flip) {
+	unsigned int layerCount = width * height * 4u; // the count of data (texels) in each layer
 	
-	tempData.first = std::move(data); // move the (copy of) supplied texture data into temporary
-	tempData.second.mWidth = width; tempData.second.mHeight = height; // set width and height of temporary
-	
-	unsigned int total = width * height * 4;
-	for (unsigned int i = tempData.first.size(); i < total; ++i) {
-		tempData.first.emplace_back(255); tempData.first.emplace_back(255);
-		tempData.first.emplace_back(255); tempData.first.emplace_back(  0);
+	if (layerCount > 0u) { // if there is any layer data (both width and height > 0)...
+		unsigned int leftover = data.size() % layerCount; // calculate remainder of data that doesn't fill up a layer
+		unsigned int padAmount = 0u; // the amount to pad the final layer
+		if (leftover > 0u || data.empty()) { // if the final layer is incomplete (requires padding)...
+			padAmount = (layerCount - (leftover)) / 4u; // calculate the amount to pad
+		}
+		
+		for (unsigned int i = 0u; i < padAmount; ++i) { // for all padding required...
+			data.emplace_back(255); data.emplace_back(255); // pad with a white, transparent texel
+			data.emplace_back(255); data.emplace_back(  0);
+		}
+		
+		for (unsigned int i = 0u; i < data.size(); i += layerCount) { // for all layers...
+			TexelLayerPair tempData; // create temporary layer data
+			std::vector<unsigned char> dataLayer(data.begin() + i, data.begin() + (i + layerCount)); // add a segment of the texel data to temporary
+			
+			if (flip) { // flip texture in memory
+				std::vector<unsigned char> newData;
+				size_t increment = width * 4u;
+				
+				for (unsigned int i = 0u; i < height; ++i) {
+					newData.insert(newData.begin(), dataLayer.begin() + (increment * i), dataLayer.begin() + (increment * (i + 1)));
+				}
+				
+				std::swap(dataLayer, newData);
+			}
+			
+			if (!dataLayer.empty() && mIsTextureNull) { // if there is data in the temporary and the texture is currently null...
+				mIsTextureNull = false; // indicate texture is no longer null
+			}
+			
+			tempData.first = std::move(dataLayer); // move the extracted layer from the supplied texture data into temporary
+			tempData.second.mWidth = width; tempData.second.mHeight = height; // set width and height of temporary
+			mData.push_back(std::move(tempData)); // move the temporary into the store
+		}
+		
+		return true;
 	}
 	
-	if (!tempData.first.empty() && mIsTextureNull) { // if there is data in the temporary and the texture is currently null...
-		mIsTextureNull = false; // indicate texture is no longer null
-	}
-	
-	mData.push_back(std::move(tempData)); // move the temporary into the store
-	return true;
+	return false;
 }
 
 bool Texture::CreateTexture() {
@@ -164,7 +189,7 @@ bool Texture::CreateTexture() {
 	
 	{
 		OpenGLStates::BindTexture(mTextureID); // bind the texture
-		OpenGLStates::mCurrentTexture = mTextureID; // set the texture as the currently bound texture
+		// OpenGLStates::mCurrentTexture = mTextureID; // set the texture as the currently bound texture
 		
 		// set the texture's default properties
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
