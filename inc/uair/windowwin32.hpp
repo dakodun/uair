@@ -29,7 +29,9 @@
 #define UAIRWINDOWWIN32_HPP
 
 // Missing winuser defines
-#define MAPVK_VK_TO_VSC 0
+#ifndef MAPVK_VK_TO_VSC
+	#define MAPVK_VK_TO_VSC 0
+#endif
 #define VK_OEM_PLUS 0xBB // '+' any country
 #define VK_OEM_COMMA 0xBC // ',' any country
 #define VK_OEM_MINUS 0xBD // '-' any country
