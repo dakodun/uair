@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 2013 Iain M. Crawford
+**	Copyright (c) 20XX Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -25,11 +25,6 @@
 **		   source distribution.
 ** **************************************************************** */
 
-/** 
-* \file		utilwin32.cpp
-* \brief	.
-**/
-
 #include "utilwin32.hpp"
 
 namespace uair {
@@ -47,6 +42,10 @@ extern double GetSysTime() {
 	else {
 		return GetTickCount() * 0.001;
 	}
+}
+
+extern void Sleep(const DWORD& time) {
+	::Sleep(time);
 }
 }
 }

@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 2013 Iain M. Crawford
+**	Copyright (c) 20XX Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -25,11 +25,6 @@
 **		   source distribution.
 ** **************************************************************** */
 
-/** 
-* \file		utilwin32.hpp
-* \brief	OS specific (Win32) utility functions.
-**/
-
 #ifndef UAIRUTILWIN32_HPP
 #define UAIRUTILWIN32_HPP
 
@@ -38,6 +33,7 @@
 namespace uair {
 namespace util {
 extern double GetSysTime();
+extern void Sleep(const DWORD& time);
 }
 }
 
