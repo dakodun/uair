@@ -32,6 +32,9 @@
 
 #include "resourcestore.hpp"
 #include "texture.hpp"
+#include "renderbuffer.hpp"
+#include "font.hpp"
+#include "soundbuffer.hpp"
 
 namespace uair {
 class ResourceManager;
@@ -50,9 +53,42 @@ class ResourceManager {
 		void RemoveTexture(const std::string& name);
 		ResourcePtr<Texture> GetTexture(const std::string& name);
 		
+		
+		template<typename ...Ts>
+		ResourcePtr<RenderBuffer> AddRenderBuffer(const std::string& name, const Ts&... params) {
+			return mRenderBufferStore.AddResource(name, params...);
+		}
+		
+		ResourcePtr<RenderBuffer> AddRenderBuffer(const std::string& name, RenderBuffer&& res);
+		void RemoveRenderBuffer(const std::string& name);
+		ResourcePtr<RenderBuffer> GetRenderBuffer(const std::string& name);
+		
+		
+		template<typename ...Ts>
+		ResourcePtr<Font> AddFont(const std::string& name, const Ts&... params) {
+			return mFontStore.AddResource(name, params...);
+		}
+		
+		ResourcePtr<Font> AddFont(const std::string& name, Font&& res);
+		void RemoveFont(const std::string& name);
+		ResourcePtr<Font> GetFont(const std::string& name);
+		
+		
+		template<typename ...Ts>
+		ResourcePtr<SoundBuffer> AddSoundBuffer(const std::string& name, const Ts&... params) {
+			return mSoundBufferStore.AddResource(name, params...);
+		}
+		
+		ResourcePtr<SoundBuffer> AddSoundBuffer(const std::string& name, SoundBuffer&& res);
+		void RemoveSoundBuffer(const std::string& name);
+		ResourcePtr<SoundBuffer> GetSoundBuffer(const std::string& name);
+		
 		void Clear();
 	public :
 		ResourceStore<Texture> mTextureStore;
+		ResourceStore<RenderBuffer> mRenderBufferStore;
+		ResourceStore<Font> mFontStore;
+		ResourceStore<SoundBuffer> mSoundBufferStore;
 };
 }
 

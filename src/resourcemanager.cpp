@@ -40,7 +40,50 @@ ResourcePtr<Texture> ResourceManager::GetTexture(const std::string& name) {
 	return mTextureStore.GetResource(name);
 }
 
+
+ResourcePtr<RenderBuffer> ResourceManager::AddRenderBuffer(const std::string& name, RenderBuffer&& res) {
+	return mRenderBufferStore.AddResource(name, std::forward<RenderBuffer>(res));
+}
+
+void ResourceManager::RemoveRenderBuffer(const std::string& name) {
+	mRenderBufferStore.RemoveResource(name);
+}
+
+ResourcePtr<RenderBuffer> ResourceManager::GetRenderBuffer(const std::string& name) {
+	return mRenderBufferStore.GetResource(name);
+}
+
+
+ResourcePtr<Font> ResourceManager::AddFont(const std::string& name, Font&& res) {
+	return mFontStore.AddResource(name, std::forward<Font>(res));
+}
+
+void ResourceManager::RemoveFont(const std::string& name) {
+	mFontStore.RemoveResource(name);
+}
+
+ResourcePtr<Font> ResourceManager::GetFont(const std::string& name) {
+	return mFontStore.GetResource(name);
+}
+
+
+ResourcePtr<SoundBuffer> ResourceManager::AddSoundBuffer(const std::string& name, SoundBuffer&& res) {
+	return mSoundBufferStore.AddResource(name, std::forward<SoundBuffer>(res));
+}
+
+void ResourceManager::RemoveSoundBuffer(const std::string& name) {
+	mSoundBufferStore.RemoveResource(name);
+}
+
+ResourcePtr<SoundBuffer> ResourceManager::GetSoundBuffer(const std::string& name) {
+	return mSoundBufferStore.GetResource(name);
+}
+
+
 void ResourceManager::Clear() {
 	mTextureStore.Clear();
+	mRenderBufferStore.Clear();
+	mFontStore.Clear();
+	mSoundBufferStore.Clear();
 }
 }
