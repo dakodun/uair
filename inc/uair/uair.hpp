@@ -60,6 +60,8 @@
 #include "pbo.hpp"
 #include "vbo.hpp"
 
+#include "sound.hpp"
+
 #include "game.hpp"
 
 #endif
