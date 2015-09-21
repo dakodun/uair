@@ -67,7 +67,7 @@ class ResourcePtr {
 			return *this;
 		}
 		
-		void swap(ResourcePtr<T>& first, ResourcePtr<T>& second) {
+		friend void swap(ResourcePtr<T>& first, ResourcePtr<T>& second) {
 			std::swap(first.mPtr, second.mPtr);
 			std::swap(first.mID, second.mID);
 			

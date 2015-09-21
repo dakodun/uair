@@ -190,60 +190,6 @@ Shape Shape::GetTransformed() const {
 	transformedShape.AddContours(transformedContours);
 	
 	return transformedShape;
-	
-	/* Shape newShape; // the transformed shape
-	glm::mat3 trans = mTransformation; // the complete transofrmation matrix (initially the custom transform matrix)
-	std::vector<Contour> newContours; // the transformed contours array
-	
-	{ // apply the individual transforms to the tranformation matrix
-		trans *= util::GetTranslationMatrix(mPosition - mOrigin);
-		
-		trans *= util::GetTranslationMatrix(mOrigin);
-		trans *= util::GetRotationMatrix(mRotation);
-		trans *= util::GetSkewingMatrix(mSkew);
-		trans *= util::GetScalingMatrix(mScale);
-		trans *= util::GetTranslationMatrix(-mOrigin);
-	}
-	
-	{ // copy the mask, per-vertex colouring, and animation data and properties (unchanged)
-		newShape.mLocalMask = mLocalMask;
-		newShape.mGlobalMask = mLocalMask;
-		
-		newShape.mWindingRule = mWindingRule;
-		
-		newShape.mColourArray = mColourArray;
-		newShape.mColourArrayExtra = mColourArrayExtra;
-		
-		newShape.mFrames = mFrames;
-		newShape.mCurrentFrame = mCurrentFrame;
-		newShape.mIsAnimated = mIsAnimated;
-		newShape.mAnimationDirection = mAnimationDirection;
-		newShape.mAnimationLimit = mAnimationLimit;
-		newShape.mAnimationTimer = mAnimationTimer;
-		newShape.mAnimationLoopCount = mAnimationLoopCount;
-		newShape.mAnimationStartFrame = mAnimationStartFrame;
-		newShape.mAnimationEndFrame = mAnimationEndFrame;
-		
-		newShape.mName = mName;
-		
-		newShape.mDepth = mDepth;
-		newShape.mColour = mColour;
-		newShape.mAlpha = mAlpha;
-	}
-	
-	for (auto contour = mContours.begin(); contour != mContours.end(); ++contour) { // for all contours in the shape...
-		Contour newContour; // the transformed contour
-		for (auto point = contour->mPoints.begin(); point != contour->mPoints.end(); ++point) { // for all points in the contour...
-			glm::vec3 pos = trans * glm::vec3(*point, 1.0f); // get the transformed point (as a 3d vector)
-			
-			newContour.AddPoint(glm::vec2(pos.x, pos.y)); // add the point to the transformed contour (only x and y are needed)
-		}
-		
-		newContours.push_back(std::move(newContour)); // add the transformed contours to the transformed contours array
-	}
-	
-	newShape.Polygon::AddContours(newContours); // add the transformed contours to the new shape (call the base method directly to avoid messing with any texturing)
-	return newShape; // return the new shape */
 }
 
 std::string Shape::GetTag() const {

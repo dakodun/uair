@@ -54,7 +54,7 @@ Font::Font(const unsigned int& textureSize) {
 	
 	mRenderBuffer.CreateRenderBuffer(GL_DEPTH24_STENCIL8, mTextureSize, mTextureSize); // create the associated render buffer
 	
-	// bind teh fbo, attach the render buffer and map the draw buffers
+	// bind the fbo, attach the render buffer and map the draw buffers
 	OpenGLStates::BindFBO(mFBO.GetFBOID());
 	mFBO.AttachRenderBuffer(&mRenderBuffer, GL_DEPTH_STENCIL_ATTACHMENT);
 	mFBO.MapBuffers({GL_COLOR_ATTACHMENT0});
