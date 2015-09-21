@@ -51,6 +51,7 @@
 #include <vector>
 #include <exception>
 #include <iostream>
+#include <functional>
 
 /*! \typedef typedef unsigned long RtAudioFormat;
     \brief RtAudio data format type.
@@ -179,11 +180,8 @@ static const RtAudioStreamStatus RTAUDIO_OUTPUT_UNDERFLOW = 0x2;  // The output 
    output buffer, the function should return a value of one.  To abort
    the stream immediately, the client should return a value of two.
  */
-typedef int (*RtAudioCallback)( void *outputBuffer, void *inputBuffer,
-                                unsigned int nFrames,
-                                double streamTime,
-                                RtAudioStreamStatus status,
-                                void *userData );
+typedef std::function<int (void *outputBuffer, void *inputBuffer, unsigned int nFrames,
+		double streamTime, RtAudioStreamStatus status, void *userData)> RtAudioCallback;
 
 /************************************************************************/
 /*! \class RtAudioError
@@ -531,6 +529,9 @@ class RtAudio
 
   //! Returns true if the stream is running and false if it is stopped or not open.
   bool isStreamRunning( void ) const throw();
+  
+  //! Returns true if the stream is in the process of stopping and false if it is fully stopped, open or closed.
+  bool isStreamStopping( void ) const throw();
 
   //! Returns the number of elapsed seconds since the stream was started.
   /*!
@@ -605,7 +606,7 @@ class RtAudio
 struct CallbackInfo {
   void *object;    // Used as a "this" pointer.
   ThreadHandle thread;
-  void *callback;
+  RtAudioCallback callback;
   void *userData;
   void *errorCallback;
   void *apiInfo;   // void pointer for API specific callback information
@@ -615,7 +616,7 @@ struct CallbackInfo {
 
   // Default constructor.
   CallbackInfo()
-  :object(0), callback(0), userData(0), errorCallback(0), apiInfo(0), isRunning(false), doRealtime(false) {}
+  :object(0), callback(nullptr), userData(0), errorCallback(0), apiInfo(0), isRunning(false), doRealtime(false) {}
 };
 
 // **************************************************************** //
@@ -695,6 +696,7 @@ public:
   virtual void setStreamTime( double time );
   bool isStreamOpen( void ) const { return stream_.state != STREAM_CLOSED; }
   bool isStreamRunning( void ) const { return stream_.state == STREAM_RUNNING; }
+  bool isStreamStopping( void ) const { return stream_.state == STREAM_STOPPING; }
   void showWarnings( bool value ) { showWarnings_ = value; }
 
 
@@ -834,6 +836,7 @@ inline void RtAudio :: stopStream( void )  { return rtapi_->stopStream(); }
 inline void RtAudio :: abortStream( void ) { return rtapi_->abortStream(); }
 inline bool RtAudio :: isStreamOpen( void ) const throw() { return rtapi_->isStreamOpen(); }
 inline bool RtAudio :: isStreamRunning( void ) const throw() { return rtapi_->isStreamRunning(); }
+inline bool RtAudio :: isStreamStopping( void ) const throw() { return rtapi_->isStreamStopping(); }
 inline long RtAudio :: getStreamLatency( void ) { return rtapi_->getStreamLatency(); }
 inline unsigned int RtAudio :: getStreamSampleRate( void ) { return rtapi_->getStreamSampleRate(); }
 inline double RtAudio :: getStreamTime( void ) { return rtapi_->getStreamTime(); }
