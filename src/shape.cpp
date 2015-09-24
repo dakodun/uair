@@ -29,6 +29,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include <limits>
 
 #include "game.hpp"
 #include "renderbatch.hpp"
@@ -205,7 +206,19 @@ void Shape::Process() {
 			
 			// if current frame is outwith defined bounds...
 			if (currentFrame < 0 || currentFrame >= static_cast<int>(mFrames.size()) || currentFrame == static_cast<int>(mAnimationEndFrame) + mAnimationDirection) {
-				currentFrame = mAnimationStartFrame; // reset to initial frame
+				if (mAnimationLoopCount != 0) { // if animation hasn't finished looping...
+					if (mAnimationLoopCount > 0) { // if animation isn't looping indefinitely...
+						--mAnimationLoopCount; // decrease loop counter by one
+					}
+					
+					currentFrame = mAnimationStartFrame; // reset to initial frame
+				}
+				else { // otherwise if animation is finished...
+					currentFrame = mAnimationEndFrame; // set frame back to end frame
+					mIsAnimated = false; // set shape as static
+					mAnimationLimit = 0.0f; // unset animation limit (speed)
+					break;
+				}
 			}
 		}
 		
@@ -265,17 +278,29 @@ void Shape::AddFrame(ResourcePtr<Texture> texture, const unsigned int& layer) {
 	}
 }
 
-void Shape::AddFrameCoords(ResourcePtr<Texture> texture, const unsigned int& layer, const std::vector<glm::vec2>& textureCoords) {
+void Shape::AddFrameCoords(ResourcePtr<Texture> texture, const unsigned int& layer, std::vector<glm::vec2> textureCoords) {
 	Texture* tex = texture.GetResource();
 	
 	if (tex) {
 		if (layer < tex->GetDepth()) {
+			const Texture::LayerData& texData = tex->GetData(layer);
+			
 			AnimationFrame frame; // create a new frame
 			frame.mTexture = texture; // set the texture pointer of the frame
 			
+			// calculate the scale between the non-padded and padded texture (if any)
+			glm::vec2 scaleFactor = glm::vec2(texData.mWidth / static_cast<float>(tex->GetWidth()),
+					texData.mHeight / static_cast<float>(tex->GetHeight()));
+			
 			if (!textureCoords.empty()) {
-				frame.mMinST = textureCoords.front(); frame.mMaxST = textureCoords.front();
-				for (auto coord = textureCoords.begin() + 1; coord != textureCoords.end(); ++coord) {
+				// set the min and max to extreme values initially
+				frame.mMinST = glm::vec2(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
+				frame.mMaxST = glm::vec2(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest());
+				
+				for (auto coord = textureCoords.begin(); coord != textureCoords.end(); ++coord) { // for all coords in the array...
+					coord->x *= scaleFactor.x; coord->y *= scaleFactor.y; // scale the coord by the scale factor
+					
+					// update the min and max coord values
 					frame.mMinST.x = std::min(frame.mMinST.x, coord->x); frame.mMinST.y = std::min(frame.mMinST.y, coord->y);
 					frame.mMaxST.x = std::max(frame.mMaxST.x, coord->x); frame.mMaxST.y = std::max(frame.mMaxST.y, coord->y);
 				}
@@ -303,8 +328,10 @@ void Shape::AddFrameRect(ResourcePtr<Texture> texture, const unsigned int& layer
 			
 			if (textureRect.size() == 2) { // if a custom texture rect was supplied...
 				// calculate the min and max (top-left and bottom-right) ST coordinates of the required portion of the texture
-				min = glm::vec2(textureRect.at(0).x / texData.mWidth, textureRect.at(0).y / texData.mHeight);
-				max = glm::vec2(textureRect.at(1).x / texData.mWidth, textureRect.at(1).y / texData.mHeight);
+				min = glm::vec2(std::max(std::max(0.0f, textureRect.at(0).x / tex->GetWidth()), min.x),
+						std::max(std::max(0.0f, textureRect.at(0).y / tex->GetHeight()), min.y));
+				max = glm::vec2(std::min(std::min(texData.mSMax, textureRect.at(1).x / tex->GetWidth()), max.x),
+						std::min(std::min(texData.mTMax, textureRect.at(1).y / tex->GetHeight()), max.y));
 			}
 			
 			AnimationFrame frame; // create a new frame
@@ -329,17 +356,19 @@ void Shape::AddFrameStrip(ResourcePtr<Texture> texture, const unsigned int& laye
 	
 	if (tex) {
 		if (layer < tex->GetDepth()) {
-			const Texture::LayerData& texData = tex->GetData(layer);
+			const Texture::LayerData& texData = tex->GetData(layer); // get the data for the layer
 			
-			float frameWidth = static_cast<float>(texData.mWidth) - (offset.x * numPerRow);
-			float frameHeight = static_cast<float>(texData.mHeight) - (offset.y * numPerCol);
+			// calculate the dimensions of a single frame
+			float frameWidth = texData.mWidth / static_cast<float>(numPerRow);
+			float frameHeight = texData.mHeight / static_cast<float>(numPerCol);
 			
-			glm::vec2 increment = glm::vec2((frameWidth / texData.mWidth) / numPerRow, (frameHeight / texData.mHeight) / numPerCol);
-			glm::vec2 offsetIncrement = glm::vec2(offset.x / texData.mWidth, offset.y / texData.mHeight);
+			// calculate the dimensions of a single frame in texture coordinates, including the offset between frames
+			glm::vec2 increment = glm::vec2((frameWidth - offset.x) / tex->GetWidth(), (frameHeight - offset.y) / tex->GetHeight());
+			glm::vec2 offsetIncrement = glm::vec2(static_cast<float>(offset.x) / tex->GetWidth(), static_cast<float>(offset.y) / tex->GetHeight());
 			
 			for (unsigned int i = 0; i < numFrames; ++i) {
-				unsigned int t = i / numPerRow;
-				unsigned int s = i % numPerRow;
+				unsigned int t = i / numPerRow; // the current row in the sheet
+				unsigned int s = i % numPerRow; // the current column in the sheet
 				
 				// calculate the min and max (top-left and bottom-right) ST coordinates of the required portion of the texture
 				glm::vec2 min = glm::vec2((s * increment.x) + (s * offsetIncrement.x), (t * increment.y) + (t * offsetIncrement.y)); // top-left of texture
@@ -365,7 +394,7 @@ void Shape::AddFrame(Texture* texture, const unsigned int& layer) {
 	AddFrame(ResourcePtr<Texture>(texture), layer); // add naked pointer to resource pointer and call parent function
 }
 
-void Shape::AddFrameCoords(Texture* texture, const unsigned int& layer, const std::vector<glm::vec2>& textureCoords) {
+void Shape::AddFrameCoords(Texture* texture, const unsigned int& layer, std::vector<glm::vec2> textureCoords) {
 	AddFrameCoords(ResourcePtr<Texture>(texture), layer, textureCoords); // add naked pointer to resource pointer and call parent function
 }
 
@@ -410,38 +439,12 @@ std::list<RenderBatchData> Shape::Upload() {
 	std::vector<glm::vec2> vertices; // all transformed vertices in shape (from each contour)
 	
 	{ // create arrays of transformed vertices and vertex counts
-		// [!]
-		/* glm::mat3 transMat = mTransformation; // get the transform matrix for shape
-		transMat *= util::GetTranslationMatrix(mPosition - mOrigin); // translate by position offset (take into account origin offset)
-		
-		transMat *= util::GetTranslationMatrix(mOrigin); // translate to origin...
-		transMat *= util::GetRotationMatrix(mRotation); // ...rotate...
-		transMat *= util::GetSkewingMatrix(mSkew); // ...skew...
-		transMat *= util::GetScalingMatrix(mScale); // ...scale...
-		transMat *= util::GetTranslationMatrix(-mOrigin); // ...and then translate back from origin */
-		
 		for (auto contour = mContours.begin(); contour != mContours.end(); ++contour) { // for all contours...
 			const std::vector<glm::vec2>& points = contour->GetPoints(); // get const reference to vertices in countour
 			vertices.insert(vertices.end(), points.begin(), points.end());
 			vertCounts.push_back(points.size()); // store count of vertices
-			
-			// [!]
-			/* for (auto vertex = points.begin(); vertex != points.end(); ++vertex) { // for all vertices in contour...
-				glm::vec3 pos = transMat * glm::vec3(*vertex, 1.0f); // get position of transformed vertex
-				vertices.emplace_back(pos.x, pos.y); // add transformed vertex
-			} */
 		}
 	}
-	
-	// [!]
-	/* { // create rendering data for regular vertices
-		std::vector<glm::vec2> texCoords;
-		if (mCurrentFrame < mFrames.size()) {
-			texCoords.insert(texCoords.end(), mFrames.at(mCurrentFrame).mTexCoords.begin(), mFrames.at(mCurrentFrame).mTexCoords.end());
-		}
-		
-		CreateVBOVertices(rbd, vertices, texCoords, mColourArray);
-	} */
 	
 	size_t indexType = 0u; // type of indices for current render mode
 	GLenum renderMode = mRenderMode; // make a copy of the current render mode
@@ -589,25 +592,6 @@ std::list<RenderBatchData> Shape::Upload() {
 		
 		CreateVBOVertices(rbd, verticesTransformed, texCoords, colours);
 	}
-	
-	/* { // create rendering data for extra vertices added during triangulation
-		std::vector<glm::vec2> texCoords;
-		if (mCurrentFrame < mFrames.size()) {
-			texCoords.insert(texCoords.end(), mFrames.at(mCurrentFrame).mTexCoordsExtra.begin(), mFrames.at(mCurrentFrame).mTexCoordsExtra.end());
-		}
-		
-		std::vector<glm::vec4> colours;
-		colours.insert(colours.end(), mColourArrayExtra.begin(), mColourArrayExtra.end());
-		
-		{
-			std::vector<glm::vec2> verticesExtra;
-			for (auto vertex = mVertices.begin(); vertex != mVertices.end(); ++vertex) {
-				verticesExtra.push_back(vertex->mPoint);
-			}
-			
-			CreateVBOVertices(rbd, verticesExtra, texCoords, colours);
-		}
-	} */
 	
 	rbd.mIndData.insert(rbd.mIndData.end(), mIndices.at(indexType).begin(), mIndices.at(indexType).end()); // copy indices into render batch data
 	if (util::CompareFloats(mScale.x, util::LessThan, 0.0f) ^ util::CompareFloats(mScale.y, util::LessThan, 0.0f)) { // if ONE of the x or y scales is negative...

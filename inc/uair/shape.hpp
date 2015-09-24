@@ -87,13 +87,13 @@ class Shape : public Polygon, public Renderable {
 		
 		// add one or more animation frames to the shape from a sepecified texture or resource pointer
 		void AddFrame(ResourcePtr<Texture> texture, const unsigned int& layer);
-		void AddFrameCoords(ResourcePtr<Texture> texture, const unsigned int& layer, const std::vector<glm::vec2>& textureCoords);
+		void AddFrameCoords(ResourcePtr<Texture> texture, const unsigned int& layer, std::vector<glm::vec2> textureCoords);
 		void AddFrameRect(ResourcePtr<Texture> texture, const unsigned int& layer, const std::vector<glm::vec2>& textureRect);
 		void AddFrameStrip(ResourcePtr<Texture> texture, const unsigned int& layer, const unsigned int& numFrames, const unsigned int& numPerRow,
 				const unsigned int& numPerCol, const glm::ivec2& offset = glm::ivec2(0, 0));
 		
 		void AddFrame(Texture* texture, const unsigned int& layer);
-		void AddFrameCoords(Texture* texture, const unsigned int& layer, const std::vector<glm::vec2>& textureCoords);
+		void AddFrameCoords(Texture* texture, const unsigned int& layer, std::vector<glm::vec2> textureCoords);
 		void AddFrameRect(Texture* texture, const unsigned int& layer, const std::vector<glm::vec2>& textureRect);
 		void AddFrameStrip(Texture* texture, const unsigned int& layer, const unsigned int& numFrames, const unsigned int& numPerRow,
 				const unsigned int& numPerCol, const glm::ivec2& offset = glm::ivec2(0, 0));
