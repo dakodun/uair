@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 2013 Iain M. Crawford
+**	Copyright (c) 20XX Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -125,8 +125,8 @@ void WindowWin32::Process() {
 		localMouse.y = globalMouse.y;
 		ScreenToClient(mWindowHandle, &localMouse);
 		
-		if ((globalMouse.x != storedGlobalMouse.x || globalMouse.y != storedGlobalMouse.x) ||
-				(localMouse.x != storedLocalMouse.x || localMouse.y != storedLocalMouse.x)) {
+		if ((globalMouse.x != storedGlobalMouse.x || globalMouse.y != storedGlobalMouse.y) ||
+				(localMouse.x != storedLocalMouse.x || localMouse.y != storedLocalMouse.y)) {
 			
 			WindowEvent e;
 			e.type = WindowEvent::MouseMoveType;
@@ -360,14 +360,6 @@ void WindowWin32::SetUpWindow() {
 		}
 	}
 }
-
-/* void WindowWin32::LinkContext(OpenGLContextWin32& context) {
-	mContextPtr = &context;
-	mContextPtr->mWindowPtr = this;
-	
-	context.Create(mDeviceContext, mWinDS);
-	context.SetUp(mWinSize);
-} */
 
 LRESULT CALLBACK WindowWin32::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	if (message == WM_NCCREATE) {
@@ -648,7 +640,7 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND & hWnd, const UINT & messa
 			WindowEvent e;
 			e.type = WindowEvent::MouseButtonType;
 			
-			if (HIWORD(wParam)) {
+			if (HIWORD(wParam) == 1) {
 				e.mouseButton.button = Mouse::M4;
 			}
 			else {
@@ -668,7 +660,7 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND & hWnd, const UINT & messa
 			WindowEvent e;
 			e.type = WindowEvent::MouseButtonType;
 			
-			if (HIWORD(wParam)) {
+			if (HIWORD(wParam) == 1) {
 				e.mouseButton.button = Mouse::M4;
 			}
 			else {
@@ -690,7 +682,7 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND & hWnd, const UINT & messa
 			WindowEvent e;
 			e.type = WindowEvent::MouseButtonType;
 			
-			if (HIWORD(wParam)) {
+			if (HIWORD(wParam) == 1) {
 				e.mouseButton.button = Mouse::M4;
 			}
 			else {
@@ -714,21 +706,6 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND & hWnd, const UINT & messa
 			mEventQueue.push_back(e);
 			
 			return 0;
-		/* case WM_MOUSEMOVE : {
-			WindowEvent e;
-			e.type = WindowEvent::MouseMoveType;
-			e.mouseMove.localX = GET_X_LPARAM(lParam);
-			e.mouseMove.localY = GET_Y_LPARAM(lParam);
-			
-			POINT p;
-			GetCursorPos(&p);
-			e.mouseMove.globalX = p.x;
-			e.mouseMove.globalY = p.y;
-			
-			mEventQueue.push_back(e);
-			
-			break;
-		} */
 	}
 	
 	return DefWindowProcW(hWnd, message, wParam, lParam);
