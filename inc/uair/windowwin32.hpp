@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 2013 Iain M. Crawford
+**	Copyright (c) 20XX Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -86,7 +86,6 @@ class WindowWin32 {
 		void MakeCurrent(OpenGLContext& context);
 	protected :
 		void SetUpWindow();
-		// void LinkContext(OpenGLContextWin32& context);
 		
 		LRESULT CALLBACK HandleEvents(const HWND & hWnd, const UINT & message, const WPARAM & wParam, const LPARAM & lParam);
 		
