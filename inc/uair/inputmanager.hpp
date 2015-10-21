@@ -29,7 +29,9 @@
 #define UAIRINPUTMANAGER_HPP
 
 #include <memory>
+#include <vector>
 #include <map>
+#include <set>
 #include <glm/glm.hpp>
 
 #include "inputenums.hpp"
@@ -39,38 +41,105 @@ class InputManager {
 	friend class Game;
 	
 	public :
+		struct InputDeviceCaps { // a store containing the controls that an input device possesses
+			struct ControlCaps { // the capabilities of an individual control
+				Device mDevice; // the id of the control
+				int mLowerRange; // the lower end of the input device's value range
+				int mUpperRange; // the upper end of the input device's value range
+				unsigned int mCollectionID; // the id of the link collection that the control belongs to
+			};
+			
+			std::array<ControlCaps, DEVICECOUNT> mControls; // an array that holds the capabilities for all controls present on the device
+		};
+		
+		class InputDevice { // an input device connected to the system
+			friend class InputManager;
+			
+			public :
+				InputDevice();
+				InputDevice(const unsigned int& buttonCount, const unsigned int& controlCount,
+						const InputDeviceCaps& caps);
+				
+				unsigned int GetButtonCount() const; // get the number of buttons reported by the input device
+				bool GetButtonDown(const unsigned int& button) const; // returns true if the button is held down
+				bool GetButtonPressed(const unsigned int& button) const; // returns true if the button has been pressed (fires once)
+				bool GetButtonReleased(const unsigned int& button) const; // returns true if the button has been released (fires once)
+				
+				unsigned int GetControlCount() const; // get the number of controls reported by the input device
+				bool HasControl(const Device& control) const; // check if the specified control is present on the input device
+				int GetControl(const Device& control) const; // returns the value of the specified control
+				int GetControlScaled(const Device& control, std::pair<int, int> range = std::make_pair(0, 255)) const; // returns the value of the specified control scaled into the range specified
+				std::pair<int, int> GetControlRange(const Device& control) const; // returns the range of the specified control
+				
+				std::vector<Device> GetLinkedDevices(const unsigned int& collectionID) const; // get an array of all controls sharing the specified link id (if any)
+				unsigned int GetLinkID(const Device& control) const; // returns the link id associated with the specified control
+			private :
+				unsigned int mButtonCount; // the reported number of buttons present on the input device
+				unsigned int mControlCount; // the reported number of controls present on the input device
+				std::map<Device, InputDeviceCaps::ControlCaps> mControlCaps; // the capabilities of controls present on the device
+				
+				std::map<unsigned int, unsigned int> mButtonStates; // the current state of all buttons
+				std::map<Device, int> mControlStates; // the current value of all controls
+				
+				std::map<unsigned int, std::vector<Device> > mLinkCollections; // all present controls grouped by their link id
+		};
+	public :
 		InputManager();
 		
 		void Process();
 		
-		bool GetKeyboardDown(const Keyboard & key) const;
-		bool GetKeyboardPressed(const Keyboard & key) const;
-		bool GetKeyboardReleased(const Keyboard & key) const;
+		bool GetKeyboardDown(const Keyboard& key) const;
+		bool GetKeyboardPressed(const Keyboard& key) const;
+		bool GetKeyboardReleased(const Keyboard& key) const;
 		
-		bool GetMouseDown(const Mouse & button) const;
-		bool GetMousePressed(const Mouse & button) const;
-		bool GetMouseReleased(const Mouse & button) const;
+		bool GetMouseDown(const Mouse& button) const;
+		bool GetMousePressed(const Mouse& button) const;
+		bool GetMouseReleased(const Mouse& button) const;
 		
 		int GetMouseWheel() const;
 		glm::ivec2 GetLocalMouseCoords() const;
 		glm::ivec2 GetGlobalMouseCoords() const;
+		
+		bool DeviceExists(const unsigned int& deviceID) const; // returns true if the input device with the specified id exists
+		const InputDevice& GetDevice(const unsigned int& deviceID) const; // returns the input device with the associated id (or the default device if id is invalid)
+		
+		unsigned int GetDeviceButtonCount(const int& deviceID) const; // helper function
+		bool GetDeviceButtonDown(const int& deviceID, const unsigned int& button) const; // helper function
+		bool GetDeviceButtonPressed(const int& deviceID, const unsigned int& button) const; // helper function
+		bool GetDeviceButtonReleased(const int& deviceID, const unsigned int& button) const; // helper function
+		
+		unsigned int GetDeviceControlCount(const int& deviceID) const; // helper function
+		bool DeviceHasControl(const int& deviceID, const Device& control) const; // helper function
+		int GetDeviceControl(const int& deviceID, const Device& control) const; // helper function
+		int GetDeviceControlScaled(const int& deviceID, const Device& control, std::pair<int, int> range = std::make_pair(0, 255)) const; // helper function
+		std::pair<int, int> GetDeviceControlRange(const int& deviceID, const Device& control) const; // helper function
+		
+		std::vector<Device> GetDeviceLinkedDevices(const int& deviceID, const unsigned int& collectionID) const; // helper function
+		unsigned int GetDeviceLinkID(const int& deviceID, const Device& control) const; // helper function
 	private :
 		void Reset();
 		
-		void HandleKeyboardKeys(const Keyboard & key, const unsigned int & type);
+		void HandleKeyboardKeys(const Keyboard& key, const unsigned int& type);
 		
-		void HandleMouseButtons(const Mouse & button, const unsigned int & type);
-		void HandleMouseMove(const glm::ivec2 & local, const glm::ivec2 & global);
+		void HandleMouseButtons(const Mouse& button, const unsigned int& type);
+		void HandleMouseMove(const glm::ivec2& local, const glm::ivec2& global);
+		
+		void AddDevice(const int& deviceID, const unsigned int& buttonCount, const unsigned int& controlCount,
+				const InputDeviceCaps& caps); // adds an input device to the store when it is connected to the system
+		void RemoveDevice(const int& deviceID); // removes an input device from the store when it is disconnected from the system
+		void HandleDeviceButtons(const unsigned int& button, const unsigned int& type, const int& deviceID); // handles the updating of the states of input device controls
+		void HandleDeviceControls(const Device& control, const int& value, const int& deviceID); // handles the updating of the states of input device controls
 	private :
-		typedef std::map<Keyboard, unsigned int> KeyboardMap;
-		KeyboardMap mKeyboardStates;
+		std::map<Keyboard, unsigned int> mKeyboardStates;
 		
-		typedef std::map<Mouse, unsigned int> MouseMap;
-		MouseMap mMouseStates;
+		std::map<Mouse, unsigned int> mMouseStates;
 		
 		int mMouseWheel;
 		glm::ivec2 mLocalMouseCoords;
 		glm::ivec2 mGlobalMouseCoords;
+		
+		std::map<int, InputDevice> mInputDevices; // a store of all input devices currently connected to the system
+		InputDevice mDefaultDevice; // the default device that is used when an invalid device is requested
 };
 
 typedef std::shared_ptr<InputManager> InputManagerPtr;

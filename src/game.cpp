@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 2014 Iain M. Crawford
+**	Copyright (c) 20XX Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -50,16 +50,12 @@ Game::~Game() {
 }
 
 void Game::Run() {
+	mSceneManager->ChangeScene(); // perform initial scene change if required so we can capture events immediately
+	
 	while (mWindow) { // whilst we have a valid window...
 		mWindow->Process(); // process the window
 		
 		while (!mWindow->mEventQueue.empty()) { // whilst there are events waiting in the queue...
-			/* WindowEvent e = mWindow->mEventQueue.front(); // get the event at the front of the window's queue
-			mEventQueue.push_back(e); // add to our event queue
-			mWindow->mEventQueue.pop_front(); // remove it from the window's queue
-			
-			HandleEventQueue(e); // handle the event queue */
-			
 			HandleEventQueue(mWindow->mEventQueue.front());
 			mWindow->mEventQueue.pop_front();
 		}
@@ -88,7 +84,6 @@ void Game::Run() {
 				Process(); // handle all processing
 				++processed; // increase the process call count
 				
-				// mTotalFrameTime += mFrameLowerLimit; // increase the total frame time
 				mAccumulator -= mFrameLowerLimit; // decrease the accumulated time
 				
 				if (mOpen == false) { // if we are to quit the game...
@@ -104,7 +99,6 @@ void Game::Run() {
 			
 			if (processed > 0u) { // if we have had at least 1 process call...
 				PostProcess(processed); // handle all post processing
-				// mEventQueue.clear(); // empty the event queue
 			}
 		}
 		
@@ -415,8 +409,60 @@ glm::ivec2 Game::GetGlobalMouseCoords() const {
 	return mInputManager->GetGlobalMouseCoords();
 }
 
+bool Game::DeviceExists(const unsigned int& deviceID) const {
+	return mInputManager->DeviceExists(deviceID);
+}
+
+const InputManager::InputDevice& Game::GetDevice(const unsigned int& deviceID) const {
+	return mInputManager->GetDevice(deviceID);
+}
+
+unsigned int Game::GetDeviceButtonCount(const int& deviceID) const {
+	return mInputManager->GetDeviceButtonCount(deviceID);
+}
+
+bool Game::GetDeviceButtonDown(const int& deviceID, const unsigned int& button) const {
+	return mInputManager->GetDeviceButtonDown(deviceID, button);
+}
+
+bool Game::GetDeviceButtonPressed(const int& deviceID, const unsigned int& button) const {
+	return mInputManager->GetDeviceButtonPressed(deviceID, button);
+}
+
+bool Game::GetDeviceButtonReleased(const int& deviceID, const unsigned int& button) const {
+	return mInputManager->GetDeviceButtonReleased(deviceID, button);
+}
+
+unsigned int Game::GetDeviceControlCount(const int& deviceID) const {
+	return mInputManager->GetDeviceControlCount(deviceID);
+}
+
+bool Game::DeviceHasControl(const int& deviceID, const Device& control) const {
+	return mInputManager->DeviceHasControl(deviceID, control);
+}
+
+int Game::GetDeviceControl(const int& deviceID, const Device& control) const {
+	return mInputManager->GetDeviceControl(deviceID, control);
+}
+
+int Game::GetDeviceControlScaled(const int& deviceID, const Device& control, std::pair<int, int> range) const {
+	return mInputManager->GetDeviceControlScaled(deviceID, control, range);
+}
+
+std::pair<int, int> Game::GetDeviceControlRange(const int& deviceID, const Device& control) const {
+	return mInputManager->GetDeviceControlRange(deviceID, control);
+}
+
+std::vector<Device> Game::GetDeviceLinkedDevices(const int& deviceID, const unsigned int& collectionID) const {
+	return mInputManager->GetDeviceLinkedDevices(deviceID, collectionID);
+}
+
+unsigned int Game::GetDeviceLinkID(const int& deviceID, const Device& control) const {
+	return mInputManager->GetDeviceLinkID(deviceID, control);
+}
+
 void Game::HandleEventQueue(const WindowEvent& e) {
-	switch (e.type) {
+	switch (e.mType) {
 		case WindowEvent::CloseType : {
 			mOpen = false;
 			break;
@@ -430,20 +476,38 @@ void Game::HandleEventQueue(const WindowEvent& e) {
 			break;
 		}
 		case WindowEvent::KeyboardKeyType : {
-			mInputManager->HandleKeyboardKeys(e.keyboardKey.key, e.keyboardKey.type);
+			mInputManager->HandleKeyboardKeys(e.mKeyboardKey.mKey, e.mKeyboardKey.mType);
 			break;
 		}
 		case WindowEvent::MouseButtonType : {
-			mInputManager->HandleMouseButtons(e.mouseButton.button, e.mouseButton.type);
+			mInputManager->HandleMouseButtons(e.mMouseButton.mButton, e.mMouseButton.mType);
 			break;
 		}
 		case WindowEvent::MouseWheelType : {
-			mInputManager->mMouseWheel += e.mouseWheel.amount;
+			mInputManager->mMouseWheel += e.mMouseWheel.mAmount;
 			break;
 		}
 		case WindowEvent::MouseMoveType : {
-			mInputManager->HandleMouseMove(glm::ivec2(e.mouseMove.localX, e.mouseMove.localY),
-					glm::ivec2(e.mouseMove.globalX, e.mouseMove.globalY));
+			mInputManager->HandleMouseMove(glm::ivec2(e.mMouseMove.mLocalX, e.mMouseMove.mLocalY),
+					glm::ivec2(e.mMouseMove.mGlobalX, e.mMouseMove.mGlobalY));
+			break;
+		}
+		case WindowEvent::DeviceChangedType : { // an input device has been connect or disconnected
+			if (e.mDeviceChanged.mStatus) { // if the device was connected...
+				mInputManager->AddDevice(e.mDeviceChanged.mID, e.mDeviceChanged.mButtonCount, e.mDeviceChanged.mControlCount, e.mDeviceChanged.mCaps);
+			}
+			else {
+				mInputManager->RemoveDevice(e.mDeviceChanged.mID);
+			}
+			
+			break;
+		}
+		case WindowEvent::DeviceButtonType : { // a button on an input device has been pressed or released
+			mInputManager->HandleDeviceButtons(e.mDeviceButton.mButton, e.mDeviceButton.mType, e.mDeviceButton.mID);
+			break;
+		}
+		case WindowEvent::DeviceControlType : { // the value of a control on an input device has changed
+			mInputManager->HandleDeviceControls(e.mDeviceControl.mControl, e.mDeviceControl.mValue, e.mDeviceControl.mID);
 			break;
 		}
 		default :

@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 2013 Iain M. Crawford
+**	Copyright (c) 20XX Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -25,20 +25,18 @@
 **		   source distribution.
 ** **************************************************************** */
 
-/** 
-* \file		windowevent.hpp
-* \brief	WindowEvent.
-**/
-
 #ifndef UAIRWINDOWEVENT_HPP
 #define UAIRWINDOWEVENT_HPP
 
+#include <map>
+
 #include "inputenums.hpp"
+#include "inputmanager.hpp"
 
 namespace uair {
 class WindowEvent {
 	public :
-		enum Type {
+		enum Type { // the types this message can be
 			CloseType,
 			SizeType,
 			MoveType,
@@ -50,24 +48,25 @@ class WindowEvent {
 			KeyboardKeyType,
 			MouseButtonType,
 			MouseWheelType,
-			MouseMoveType
+			MouseMoveType,
+			DeviceChangedType,
+			DeviceButtonType,
+			DeviceControlType
 		};
-		
-		Type type;
 		
 		struct Close {
 			
 		};
 		
 		struct Size {
-			unsigned int type;
-			short width;
-			short height;
+			unsigned int mType;
+			short mWidth;
+			short mHeight;
 		};
 		
 		struct Move {
-			short x;
-			short y;
+			short mX;
+			short mY;
 		};
 		
 		struct GainedFocus {
@@ -79,8 +78,8 @@ class WindowEvent {
 		};
 		
 		struct DisplayChange {
-			short width;
-			short height;
+			short mWidth;
+			short mHeight;
 		};
 		
 		struct GainedCapture {
@@ -92,39 +91,64 @@ class WindowEvent {
 		};
 		
 		struct KeyboardKey {
-			Keyboard key;
-			unsigned int type;
+			Keyboard mKey;
+			unsigned int mType;
 		};
 		
 		struct MouseButton {
-			Mouse button;
-			unsigned int type;
+			Mouse mButton;
+			unsigned int mType;
 		};
 		
 		struct MouseWheel {
-			int amount;
+			int mAmount;
 		};
 		
 		struct MouseMove {
-			int localX;
-			int localY;
-			int globalX;
-			int globalY;
+			int mLocalX;
+			int mLocalY;
+			int mGlobalX;
+			int mGlobalY;
 		};
 		
-		union {
-			Close close;
-			Size size;
-			Move move;
-			GainedFocus gainedFocus;
-			LostFocus lostFocus;
-			DisplayChange displayChange;
-			GainedCapture gainedCapture;
-			LostCapture lostCapture;
-			KeyboardKey keyboardKey;
-			MouseButton mouseButton;
-			MouseWheel mouseWheel;
-			MouseMove mouseMove;
+		struct DeviceChanged { // an input device has been connect or disconnected
+			int mID; // the id of the input device
+			bool mStatus; // the type of event (connected or disconnected)
+			unsigned int mButtonCount; // the number of buttons the input device reports
+			unsigned int mControlCount; // the number of controls the input device reports
+			InputManager::InputDeviceCaps mCaps; // an array of the controls present on the input device and their ranges and link ids
+		};
+		
+		struct DeviceButton { // a button on an input device has been pressed or released
+			unsigned int mButton; // the id of the button
+			unsigned int mType; // the type of event (pressed or released)
+			int mID; // the id of the input device
+		};
+		
+		struct DeviceControl { // the value of a control on an input device has changed
+			Device mControl; // the type of control
+			int mValue; // the value of the control
+			int mID; // the id of the input device
+		};
+	public :
+		Type mType; // the type that this message is
+		
+		union { // the data supplied with this message
+			Close mClose;
+			Size mSize;
+			Move mMove;
+			GainedFocus mGainedFocus;
+			LostFocus mLostFocus;
+			DisplayChange mDisplayChange;
+			GainedCapture mGainedCapture;
+			LostCapture mLostCapture;
+			KeyboardKey mKeyboardKey;
+			MouseButton mMouseButton;
+			MouseWheel mMouseWheel;
+			MouseMove mMouseMove;
+			DeviceChanged mDeviceChanged;
+			DeviceButton mDeviceButton;
+			DeviceControl mDeviceControl;
 		};
 };
 }

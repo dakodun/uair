@@ -38,8 +38,10 @@
 #define VK_OEM_PERIOD 0xBE // '.' any country
 
 #include <string>
-#include <set>
 #include <deque>
+#include <map>
+#include <vector>
+#include <memory>
 
 #include <glm/glm.hpp>
 
@@ -58,8 +60,8 @@ class WindowWin32 {
 	
 	public :
 		WindowWin32();
-		WindowWin32(const std::string & windowTitle, const WindowDisplaySettings & settings,
-				const unsigned long & windowStyle = WindowStyles::Visible | WindowStyles::Titlebar | WindowStyles::Close);
+		WindowWin32(const std::string& windowTitle, const WindowDisplaySettings& settings,
+				const unsigned long& windowStyle = WindowStyles::Visible | WindowStyles::Titlebar | WindowStyles::Close);
 		WindowWin32(const WindowWin32& other) = delete;
 		WindowWin32(WindowWin32&& other);
 		virtual ~WindowWin32();
@@ -85,13 +87,28 @@ class WindowWin32 {
 		
 		void MakeCurrent(OpenGLContext& context);
 	protected :
+		struct InputDevice { // an input device connected to the system
+			int mID = 0; // the id assigned to the input device
+			unsigned int mButtonCount = 0u; // the number of buttons reported by the input device
+			unsigned int mControlCount = 0u; // the number of controls reported by the input device
+			std::vector<InputManager::InputDeviceCaps::ControlCaps> mControls; // the capabilities of controls present on the device
+			
+			std::vector<bool> mButtonStates; // the current state of all buttons
+			std::map<Device, int> mControlStates; // the current values of all controls
+		};
+	protected :
 		void SetUpWindow();
 		
-		LRESULT CALLBACK HandleEvents(const HWND & hWnd, const UINT & message, const WPARAM & wParam, const LPARAM & lParam);
+		LRESULT CALLBACK HandleEvents(const HWND& hWnd, const UINT& message, const WPARAM& wParam, const LPARAM& lParam);
 		
 		static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 		
-		Keyboard ToKeyboard(const WPARAM & code, const LPARAM & flags) const;
+		Keyboard ToKeyboard(const WPARAM& code, const LPARAM& flags) const;
+		Device ToDevice(const unsigned int& valueID) const; // converts a control value id to an enum value
+		
+		bool RegisterInputDevice(HANDLE deviceHandle); // adds an input device to the store
+		bool GetDeviceCapabilities(const PHIDP_PREPARSED_DATA& preparsedData, HIDP_CAPS& caps, PHIDP_BUTTON_CAPS& buttonCaps,
+				std::unique_ptr<BYTE[]>& buttonCapsBuffer, PHIDP_VALUE_CAPS& valueCaps, std::unique_ptr<BYTE[]>& valueCapsBuffer); // gets the capabilities reported by the device
 	protected :
 		static unsigned int mWindowCount;
 		
@@ -113,6 +130,8 @@ class WindowWin32 {
 		
 		glm::ivec2 storedGlobalMouse;
 		glm::ivec2 storedLocalMouse;
+		std::map<HANDLE, InputDevice> mInputDevices; // a store of input devices currently connected to the system
+		int mInputDeviceIDCounter = 0; // the counter used to assign a unique id to a connected device
 };
 }
 

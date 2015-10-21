@@ -131,9 +131,7 @@ enum class Keyboard {
 	F14,
 	F15,
 	Break,
-	Unknown,
-	
-	Count
+	Unknown
 };
 
 enum class Mouse {
@@ -141,9 +139,23 @@ enum class Mouse {
 	Middle,
 	Right,
 	M4,
-	M5,
-	
-	Count
+	M5
+};
+
+static const unsigned int BUTTONCOUNT = 64u; // the maximum amount of buttons allowed
+static const unsigned int DEVICECOUNT = 10u; // the count of known device controls
+enum class Device { // input device controls
+	AxisX,
+	AxisY,
+	AxisZ,
+	AxisRx,
+	AxisRy,
+	AxisRz,
+	Slider,
+	Dial,
+	Wheel,
+	HatSwitch,
+	Unknown
 };
 }
 

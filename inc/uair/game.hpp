@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 2014 Iain M. Crawford
+**	Copyright (c) 20XX Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -65,7 +65,6 @@ class Game {
 		
 		void CreateDefaultShader();
 		void SetShader();
-		// void SetShader(const Shader & shader);
 		
 		// scene manager related helper functions
 		SceneManagerPtr GetSceneManager();
@@ -113,6 +112,19 @@ class Game {
 		int GetMouseWheel() const;
 		glm::ivec2 GetLocalMouseCoords() const;
 		glm::ivec2 GetGlobalMouseCoords() const;
+		bool DeviceExists(const unsigned int& deviceID) const;
+		const InputManager::InputDevice& GetDevice(const unsigned int& deviceID) const;
+		unsigned int GetDeviceButtonCount(const int& deviceID) const;
+		bool GetDeviceButtonDown(const int& deviceID, const unsigned int& button) const;
+		bool GetDeviceButtonPressed(const int& deviceID, const unsigned int& button) const;
+		bool GetDeviceButtonReleased(const int& deviceID, const unsigned int& button) const;
+		unsigned int GetDeviceControlCount(const int& deviceID) const;
+		bool DeviceHasControl(const int& deviceID, const Device& control) const;
+		int GetDeviceControl(const int& deviceID, const Device& control) const;
+		int GetDeviceControlScaled(const int& deviceID, const Device& control, std::pair<int, int> range = std::make_pair(0, 255)) const;
+		std::pair<int, int> GetDeviceControlRange(const int& deviceID, const Device& control) const;
+		std::vector<Device> GetDeviceLinkedDevices(const int& deviceID, const unsigned int& collectionID) const;
+		unsigned int GetDeviceLinkID(const int& deviceID, const Device& control) const;
 		
 		// resource manager related helper functions
 		void SetResourceManager(ResourceManager* resMan);
@@ -142,8 +154,6 @@ class Game {
 			return mFTLibrary;
 		}
 	public :
-		// std::vector<WindowEvent> mEventQueue;
-		
 		float mFrameLowerLimit = 0.02f;
 		float mFrameUpperLimit = 1.0f;
 		

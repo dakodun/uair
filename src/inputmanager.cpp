@@ -30,6 +30,133 @@
 #include <iostream>
 
 namespace uair {
+InputManager::InputDevice::InputDevice() : mButtonCount(0u), mControlCount(0u) {
+	
+}
+
+InputManager::InputDevice::InputDevice(const unsigned int& buttonCount, const unsigned int& controlCount,
+		const InputDeviceCaps& caps) : mButtonCount(buttonCount), mControlCount(controlCount) {
+	
+	for (unsigned int i = 0u; i < buttonCount; ++i) { // for all buttons...
+		mButtonStates.emplace(i, 0); // add a state value to the store
+	}
+	
+	for (unsigned int i = 0u; i < controlCount; ++i) { // for all controls...
+		mControlCaps.emplace(caps.mControls.at(i).mDevice, caps.mControls.at(i)); // store the capabilities of the control
+		mControlStates.emplace(caps.mControls.at(i).mDevice, 0); // add a value to the store
+		
+		std::vector<Device> tempLinkCollection; // create a new link collection
+		auto linkCollection = mLinkCollections.emplace(caps.mControls.at(i).mCollectionID, std::move(tempLinkCollection)); // add it to the store or retrieve existing entry
+		linkCollection.first->second.emplace_back(caps.mControls.at(i).mDevice); // add the control to the link collection
+	}
+}
+
+unsigned int InputManager::InputDevice::GetButtonCount() const {
+	return mButtonCount; // return the number of buttons reported by the device
+}
+
+bool InputManager::InputDevice::GetButtonDown(const unsigned int& button) const {
+	auto buttonState = mButtonStates.find(button); // get the state of the button
+	if (buttonState != mButtonStates.end()) { // if the button was valid...
+		if (buttonState->second == 1 || buttonState->second == 2) { // if the state is down or pressed...
+			return true; // button is down
+		}
+	}
+	
+	return false; // button is not down
+}
+
+bool InputManager::InputDevice::GetButtonPressed(const unsigned int& button) const {
+	auto buttonState = mButtonStates.find(button); // get the state of the button
+	if (buttonState != mButtonStates.end()) { // if the button was valid...
+		if (buttonState->second == 2) { // if the state is pressed...
+			return true; // button is pressed
+		}
+	}
+	
+	return false; // button is not pressed
+}
+
+bool InputManager::InputDevice::GetButtonReleased(const unsigned int& button) const {
+	auto buttonState = mButtonStates.find(button); // get the state of the button
+	if (buttonState != mButtonStates.end()) { // if the button was valid...
+		if (buttonState->second == 3) { // if the state is released...
+			return true; // button is released
+		}
+	}
+	
+	return false; // button is not released
+}
+
+unsigned int InputManager::InputDevice::GetControlCount() const {
+	return mControlCount; // return the number of controls reported by the device
+}
+
+bool InputManager::InputDevice::HasControl(const Device& control) const {
+	auto controlState = mControlStates.find(control); // try to get the state of the control
+	if (controlState != mControlStates.end()) { // if the control was valid...
+		return true; // the control exists
+	}
+	
+	return false; // the control doesn't exist
+}
+
+int InputManager::InputDevice::GetControl(const Device& control) const {
+	auto controlState = mControlStates.find(control); // try to get the state of the control
+	if (controlState != mControlStates.end()) { // if the control was valid...
+		return controlState->second; // return the current value of the control
+	}
+	
+	return 0; // return 0 (invalid control)
+}
+
+int InputManager::InputDevice::GetControlScaled(const Device& control, std::pair<int, int> range) const {
+	auto controlState = mControlStates.find(control); // try to get the state of the control
+	if (controlState != mControlStates.end()) { // if the control was valid...
+		auto controlRange = mControlCaps.find(control);
+		if (controlRange != mControlCaps.end()) { // if the control was valid...
+			int rangeMin = controlRange->second.mLowerRange; // get the control's upper range
+			int rangeMax = controlRange->second.mUpperRange; // get the control's lower range
+			float scaleFactor = (controlState->second - rangeMin) / static_cast<float>(rangeMax - rangeMin); // calculate the factor required to scale the value by
+			
+			int scaledValue = (scaleFactor * (range.second - range.first)) + range.first; // scale the value into the range specified
+			
+			return scaledValue; // return the new scaled value
+		}
+	}
+	
+	return 0; // return 0 (invalid control)
+}
+
+std::pair<int, int> InputManager::InputDevice::GetControlRange(const Device& control) const {
+	auto controlRange = mControlCaps.find(control); // try to get the range of the control
+	if (controlRange != mControlCaps.end()) { // if the control was valid...
+		return std::make_pair(controlRange->second.mLowerRange, controlRange->second.mUpperRange); // return the range of the control
+	}
+	
+	return std::make_pair(0, 0); // return (0, 0) (invalid control)
+}
+
+std::vector<Device> InputManager::InputDevice::GetLinkedDevices(const unsigned int& collectionID) const {
+	auto collection = mLinkCollections.find(collectionID); // get the collection associated with the specified id
+	if (collection != mLinkCollections.end()) { // if the collection id was valid...
+		return collection->second; // return the collection
+	}
+	
+	return {}; // return empty collection
+}
+
+unsigned int InputManager::InputDevice::GetLinkID(const Device& control) const {
+	if (HasControl(control)) { // if the control exists...
+		auto controlLinkID = mControlCaps.find(control); // try to get the link id of the control
+		if (controlLinkID != mControlCaps.end()) { // if the control was valid...
+			return controlLinkID->second.mCollectionID; // return the link id of the control
+		}
+	}
+	
+	return 0;
+}
+
 InputManager::InputManager() {
 	mKeyboardStates.emplace(Keyboard::A, 0);
 	mKeyboardStates.emplace(Keyboard::B, 0);
@@ -161,6 +288,17 @@ void InputManager::Process() {
 	}
 	
 	mMouseWheel = 0;
+	
+	for (auto device = mInputDevices.begin(); device != mInputDevices.end(); ++device) {
+		for (auto iter = device->second.mButtonStates.begin(); iter != device->second.mButtonStates.end(); ++iter) { // update all device button states
+			if (iter->second == 2u) { // if state is pressed
+				iter->second = 1u; // it is now down
+			}
+			else if (iter->second == 3u) { // if state is released
+				iter->second = 0u; // it is now up
+			}
+		}
+	}
 }
 
 bool InputManager::GetKeyboardDown(const Keyboard & key) const {
@@ -241,6 +379,68 @@ glm::ivec2 InputManager::GetGlobalMouseCoords() const {
 	return mGlobalMouseCoords;
 }
 
+bool InputManager::DeviceExists(const unsigned int& deviceID) const {
+	auto device = mInputDevices.find(deviceID); // get the input device associate with the specified id
+	if (device != mInputDevices.end()) { // if the input device id was valid...
+		return true; // the device exists
+	}
+	
+	return false; // the device doesn't exist
+}
+
+const InputManager::InputDevice& InputManager::GetDevice(const unsigned int& deviceID) const {
+	auto device = mInputDevices.find(deviceID); // get the input device associate with the specified id
+	if (device != mInputDevices.end()) { // if the input device id was valid...
+		return device->second; // return the requested device
+	}
+	
+	return mDefaultDevice; // return the default device
+}
+
+unsigned int InputManager::GetDeviceButtonCount(const int& deviceID) const {
+	return GetDevice(deviceID).GetButtonCount();
+}
+
+bool InputManager::GetDeviceButtonDown(const int& deviceID, const unsigned int& button) const {
+	return GetDevice(deviceID).GetButtonDown(button);
+}
+
+bool InputManager::GetDeviceButtonPressed(const int& deviceID, const unsigned int& button) const {
+	return GetDevice(deviceID).GetButtonPressed(button);
+}
+
+bool InputManager::GetDeviceButtonReleased(const int& deviceID, const unsigned int& button) const {
+	return GetDevice(deviceID).GetButtonReleased(button);
+}
+
+unsigned int InputManager::GetDeviceControlCount(const int& deviceID) const {
+	return GetDevice(deviceID).GetControlCount();
+}
+
+bool InputManager::DeviceHasControl(const int& deviceID, const Device& control) const {
+	return GetDevice(deviceID).HasControl(control);
+}
+
+int InputManager::GetDeviceControl(const int& deviceID, const Device& control) const {
+	return GetDevice(deviceID).GetControl(control);
+}
+
+int InputManager::GetDeviceControlScaled(const int& deviceID, const Device& control, std::pair<int, int> range) const {
+	return GetDevice(deviceID).GetControlScaled(control, range);
+}
+
+std::pair<int, int> InputManager::GetDeviceControlRange(const int& deviceID, const Device& control) const {
+	return GetDevice(deviceID).GetControlRange(control);
+}
+
+std::vector<Device> InputManager::GetDeviceLinkedDevices(const int& deviceID, const unsigned int& collectionID) const {
+	return GetDevice(deviceID).GetLinkedDevices(collectionID);
+}
+
+unsigned int InputManager::GetDeviceLinkID(const int& deviceID, const Device& control) const {
+	return GetDevice(deviceID).GetLinkID(control);
+}
+
 void InputManager::Reset() {
 	for (auto iter = mKeyboardStates.begin(); iter != mKeyboardStates.end(); ++iter) { // update all keyboard states
 		if (iter->second == 1u) { // if state is down
@@ -251,6 +451,16 @@ void InputManager::Reset() {
 	for (auto iter = mMouseStates.begin(); iter != mMouseStates.end(); ++iter) { // update all mouse states
 		if (iter->second == 1u) { // if state is down
 			iter->second = 3u; // it is now released
+		}
+	}
+	
+	mMouseWheel = 0;
+	
+	for (auto device = mInputDevices.begin(); device != mInputDevices.end(); ++device) {
+		for (auto iter = device->second.mButtonStates.begin(); iter != device->second.mButtonStates.end(); ++iter) { // update all device button states
+			if (iter->second == 1u) { // if state is down
+				iter->second = 3u; // it is now released
+			}
 		}
 	}
 }
@@ -304,6 +514,53 @@ void InputManager::HandleMouseMove(const glm::ivec2 & local, const glm::ivec2 & 
 	if (global.x != mGlobalMouseCoords.x ||global.y != mGlobalMouseCoords.y) {
 		mGlobalMouseCoords.x = global.x;
 		mGlobalMouseCoords.y = global.y;
+	}
+}
+
+void InputManager::AddDevice(const int& deviceID, const unsigned int& buttonCount, const unsigned int& controlCount,
+		const InputDeviceCaps& caps) {
+	
+	InputDevice inputDevice(buttonCount, controlCount, caps); // create a new input device
+	mInputDevices.emplace(deviceID, std::move(inputDevice)); // add the new input device to the store
+}
+
+void InputManager::RemoveDevice(const int& deviceID) {
+	auto device = mInputDevices.find(deviceID); // get the input device associated with the specified id
+	if (device != mInputDevices.end()) { // if the input device exists...
+		mInputDevices.erase(device); // remove the input device from the store
+	}
+}
+
+void InputManager::HandleDeviceButtons(const unsigned int& button, const unsigned int& type, const int& deviceID) {
+	auto device = mInputDevices.find(deviceID); // get the input device associated with the specified id
+	if (device != mInputDevices.end()) { // if the input device exists...
+		auto buttonState = device->second.mButtonStates.find(button); // get the state of the button requested
+		if (buttonState != device->second.mButtonStates.end()) { // if the button was valid...
+			switch (type) {
+				case 0 : // down
+					if (buttonState->second == 0 || buttonState->second == 3) { // if state is up or released
+						buttonState->second = 2; // state is now pressed (note: not down)
+					}
+					
+					break;
+				case 1 : // up
+					if (buttonState->second == 1 || buttonState->second == 2) { // if state is down or pressed
+						buttonState->second = 3; // state is now released (note: not up)
+					}
+					
+					break;
+			}
+		}
+	}
+}
+
+void InputManager::HandleDeviceControls(const Device& control, const int& value, const int& deviceID) {
+	auto device = mInputDevices.find(deviceID); // get the input device associated with the specified id
+	if (device != mInputDevices.end()) { // if the input device exists...
+		auto controlState = device->second.mControlStates.find(control); // get the value of the control requested
+		if (controlState != device->second.mControlStates.end()) { // if the control was valid...
+			controlState->second = value; // update the control's value
+		}
 	}
 }
 }

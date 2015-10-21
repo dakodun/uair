@@ -28,7 +28,6 @@
 #include "windowwin32.hpp"
 
 #include <iostream>
-#include <vector>
 
 #include "openglcontext.hpp"
 #include "exception.hpp"
@@ -129,9 +128,9 @@ void WindowWin32::Process() {
 				(localMouse.x != storedLocalMouse.x || localMouse.y != storedLocalMouse.y)) {
 			
 			WindowEvent e;
-			e.type = WindowEvent::MouseMoveType;
-			e.mouseMove.globalX = globalMouse.x; e.mouseMove.globalY = globalMouse.y;
-			e.mouseMove.localX = localMouse.x; e.mouseMove.localY = localMouse.y;
+			e.mType = WindowEvent::MouseMoveType;
+			e.mMouseMove.mGlobalX = globalMouse.x; e.mMouseMove.mGlobalY = globalMouse.y;
+			e.mMouseMove.mLocalX = localMouse.x; e.mMouseMove.mLocalY = localMouse.y;
 			mEventQueue.push_back(e);
 			
 			storedGlobalMouse.x = globalMouse.x; storedGlobalMouse.y = globalMouse.y;
@@ -299,7 +298,7 @@ void WindowWin32::SetUpWindow() {
 		1,															// The version number of the pfd
 		PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER, // Bit flags specifying properties of the PFD
 		PFD_TYPE_RGBA,												// The type of pixel data
-		static_cast<unsigned char>(mWinDS.mColourDepth),				// The colour-depth of the frame buffer
+		static_cast<unsigned char>(mWinDS.mColourDepth),			// The colour-depth of the frame buffer
 		0, 0, 0, 0, 0, 0, 											// R, G and B bit number and shift count in the frame buffer
 		0, 0,														// Alpha bit number and shift count in the frame buffer (unsupported)
 		0,															// Number of bits in the accumulation buffer
@@ -350,9 +349,9 @@ void WindowWin32::SetUpWindow() {
 		
 		{
 			WindowEvent e;
-			e.type = WindowEvent::MouseMoveType;
-			e.mouseMove.globalX = globalMouse.x; e.mouseMove.globalY = globalMouse.y;
-			e.mouseMove.localX = localMouse.x; e.mouseMove.localY = localMouse.y;
+			e.mType = WindowEvent::MouseMoveType;
+			e.mMouseMove.mGlobalX = globalMouse.x; e.mMouseMove.mGlobalY = globalMouse.y;
+			e.mMouseMove.mLocalX = localMouse.x; e.mMouseMove.mLocalY = localMouse.y;
 			mEventQueue.push_back(e);
 			
 			storedGlobalMouse.x = globalMouse.x; storedGlobalMouse.y = globalMouse.y;
@@ -376,30 +375,51 @@ LRESULT CALLBACK WindowWin32::WndProc(HWND hWnd, UINT message, WPARAM wParam, LP
 	}
 }
 
-LRESULT CALLBACK WindowWin32::HandleEvents(const HWND & hWnd, const UINT & message, const WPARAM & wParam, const LPARAM & lParam) {
+LRESULT CALLBACK WindowWin32::HandleEvents(const HWND& hWnd, const UINT& message, const WPARAM& wParam, const LPARAM& lParam) {
 	switch (message) {
-		case WM_CLOSE :
+		case WM_CREATE : {
+			RAWINPUTDEVICE rid[2];
+			rid[0] = {
+				0x01,				// the game controls usage page
+				0x04,				// joystick
+				RIDEV_DEVNOTIFY,	// send messages when device is added or removed
+				hWnd				// the handle to the window
+			};
+			
+			rid[1] = {
+				0x01,
+				0x05,				// gamepad
+				RIDEV_DEVNOTIFY,
+				hWnd
+			};
+			
+			RegisterRawInputDevices(rid, 2, sizeof(rid[0]));
+			
+			return 0;
+		}
+		case WM_CLOSE : {
 			WindowEvent e;
-			e.type = WindowEvent::CloseType;
+			e.mType = WindowEvent::CloseType;
 			mEventQueue.push_back(e);
 			
 			return 0;
+		}
 		case WM_SIZE : {
 			WindowEvent e;
-			e.type = WindowEvent::SizeType;
+			e.mType = WindowEvent::SizeType;
 			
-			e.size.type = wParam;
-			e.size.width = LOWORD(lParam);
-			e.size.height = HIWORD(lParam);
+			e.mSize.mType = wParam;
+			e.mSize.mWidth = LOWORD(lParam);
+			e.mSize.mHeight = HIWORD(lParam);
 			mEventQueue.push_back(e);
 			
-			mWinDS.mWidth = e.size.width; mWinDS.mHeight = e.size.height;
-			mWinSize.x = e.size.width; mWinSize.y = e.size.height;
+			mWinDS.mWidth = e.mSize.mWidth; mWinDS.mHeight = e.mSize.mHeight;
+			mWinSize.x = e.mSize.mWidth; mWinSize.y = e.mSize.mHeight;
 			
 			{
 				RECT winRect;
-				winRect.left = static_cast<long>(0); winRect.right = static_cast<long>(e.size.width);
-				winRect.top = static_cast<long>(0); winRect.bottom = static_cast<long>(e.size.height);
+				winRect.left = static_cast<long>(0); winRect.right = static_cast<long>(e.mSize.mWidth);
+				winRect.top = static_cast<long>(0); winRect.bottom = static_cast<long>(e.mSize.mHeight);
 				
 				AdjustWindowRectEx(&winRect, GetWindowLong(mWindowHandle, GWL_STYLE), false,
 						GetWindowLong(mWindowHandle, GWL_EXSTYLE));
@@ -409,8 +429,8 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND & hWnd, const UINT & messa
 			}
 			
 			if (wglGetCurrentContext() != 0) {
-				GLint width = static_cast<GLint>(e.size.width);
-				GLint height = static_cast<GLint>(e.size.height);
+				GLint width = static_cast<GLint>(e.mSize.mWidth);
+				GLint height = static_cast<GLint>(e.mSize.mHeight);
 				if (height == 0) {
 					height = 1;
 				}
@@ -422,13 +442,13 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND & hWnd, const UINT & messa
 		}
 		case WM_MOVE : {
 			WindowEvent e;
-			e.type = WindowEvent::MoveType;
+			e.mType = WindowEvent::MoveType;
 			
-			e.move.x = LOWORD(lParam);
-			e.move.y = HIWORD(lParam);
+			e.mMove.mX = LOWORD(lParam);
+			e.mMove.mY = HIWORD(lParam);
 			mEventQueue.push_back(e);
 			
-			mWinPos = glm::ivec2(e.move.x, e.move.y);
+			mWinPos = glm::ivec2(e.mMove.mX, e.mMove.mY);
 			
 			return 0;
 		}
@@ -436,7 +456,7 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND & hWnd, const UINT & messa
 			// wglMakeCurrent(mDeviceContext, mRenderContext);
 			
 			WindowEvent e;
-			e.type = WindowEvent::GainedFocusType;
+			e.mType = WindowEvent::GainedFocusType;
 			mEventQueue.push_back(e);
 			
 			mHasFocus = true;
@@ -445,7 +465,7 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND & hWnd, const UINT & messa
 		}
 		case WM_KILLFOCUS : {
 			WindowEvent e;
-			e.type = WindowEvent::LostFocusType;
+			e.mType = WindowEvent::LostFocusType;
 			mEventQueue.push_back(e);
 			
 			ReleaseCapture();
@@ -457,9 +477,9 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND & hWnd, const UINT & messa
 		}
 		case WM_DISPLAYCHANGE : {
 			WindowEvent e;
-			e.type = WindowEvent::DisplayChangeType;
-			e.displayChange.height = HIWORD(lParam);
-			e.displayChange.width = LOWORD(lParam);
+			e.mType = WindowEvent::DisplayChangeType;
+			e.mDisplayChange.mHeight = HIWORD(lParam);
+			e.mDisplayChange.mWidth = LOWORD(lParam);
 			
 			mEventQueue.push_back(e);
 			
@@ -469,10 +489,10 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND & hWnd, const UINT & messa
 			WindowEvent e;
 			
 			if (reinterpret_cast<HWND>(lParam) == mWindowHandle) {
-				e.type = WindowEvent::GainedCaptureType;
+				e.mType = WindowEvent::GainedCaptureType;
 			}
 			else {
-				e.type = WindowEvent::LostCaptureType;
+				e.mType = WindowEvent::LostCaptureType;
 			}
 			
 			mEventQueue.push_back(e);
@@ -488,9 +508,9 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND & hWnd, const UINT & messa
 			Keyboard key = ToKeyboard(wParam, lParam);
 			
 			WindowEvent e;
-			e.type = WindowEvent::KeyboardKeyType;
-			e.keyboardKey.key = key;
-			e.keyboardKey.type = 0;
+			e.mType = WindowEvent::KeyboardKeyType;
+			e.mKeyboardKey.mKey = key;
+			e.mKeyboardKey.mType = 0;
 			
 			mEventQueue.push_back(e);
 			
@@ -501,9 +521,9 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND & hWnd, const UINT & messa
 			Keyboard key = ToKeyboard(wParam, lParam);
 			
 			WindowEvent e;
-			e.type = WindowEvent::KeyboardKeyType;
-			e.keyboardKey.key = key;
-			e.keyboardKey.type = 1;
+			e.mType = WindowEvent::KeyboardKeyType;
+			e.mKeyboardKey.mKey = key;
+			e.mKeyboardKey.mType = 1;
 			
 			mEventQueue.push_back(e);
 			
@@ -515,9 +535,9 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND & hWnd, const UINT & messa
 	switch (message) {
 		case WM_LBUTTONDOWN : { // left muse button down
 			WindowEvent e;
-			e.type = WindowEvent::MouseButtonType;
-			e.mouseButton.button = Mouse::Left;
-			e.mouseButton.type = 0;
+			e.mType = WindowEvent::MouseButtonType;
+			e.mMouseButton.mButton = Mouse::Left;
+			e.mMouseButton.mType = 0;
 			
 			mEventQueue.push_back(e);
 			
@@ -528,9 +548,9 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND & hWnd, const UINT & messa
 		}
 		case WM_LBUTTONUP : {
 			WindowEvent e;
-			e.type = WindowEvent::MouseButtonType;
-			e.mouseButton.button = Mouse::Left;
-			e.mouseButton.type = 1;
+			e.mType = WindowEvent::MouseButtonType;
+			e.mMouseButton.mButton = Mouse::Left;
+			e.mMouseButton.mType = 1;
 			
 			mEventQueue.push_back(e);
 			
@@ -543,9 +563,9 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND & hWnd, const UINT & messa
 		}
 		case WM_LBUTTONDBLCLK : {
 			WindowEvent e;
-			e.type = WindowEvent::MouseButtonType;
-			e.mouseButton.button = Mouse::Left;
-			e.mouseButton.type = 2;
+			e.mType = WindowEvent::MouseButtonType;
+			e.mMouseButton.mButton = Mouse::Left;
+			e.mMouseButton.mType = 2;
 			
 			mEventQueue.push_back(e);
 			
@@ -556,9 +576,9 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND & hWnd, const UINT & messa
 		}
 		case WM_MBUTTONDOWN : {
 			WindowEvent e;
-			e.type = WindowEvent::MouseButtonType;
-			e.mouseButton.button = Mouse::Middle;
-			e.mouseButton.type = 0;
+			e.mType = WindowEvent::MouseButtonType;
+			e.mMouseButton.mButton = Mouse::Middle;
+			e.mMouseButton.mType = 0;
 			
 			mEventQueue.push_back(e);
 			
@@ -569,9 +589,9 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND & hWnd, const UINT & messa
 		}
 		case WM_MBUTTONUP : {
 			WindowEvent e;
-			e.type = WindowEvent::MouseButtonType;
-			e.mouseButton.button = Mouse::Middle;
-			e.mouseButton.type = 1;
+			e.mType = WindowEvent::MouseButtonType;
+			e.mMouseButton.mButton = Mouse::Middle;
+			e.mMouseButton.mType = 1;
 			
 			mEventQueue.push_back(e);
 			
@@ -584,9 +604,9 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND & hWnd, const UINT & messa
 		}
 		case WM_MBUTTONDBLCLK : {
 			WindowEvent e;
-			e.type = WindowEvent::MouseButtonType;
-			e.mouseButton.button = Mouse::Middle;
-			e.mouseButton.type = 2;
+			e.mType = WindowEvent::MouseButtonType;
+			e.mMouseButton.mButton = Mouse::Middle;
+			e.mMouseButton.mType = 2;
 			
 			mEventQueue.push_back(e);
 			
@@ -597,9 +617,9 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND & hWnd, const UINT & messa
 		}
 		case WM_RBUTTONDOWN : {
 			WindowEvent e;
-			e.type = WindowEvent::MouseButtonType;
-			e.mouseButton.button = Mouse::Right;
-			e.mouseButton.type = 0;
+			e.mType = WindowEvent::MouseButtonType;
+			e.mMouseButton.mButton = Mouse::Right;
+			e.mMouseButton.mType = 0;
 			
 			mEventQueue.push_back(e);
 			
@@ -610,9 +630,9 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND & hWnd, const UINT & messa
 		}
 		case WM_RBUTTONUP : {
 			WindowEvent e;
-			e.type = WindowEvent::MouseButtonType;
-			e.mouseButton.button = Mouse::Right;
-			e.mouseButton.type = 1;
+			e.mType = WindowEvent::MouseButtonType;
+			e.mMouseButton.mButton = Mouse::Right;
+			e.mMouseButton.mType = 1;
 			
 			mEventQueue.push_back(e);
 			
@@ -625,9 +645,9 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND & hWnd, const UINT & messa
 		}
 		case WM_RBUTTONDBLCLK : {
 			WindowEvent e;
-			e.type = WindowEvent::MouseButtonType;
-			e.mouseButton.button = Mouse::Right;
-			e.mouseButton.type = 2;
+			e.mType = WindowEvent::MouseButtonType;
+			e.mMouseButton.mButton = Mouse::Right;
+			e.mMouseButton.mType = 2;
 			
 			mEventQueue.push_back(e);
 			
@@ -638,16 +658,16 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND & hWnd, const UINT & messa
 		}
 		case WM_XBUTTONDOWN : {
 			WindowEvent e;
-			e.type = WindowEvent::MouseButtonType;
+			e.mType = WindowEvent::MouseButtonType;
 			
 			if (HIWORD(wParam) == 1) {
-				e.mouseButton.button = Mouse::M4;
+				e.mMouseButton.mButton = Mouse::M4;
 			}
 			else {
-				e.mouseButton.button = Mouse::M5;
+				e.mMouseButton.mButton = Mouse::M5;
 			}
 			
-			e.mouseButton.type = 0;
+			e.mMouseButton.mType = 0;
 			
 			mEventQueue.push_back(e);
 			
@@ -658,16 +678,16 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND & hWnd, const UINT & messa
 		}
 		case WM_XBUTTONUP : {
 			WindowEvent e;
-			e.type = WindowEvent::MouseButtonType;
+			e.mType = WindowEvent::MouseButtonType;
 			
 			if (HIWORD(wParam) == 1) {
-				e.mouseButton.button = Mouse::M4;
+				e.mMouseButton.mButton = Mouse::M4;
 			}
 			else {
-				e.mouseButton.button = Mouse::M5;
+				e.mMouseButton.mButton = Mouse::M5;
 			}
 			
-			e.mouseButton.type = 1;
+			e.mMouseButton.mType = 1;
 			
 			mEventQueue.push_back(e);
 			
@@ -680,16 +700,16 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND & hWnd, const UINT & messa
 		}
 		case WM_XBUTTONDBLCLK : {
 			WindowEvent e;
-			e.type = WindowEvent::MouseButtonType;
+			e.mType = WindowEvent::MouseButtonType;
 			
 			if (HIWORD(wParam) == 1) {
-				e.mouseButton.button = Mouse::M4;
+				e.mMouseButton.mButton = Mouse::M4;
 			}
 			else {
-				e.mouseButton.button = Mouse::M5;
+				e.mMouseButton.mButton = Mouse::M5;
 			}
 			
-			e.mouseButton.type = 2;
+			e.mMouseButton.mType = 2;
 			
 			mEventQueue.push_back(e);
 			
@@ -698,14 +718,172 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND & hWnd, const UINT & messa
 			
 			return 0;
 		}
-		case WM_MOUSEWHEEL :
+		case WM_MOUSEWHEEL : {
 			WindowEvent e;
-			e.type = WindowEvent::MouseWheelType;
-			e.mouseWheel.amount = GET_WHEEL_DELTA_WPARAM(wParam);
+			e.mType = WindowEvent::MouseWheelType;
+			e.mMouseWheel.mAmount = GET_WHEEL_DELTA_WPARAM(wParam);
 			
 			mEventQueue.push_back(e);
 			
 			return 0;
+		}
+	}
+	
+	// input related events: device
+	switch (message) {
+		case WM_INPUT : { // input recieve from a connected input device
+			if (GET_RAWINPUT_CODE_WPARAM(wParam) == RIM_INPUT) {
+				UINT ridBufferSize; // size of the rawinput data buffer
+				
+				// get the required rawinput data buffer size...
+				if (GetRawInputData((HRAWINPUT)lParam, RID_INPUT, NULL, &ridBufferSize, sizeof(RAWINPUTHEADER)) != 0) {
+					return DefWindowProcW(hWnd, message, wParam, lParam);
+				}
+				
+				std::unique_ptr<BYTE[]> ridBuffer(new BYTE[ridBufferSize]); // create an appropiately sized array to hold the data
+				
+				// load the data into the rawinput data buffer and check the size matches the required size returned by the first call...
+				if (GetRawInputData((HRAWINPUT)lParam, RID_INPUT, ridBuffer.get(), &ridBufferSize, sizeof(RAWINPUTHEADER)) != ridBufferSize) {
+					// size mismatch
+					return DefWindowProcW(hWnd, message, wParam, lParam);
+				}
+				
+				PRAWINPUT rawInput = (PRAWINPUT)ridBuffer.get(); // convert buffer to RAWINPUT pointer
+				if (rawInput->header.dwType == RIM_TYPEHID) { // if input device is not a keyboard or mouse...
+					auto inputDevice = mInputDevices.find(rawInput->header.hDevice);
+					if (inputDevice == mInputDevices.end()) { // if the device hasn't been registered yet...
+						if (!RegisterInputDevice(rawInput->header.hDevice)) { // attempt to register the device...
+							// error: unable to register device
+							return DefWindowProcW(hWnd, message, wParam, lParam);
+						}
+						
+						inputDevice = mInputDevices.find(rawInput->header.hDevice);
+						if (inputDevice == mInputDevices.end()) {
+							// error: unable to register device
+							return DefWindowProcW(hWnd, message, wParam, lParam);
+						}
+					}
+					
+					UINT ppdBufferSize;
+					if (GetRawInputDeviceInfo(rawInput->header.hDevice, RIDI_PREPARSEDDATA, NULL, &ppdBufferSize) != 0) {
+						// error: 
+						return DefWindowProcW(hWnd, message, wParam, lParam);
+					}
+					
+					std::unique_ptr<BYTE[]> ppdBuffer(new BYTE[ppdBufferSize]);
+					if (GetRawInputDeviceInfo(rawInput->header.hDevice, RIDI_PREPARSEDDATA, ppdBuffer.get(), &ppdBufferSize) != ppdBufferSize) {
+						// error: size mismatch
+						return DefWindowProcW(hWnd, message, wParam, lParam);
+					}
+					
+					PHIDP_PREPARSED_DATA preparsedData = (PHIDP_PREPARSED_DATA)ppdBuffer.get();
+					HIDP_CAPS caps;
+					
+					PHIDP_BUTTON_CAPS buttonCaps;
+					std::unique_ptr<BYTE[]> buttonCapsBuffer;
+					
+					PHIDP_VALUE_CAPS valueCaps;
+					std::unique_ptr<BYTE[]> valueCapsBuffer;
+					
+					if (!GetDeviceCapabilities(preparsedData, caps, buttonCaps, buttonCapsBuffer, valueCaps, valueCapsBuffer)) {
+						// error: unable to get device capabilities
+						return DefWindowProcW(hWnd, message, wParam, lParam);
+					}
+					
+					{ // buttons
+						ULONG usageLength = buttonCaps->Range.UsageMax - buttonCaps->Range.UsageMin + 1; // ...
+						USAGE usageList[usageLength]; // ...
+						
+						// ...
+						if (HidP_GetUsages(HidP_Input, buttonCaps->UsagePage, 0, usageList, &usageLength, preparsedData,
+								(PCHAR)rawInput->data.hid.bRawData, rawInput->data.hid.dwSizeHid) != HIDP_STATUS_SUCCESS) {
+							
+							// error: unable to get current button values
+							return DefWindowProcW(hWnd, message, wParam, lParam);
+						}
+						
+						std::vector<bool> tempButtonStates(inputDevice->second.mButtonCount, false);
+						for (unsigned int i = 0u; i < usageLength && i < inputDevice->second.mButtonCount; ++i) {
+							tempButtonStates.at(usageList[i] - buttonCaps->Range.UsageMin) = true;
+						}
+						
+						for (unsigned int i = 0u; i < inputDevice->second.mButtonCount; ++i) {
+							if (inputDevice->second.mButtonStates.at(i) != tempButtonStates.at(i)) {
+								// dispatch an event indicating a button state has changed
+								WindowEvent e;
+								e.mType = WindowEvent::DeviceButtonType;
+								e.mDeviceButton.mButton = i;
+								e.mDeviceButton.mID = inputDevice->second.mID;
+								
+								if (tempButtonStates.at(i)) {
+									e.mDeviceButton.mType = 0;
+								}
+								else {
+									e.mDeviceButton.mType = 1;
+								}
+								
+								mEventQueue.push_back(e);
+							}
+						}
+						
+						inputDevice->second.mButtonStates = std::move(tempButtonStates);
+					}
+					
+					{ // controls
+						for (unsigned int i = 0; i < caps.NumberInputValueCaps; ++i) {
+							ULONG value;
+							
+							if (HidP_GetUsageValue(HidP_Input, valueCaps[i].UsagePage, 0, valueCaps[i].Range.UsageMin, &value, preparsedData,
+									(PCHAR)rawInput->data.hid.bRawData, rawInput->data.hid.dwSizeHid) != HIDP_STATUS_SUCCESS) {
+								
+								// various possible errors
+								return DefWindowProcW(hWnd, message, wParam, lParam);
+							}
+							
+							int intValue = static_cast<int>(std::min(value, static_cast<ULONG>(std::numeric_limits<int>::max())));
+							Device control = ToDevice(valueCaps[i].Range.UsageMin);
+							
+							auto oldValue = inputDevice->second.mControlStates.find(control);
+							
+							if (oldValue != inputDevice->second.mControlStates.end() && oldValue->second != intValue) { // if the value exists and differs from the previous...
+								oldValue->second = intValue; // update the previous...
+								
+								// dispatch an event indicating a control value has changed
+								WindowEvent e;
+								e.mType = WindowEvent::DeviceControlType;
+								e.mDeviceControl.mControl = control;
+								e.mDeviceControl.mID = inputDevice->second.mID;
+								e.mDeviceControl.mValue = intValue;
+								mEventQueue.push_back(e);
+							}
+						}
+					}
+				}
+			}
+			
+			return DefWindowProcW(hWnd, message, wParam, lParam);
+		}
+		case WM_INPUT_DEVICE_CHANGE : { // input device was connected or disconnected
+			if (wParam == GIDC_ARRIVAL) { // if a device was connected to the system...
+				if (!RegisterInputDevice((HANDLE)lParam)) { // attempt to register the device...
+					// error: unable to register device
+				}
+			}
+			else { // otherwise if a device was removed from the system...
+				auto result = mInputDevices.find((HANDLE)lParam); // find the device's handle in the device store
+				if (result != mInputDevices.end()) { // if the device exists in the store...
+					WindowEvent e; // create a window event
+					e.mType = WindowEvent::DeviceChangedType; // set the event type
+					e.mDeviceChanged.mID = result->second.mID; // set the id to the device's id in the store
+					e.mDeviceChanged.mStatus = false; // set the connection status to false (disconnected)
+					
+					mInputDevices.erase(result); // remove the device from the store
+					mEventQueue.push_back(e); // add the window event to the event queue
+				}
+			}
+			
+			return 0;
+		}
 	}
 	
 	return DefWindowProcW(hWnd, message, wParam, lParam);
@@ -920,5 +1098,147 @@ Keyboard WindowWin32::ToKeyboard(const WPARAM & code, const LPARAM & flags) cons
 	}
 	
 	return Keyboard::Unknown;
+}
+
+Device WindowWin32::ToDevice(const unsigned int& valueID) const {
+	switch (valueID) {
+		case 0x30 :
+			return Device::AxisX;
+		case 0x31 :
+			return Device::AxisY;
+		case 0x32 :
+			return Device::AxisZ;
+		case 0x33 :
+			return Device::AxisRx;
+		case 0x34 :
+			return Device::AxisRy;
+		case 0x35 :
+			return Device::AxisRz;
+		case 0x36 :
+			return Device::Slider;
+		case 0x37 :
+			return Device::Dial;
+		case 0x38 :
+			return Device::Wheel;
+		case 0x39 :
+			return Device::HatSwitch;
+	}
+	
+	return Device::Unknown;
+}
+
+bool WindowWin32::RegisterInputDevice(HANDLE deviceHandle) {
+	UINT ridBufferSize; // size of the rawinput data buffer
+	GetRawInputDeviceInfo(deviceHandle, RIDI_DEVICEINFO, NULL, &ridBufferSize); // get and store the required buffer size
+	std::unique_ptr<BYTE[]> ridBuffer(new BYTE[ridBufferSize]); // create an appropiately sized array to hold the data
+	if (GetRawInputDeviceInfo(deviceHandle, RIDI_DEVICEINFO, ridBuffer.get(), &ridBufferSize) != ridBufferSize) { // get the rawinput data and check for errors...
+		// size mismatch
+		return false;
+	}
+	
+	PRID_DEVICE_INFO deviceInfo = (PRID_DEVICE_INFO)ridBuffer.get(); // cast the rawinput data to a pointer to a device info structure
+	
+	if (deviceInfo->dwType == RIM_TYPEHID) { // if the device connected wasn't a mouse or keyboard...
+		WindowEvent e; // create a window event
+		e.mType = WindowEvent::DeviceChangedType; // set the event type
+		e.mDeviceChanged.mID = mInputDeviceIDCounter; // set the id to the device's id in the store
+		e.mDeviceChanged.mStatus = true; // set the connection status to true (connected)
+		
+		UINT ppdBufferSize;
+		GetRawInputDeviceInfo(deviceHandle, RIDI_PREPARSEDDATA, NULL, &ppdBufferSize);
+		std::unique_ptr<BYTE[]> ppdBuffer(new BYTE[ppdBufferSize]);
+		if (GetRawInputDeviceInfo(deviceHandle, RIDI_PREPARSEDDATA, ppdBuffer.get(), &ppdBufferSize) != ppdBufferSize) {
+			// error
+			return false;
+		}
+		
+		PHIDP_PREPARSED_DATA preparsedData = (PHIDP_PREPARSED_DATA)ppdBuffer.get();
+		HIDP_CAPS caps;
+		
+		PHIDP_BUTTON_CAPS buttonCaps;
+		std::unique_ptr<BYTE[]> buttonCapsBuffer;
+		
+		PHIDP_VALUE_CAPS valueCaps;
+		std::unique_ptr<BYTE[]> valueCapsBuffer;
+		
+		if (!GetDeviceCapabilities(preparsedData, caps, buttonCaps, buttonCapsBuffer, valueCaps, valueCapsBuffer)) {
+			// error: unable to get device capabilities
+			return false;
+		}
+		
+		InputDevice inputDevice; // create the input device
+		
+		inputDevice.mButtonCount += (buttonCaps->Range.UsageMax - buttonCaps->Range.UsageMin) + 1;
+		inputDevice.mButtonStates.insert(inputDevice.mButtonStates.end(), inputDevice.mButtonCount, false);
+		
+		inputDevice.mControlCount = caps.NumberInputValueCaps;
+		for (unsigned int i = 0; i < caps.NumberInputValueCaps; ++i) {
+			Device control = ToDevice(valueCaps[i].Range.UsageMin);
+			if (control != Device::Unknown) {
+				// cast the range to an unsigned value
+				ULONG uLogicalMin = static_cast<ULONG>(std::max(0l, valueCaps[i].LogicalMin));
+				ULONG uLogicalMax = static_cast<ULONG>(std::max(0l, valueCaps[i].LogicalMax));
+				
+				// cast the range to an int
+				int intLowerRange = static_cast<int>(std::min(uLogicalMin, static_cast<ULONG>(std::numeric_limits<int>::max())));
+				int intUpperRange = static_cast<int>(std::min(uLogicalMax, static_cast<ULONG>(std::numeric_limits<int>::max())));
+				
+				// fix the range if it is invalid
+				if (intUpperRange <= intLowerRange) {
+					intLowerRange = 0;
+					intUpperRange = 65535;
+				}
+				
+				// create a control capability structure
+				InputManager::InputDeviceCaps::ControlCaps deviceControlCaps;
+				deviceControlCaps.mDevice = control;
+				deviceControlCaps.mLowerRange = intLowerRange;
+				deviceControlCaps.mUpperRange = intUpperRange;
+				deviceControlCaps.mCollectionID = valueCaps[i].LinkCollection;
+				
+				inputDevice.mControls.push_back(std::move(deviceControlCaps));
+				inputDevice.mControlStates.emplace(control, 0);
+			}
+			else {
+				--inputDevice.mControlCount; // decrement total control count to account for unknown control
+			}
+		}
+		
+		e.mDeviceChanged.mButtonCount = inputDevice.mButtonCount; // set the reported number of buttons present
+		e.mDeviceChanged.mControlCount = inputDevice.mControlCount; // set the reported number of controls present
+		for (unsigned int i = 0u; i < inputDevice.mControlCount && i < DEVICECOUNT; ++i) { // for all controls present...
+			e.mDeviceChanged.mCaps.mControls.at(i) = inputDevice.mControls.at(i); // set the control capabilities
+		}
+		
+		inputDevice.mID = mInputDeviceIDCounter++; // set the new device's id and then increment the id counter
+		mInputDevices.emplace(deviceHandle, std::move(inputDevice)); // add the new device to the store
+		mEventQueue.push_back(e); // add the window event to the event queue
+	}
+	
+	return true;
+}
+
+bool WindowWin32::GetDeviceCapabilities(const PHIDP_PREPARSED_DATA& preparsedData, HIDP_CAPS& caps, PHIDP_BUTTON_CAPS& buttonCaps,
+		std::unique_ptr<BYTE[]>& buttonCapsBuffer, PHIDP_VALUE_CAPS& valueCaps, std::unique_ptr<BYTE[]>& valueCapsBuffer) {
+	
+	if (HidP_GetCaps(preparsedData, &caps) != HIDP_STATUS_SUCCESS) { // attempt to get input device caps...
+		return false; // unable to get input device caps
+	}
+	
+	std::unique_ptr<BYTE[]> buttonCapsBufferTemp(new BYTE[sizeof(HIDP_BUTTON_CAPS) * caps.NumberInputButtonCaps]); // temporary buffer for button cap data
+	buttonCapsBuffer = std::move(buttonCapsBufferTemp); // move temporary buffer into actual buffer
+	buttonCaps = (PHIDP_BUTTON_CAPS)buttonCapsBuffer.get(); // convert buffer to pointer to button cap structure
+	if (HidP_GetButtonCaps(HidP_Input, buttonCaps, &caps.NumberInputButtonCaps, preparsedData) != HIDP_STATUS_SUCCESS) { // attempt to get input device button caps...
+		return false; // unable to get input device button caps
+	}
+	
+	std::unique_ptr<BYTE[]> valueCapsBufferTemp(new BYTE[sizeof(HIDP_VALUE_CAPS) * caps.NumberInputValueCaps]);
+	valueCapsBuffer = std::move(valueCapsBufferTemp);
+	valueCaps = (PHIDP_VALUE_CAPS)valueCapsBuffer.get();
+	if (HidP_GetValueCaps(HidP_Input, valueCaps, &caps.NumberInputValueCaps, preparsedData) != HIDP_STATUS_SUCCESS) {
+		return false;
+	}
+	
+	return true; // successfully retrieved input device capabilities
 }
 }
