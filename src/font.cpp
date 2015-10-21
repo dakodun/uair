@@ -314,7 +314,7 @@ bool Font::LoadFromCache(const std::string& cacheFilename) {
 			std::string dataStr = cacheFile.mBuffer.at(5);
 			std::vector<std::string> parts = util::SplitString(dataStr, ' ');
 			
-			for (unsigned int i = 0u; i < parts.size(); ++i) {
+			for (unsigned int i = 0u; i < parts.size();) {
 				size_t rectCount = util::FromString<size_t>(parts.at(i));
 				packingRects.emplace_back();
 				++i;
