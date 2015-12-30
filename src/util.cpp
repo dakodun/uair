@@ -165,11 +165,34 @@ extern glm::vec2 ReflectPointByLine(const glm::vec2& pointA, const glm::vec2& po
 	glm::vec2 AB = pointB - pointA;
 	glm::vec2 AC = pointC - pointA;
 	
-	glm::vec2 projecction = ((glm::dot(AC, AB)) / (AB.x * AB.x + AB.y * AB.y)) * AB;
-	glm::vec2 intersection = projecction - AC;
+	glm::vec2 projection = ((glm::dot(AC, AB)) / (AB.x * AB.x + AB.y * AB.y)) * AB;
+	glm::vec2 intersection = projection - AC;
 	
 	glm::vec2 reflection = pointC + (2.0f * intersection);
 	return reflection;
+}
+
+extern glm::vec3 RotatePointAroundAxis(const glm::vec3& pointA, const glm::vec3& axis, const float& angle) {
+	// rotation around an arbitrary axis using rodriguez formula: https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle
+	
+	float angleRads = angle * static_cast<float>(util::PIOVER180);
+	glm::vec3 unit = glm::normalize(axis);
+	
+	glm::mat3 identity(1,  0,  0,
+					   0,  1,  0,
+					   0,  0,  1);
+	
+	glm::mat3 outerProduct(unit.x * unit.x,  unit.x * unit.y,  unit.x * unit.z,
+						   unit.x * unit.y,  unit.y * unit.y,  unit.y * unit.z,
+						   unit.x * unit.z,  unit.y * unit.z,  unit.z * unit.z);
+	
+	glm::mat3 crossProduct(      0,  -unit.z,   unit.y,
+							unit.z,        0,  -unit.x,
+						   -unit.y,   unit.x,        0);
+	
+	glm::mat3 rotation = (static_cast<float>(cos(angleRads)) * identity) + (static_cast<float>(sin(angleRads)) * crossProduct) + (static_cast<float>((1 - cos(angleRads))) * outerProduct);
+	
+	return glm::normalize(rotation * pointA);
 }
 
 extern std::string GetGLErrorStatus() {

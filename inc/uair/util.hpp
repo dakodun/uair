@@ -47,6 +47,7 @@ namespace uair {
 namespace util {
 static const float EPSILON = 1e-6f;
 static const double PI = 3.1415926535897;
+static const double PIOVER180 = PI / 180;
 extern unsigned int LOGLEVEL;
 extern std::string LOGLOCATION;
 
@@ -67,6 +68,7 @@ extern glm::mat3 GetSkewingMatrix(const glm::vec2& skew);
 extern unsigned int NextPowerOf2(const unsigned int& input);
 extern int IsConvex(const glm::vec2& pointA, const glm::vec2& pointB, const glm::vec2& pointC);
 extern glm::vec2 ReflectPointByLine(const glm::vec2& pointA, const glm::vec2& pointB, const glm::vec2& pointC);
+extern glm::vec3 RotatePointAroundAxis(const glm::vec3& pointA, const glm::vec3& axis, const float& angle);
 
 extern std::string GetGLErrorStatus();
 extern void LogMessage(const unsigned int& level, const std::string& message);

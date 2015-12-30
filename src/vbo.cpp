@@ -56,7 +56,7 @@ VBO::~VBO() {
 
 void VBO::AddData(const std::vector<VBOVertex>& vertData, const std::vector<VBOIndex>& indData) {
 	std::vector<SegmentInfo> vecSegment; // container holding segment data
-	vecSegment.emplace_back(0, GL_TRIANGLE_FAN, indData.size(), 0, 0, indData.size());
+	vecSegment.emplace_back(0, GL_TRIANGLES, indData.size(), 0, 0, indData.size());
 	
 	std::map< unsigned int, std::vector<SegmentInfo> > segmentInfo;
 	segmentInfo.insert(IndexedSegmentInfo(0, vecSegment));

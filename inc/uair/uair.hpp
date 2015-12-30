@@ -59,6 +59,7 @@
 #include "fbo.hpp"
 #include "pbo.hpp"
 #include "vbo.hpp"
+#include "camera.hpp"
 
 #include "sound.hpp"
 
