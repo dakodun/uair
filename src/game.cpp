@@ -401,12 +401,23 @@ int Game::GetMouseWheel() const {
 	return mInputManager->GetMouseWheel();
 }
 
-glm::ivec2 Game::GetLocalMouseCoords() const {
-	return mInputManager->GetLocalMouseCoords();
+void Game::SetMouseCoords(const glm::ivec2& newCoords, const CoordinateSpace& coordinateSpace) {
+	std::pair<glm::ivec2, glm::ivec2> mousePos = mWindow->SetMouseCoords(newCoords, coordinateSpace);
+	
+	mInputManager->mLocalMouseCoords = mousePos.first;
+	mInputManager->mGlobalMouseCoords = mousePos.second;
+	
+	WindowEvent e;
+	e.mType = WindowEvent::MouseMoveType;
+	e.mMouseMove.mGlobalX = mousePos.second.x; e.mMouseMove.mGlobalY = mousePos.second.y;
+	e.mMouseMove.mLocalX = mousePos.first.x; e.mMouseMove.mLocalY = mousePos.first.y;
+	mWindow->mEventQueue.push_back(e);
+	
+	// or remove any previous mouse move events currently in queue to prevent them over-writing our new coords
 }
 
-glm::ivec2 Game::GetGlobalMouseCoords() const {
-	return mInputManager->GetGlobalMouseCoords();
+glm::ivec2 Game::GetMouseCoords(const CoordinateSpace& coordinateSpace) const {
+	return mInputManager->GetMouseCoords(coordinateSpace);
 }
 
 bool Game::DeviceExists(const unsigned int& deviceID) const {

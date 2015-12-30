@@ -1241,4 +1241,32 @@ bool WindowWin32::GetDeviceCapabilities(const PHIDP_PREPARSED_DATA& preparsedDat
 	
 	return true; // successfully retrieved input device capabilities
 }
+
+std::pair<glm::ivec2, glm::ivec2> WindowWin32::SetMouseCoords(const glm::ivec2& newCoords, const CoordinateSpace& coordinateSpace) {
+	POINT localMouse;
+	localMouse.x = newCoords.x;
+	localMouse.y = newCoords.y;
+	
+	POINT globalMouse;
+	globalMouse.x = newCoords.x;
+	globalMouse.y = newCoords.y;
+	
+	if (coordinateSpace == CoordinateSpace::Local) {
+		ClientToScreen(mWindowHandle, &globalMouse);
+	}
+	else {
+		ScreenToClient(mWindowHandle, &localMouse);
+	}
+	
+	SetCursorPos(globalMouse.x, globalMouse.y);
+	
+	if ((globalMouse.x != storedGlobalMouse.x || globalMouse.y != storedGlobalMouse.y) ||
+			(localMouse.x != storedLocalMouse.x || localMouse.y != storedLocalMouse.y)) {
+		
+		storedGlobalMouse.x = globalMouse.x; storedGlobalMouse.y = globalMouse.y;
+		storedLocalMouse.x = localMouse.x; storedLocalMouse.y = localMouse.y;
+	}
+	
+	return std::make_pair(storedLocalMouse, storedGlobalMouse);
+}
 }

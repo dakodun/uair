@@ -110,8 +110,8 @@ class Game {
 		bool GetMousePressed(const Mouse & button) const;
 		bool GetMouseReleased(const Mouse & button) const;
 		int GetMouseWheel() const;
-		glm::ivec2 GetLocalMouseCoords() const;
-		glm::ivec2 GetGlobalMouseCoords() const;
+		void SetMouseCoords(const glm::ivec2& newCoords, const CoordinateSpace& coordinateSpace = CoordinateSpace::Local);
+		glm::ivec2 GetMouseCoords(const CoordinateSpace& coordinateSpace = CoordinateSpace::Local) const;
 		bool DeviceExists(const unsigned int& deviceID) const;
 		const InputManager::InputDevice& GetDevice(const unsigned int& deviceID) const;
 		unsigned int GetDeviceButtonCount(const int& deviceID) const;

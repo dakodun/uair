@@ -29,6 +29,8 @@
 
 #include <iostream>
 
+#include "game.hpp"
+
 namespace uair {
 InputManager::InputDevice::InputDevice() : mButtonCount(0u), mControlCount(0u) {
 	
@@ -371,12 +373,16 @@ int InputManager::GetMouseWheel() const {
 	return mMouseWheel;
 }
 
-glm::ivec2 InputManager::GetLocalMouseCoords() const {
-	return mLocalMouseCoords;
+void InputManager::SetMouseCoords(const glm::ivec2& newCoords, const CoordinateSpace& coordinateSpace) {
+	GAME.SetMouseCoords(newCoords, coordinateSpace);
 }
 
-glm::ivec2 InputManager::GetGlobalMouseCoords() const {
-	return mGlobalMouseCoords;
+glm::ivec2 InputManager::GetMouseCoords(const CoordinateSpace& coordinateSpace) const {
+	if (coordinateSpace == CoordinateSpace::Global) {
+		return mGlobalMouseCoords;
+	}
+	
+	return mLocalMouseCoords;
 }
 
 bool InputManager::DeviceExists(const unsigned int& deviceID) const {

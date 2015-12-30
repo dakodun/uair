@@ -109,6 +109,8 @@ class WindowWin32 {
 		bool RegisterInputDevice(HANDLE deviceHandle); // adds an input device to the store
 		bool GetDeviceCapabilities(const PHIDP_PREPARSED_DATA& preparsedData, HIDP_CAPS& caps, PHIDP_BUTTON_CAPS& buttonCaps,
 				std::unique_ptr<BYTE[]>& buttonCapsBuffer, PHIDP_VALUE_CAPS& valueCaps, std::unique_ptr<BYTE[]>& valueCapsBuffer); // gets the capabilities reported by the device
+		
+		std::pair<glm::ivec2, glm::ivec2> SetMouseCoords(const glm::ivec2& newCoords, const CoordinateSpace& coordinateSpace = CoordinateSpace::Local);
 	protected :
 		static unsigned int mWindowCount;
 		

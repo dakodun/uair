@@ -34,6 +34,7 @@
 #include <set>
 #include <glm/glm.hpp>
 
+#include "polygon.hpp"
 #include "inputenums.hpp"
 
 namespace uair {
@@ -97,8 +98,8 @@ class InputManager {
 		bool GetMouseReleased(const Mouse& button) const;
 		
 		int GetMouseWheel() const;
-		glm::ivec2 GetLocalMouseCoords() const;
-		glm::ivec2 GetGlobalMouseCoords() const;
+		void SetMouseCoords(const glm::ivec2& newCoords, const CoordinateSpace& coordinateSpace = CoordinateSpace::Local);
+		glm::ivec2 GetMouseCoords(const CoordinateSpace& coordinateSpace = CoordinateSpace::Local) const;
 		
 		bool DeviceExists(const unsigned int& deviceID) const; // returns true if the input device with the specified id exists
 		const InputDevice& GetDevice(const unsigned int& deviceID) const; // returns the input device with the associated id (or the default device if id is invalid)
