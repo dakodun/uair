@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 2014 Iain M. Crawford
+**	Copyright (c) 2010 - 2016, Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -25,8 +25,8 @@
 **		   source distribution.
 ** **************************************************************** */
 
-#ifndef UAIRTRANSFORMABLE_HPP
-#define UAIRTRANSFORMABLE_HPP
+#ifndef UAIRTRANSFORMABLE2D_HPP
+#define UAIRTRANSFORMABLE2D_HPP
 
 #include <vector>
 
@@ -34,9 +34,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace uair {
-class Transformable {
+class Transformable2D {
 	public :
-		virtual ~Transformable() = default;
+		virtual ~Transformable2D() = default;
 		
 		glm::vec2 GetPosition() const;
 		void SetPosition(const glm::vec2& newPos);

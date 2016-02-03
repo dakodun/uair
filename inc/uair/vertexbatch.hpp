@@ -25,43 +25,29 @@
 **		   source distribution.
 ** **************************************************************** */
 
-#ifndef UAIRRENDERSTRING_HPP
-#define UAIRRENDERSTRING_HPP
+#ifndef UAIRVERTEXBATCH_HPP
+#define UAIRVERTEXBATCH_HPP
 
-#include "transformable2d.hpp"
-#include "renderable.hpp"
-#include "resourceptr.hpp"
-#include "font.hpp"
-#include "vbo.hpp"
+#include "transformable3d.hpp"
 
 namespace uair {
-class RenderBatch;
-
-class RenderString : public Transformable2D, public Renderable {
-	friend class RenderBatch;
-	
+/* class VertexBatch : public Transformable3D, public Renderable {
 	public :
 		std::string GetTag() const;
 		
-		void SetFont(ResourcePtr<Font> font); // set the font from a resource pointer
-		void SetFont(Font* font); // set the font from a raw pointer
-		void SetText(const std::u32string& newText); // change the string
-		void SetSize(const unsigned int& size); // set the size of the string
+		std::vector<glm::vec3> mVertexData;
+		std::vector<unsigned int> mIndexData;
+		
+		std::vector<glm::vec4> mColourData;
+		std::vector<glm::vec3> mTextureData;
+		std::vector<glm::vec3> mNormalData;
 	protected :
 		void UpdateGlobalBoundingBox();
-		void UpdateGlobalMask();
-		void CreateLocalMask();
 		
 		std::list<RenderBatchData> Upload();
 	private :
-		void CreateVBOVertices(); // create vertices for rendering from the vertices, transform matrix, and colours supplied
-	private :
-		ResourcePtr<Font> mFont; // the font associated with this render string
-		std::u32string mString; // the content of the render string
-		unsigned int mSize = 1u; // the size the string is to be rendered at
 		
-		std::list<Shape> mQuads; // a list of individual glyph quads store for efficiency
-};
+}; */
 }
 
 #endif

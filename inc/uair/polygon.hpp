@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 20XX Iain M. Crawford
+**	Copyright (c) 2010 - 2016, Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -34,7 +34,7 @@
 #include <glm/glm.hpp>
 #include <clipper.hpp>
 
-#include "transformable.hpp"
+#include "transformable2d.hpp"
 
 namespace uair {
 class Shape;
@@ -82,7 +82,7 @@ class Contour {
 		std::vector<glm::vec2> mBounds;
 };
 
-class Polygon : public Transformable {
+class Polygon : public Transformable2D {
 	public :
 		Polygon() = default;
 		explicit Polygon(const std::vector<Contour>& contours, const CoordinateSpace& coordinateSpace = CoordinateSpace::Local);

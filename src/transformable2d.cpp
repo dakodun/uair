@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 2014 Iain M. Crawford
+**	Copyright (c) 2010 - 2016, Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -25,99 +25,99 @@
 **		   source distribution.
 ** **************************************************************** */
 
-#include "transformable.hpp"
+#include "transformable2d.hpp"
 
 namespace uair {
-glm::vec2 Transformable::GetPosition() const {
+glm::vec2 Transformable2D::GetPosition() const {
 	return mPosition;
 }
 
-void Transformable::SetPosition(const glm::vec2& newPos) {
+void Transformable2D::SetPosition(const glm::vec2& newPos) {
 	mPosition = newPos;
 	
 	UpdateGlobalBoundingBox();
 	UpdateGlobalMask();
 }
 
-glm::vec2 Transformable::GetOrigin() const {
+glm::vec2 Transformable2D::GetOrigin() const {
 	return mOrigin;
 }
 
-void Transformable::SetOrigin(const glm::vec2& newOrigin) {
+void Transformable2D::SetOrigin(const glm::vec2& newOrigin) {
 	mOrigin = newOrigin;
 	
 	UpdateGlobalBoundingBox();
 	UpdateGlobalMask();
 }
 
-glm::vec2 Transformable::GetScale() const {
+glm::vec2 Transformable2D::GetScale() const {
 	return mScale;
 }
 
-void Transformable::SetScale(const glm::vec2& newScale) {
+void Transformable2D::SetScale(const glm::vec2& newScale) {
 	mScale = newScale;
 	
 	UpdateGlobalBoundingBox();
 	UpdateGlobalMask();
 }
 
-float Transformable::GetRotation() const {
+float Transformable2D::GetRotation() const {
 	return mRotation;
 }
 
-void Transformable::SetRotation(const float& newRotation) {
+void Transformable2D::SetRotation(const float& newRotation) {
 	mRotation = newRotation;
 	
 	UpdateGlobalBoundingBox();
 	UpdateGlobalMask();
 }
 
-glm::vec2 Transformable::GetSkew() const {
+glm::vec2 Transformable2D::GetSkew() const {
 	return mSkew;
 }
 
-void Transformable::SetSkew(const glm::vec2& newSkew) {
+void Transformable2D::SetSkew(const glm::vec2& newSkew) {
 	mSkew = newSkew;
 	
 	UpdateGlobalBoundingBox();
 	UpdateGlobalMask();
 }
 
-glm::mat3 Transformable::GetTransformationMatrix() const {
+glm::mat3 Transformable2D::GetTransformationMatrix() const {
 	return mTransformation;
 }
 
-void Transformable::SetTransformationMatrix(const glm::mat3& newTrans) {
+void Transformable2D::SetTransformationMatrix(const glm::mat3& newTrans) {
 	mTransformation = newTrans;
 	
 	UpdateGlobalBoundingBox();
 	UpdateGlobalMask();
 }
 
-std::vector<glm::vec2> Transformable::GetLocalBoundingBox() const {
+std::vector<glm::vec2> Transformable2D::GetLocalBoundingBox() const {
 	return mLocalBoundingBox;
 }
 
-std::vector<glm::vec2> Transformable::GetGlobalBoundingBox() const {
+std::vector<glm::vec2> Transformable2D::GetGlobalBoundingBox() const {
 	return mGlobalBoundingBox;
 }
 
-std::vector<glm::vec2> Transformable::GetLocalMask() const {
+std::vector<glm::vec2> Transformable2D::GetLocalMask() const {
 	return mLocalMask;
 }
 
-void Transformable::SetLocalMask() {
+void Transformable2D::SetLocalMask() {
 	CreateLocalMask();
 	UpdateGlobalMask();
 }
 
-void Transformable::SetLocalMask(const std::vector<glm::vec2>& newMask) {
+void Transformable2D::SetLocalMask(const std::vector<glm::vec2>& newMask) {
 	mLocalMask.clear();
 	mLocalMask.insert(mLocalMask.end(), newMask.begin(), newMask.end());
 	UpdateGlobalMask();
 }
 
-std::vector<glm::vec2> Transformable::GetGlobalMask() const {
+std::vector<glm::vec2> Transformable2D::GetGlobalMask() const {
 	return mGlobalMask;
 }
 }
