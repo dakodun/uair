@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 20XX Iain M. Crawford
+**	Copyright (c) 2010 - 2016, Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -27,6 +27,10 @@
 
 #ifndef UAIRTRIANGULATE_HPP
 #define UAIRTRIANGULATE_HPP
+
+#ifndef CALLBACK
+#define CALLBACK
+#endif
 
 #include <iostream>
 #include <vector>
@@ -55,8 +59,6 @@ class Triangulate {
 		
 		typedef std::pair< std::vector<Vertex>, std::vector<unsigned int> > Result;
 	private :
-		typedef GLvoid (*Callback)();
-		
 		class VertexData {
 			public :
 				explicit VertexData(const glm::vec2& vertex, const unsigned int& index);
@@ -81,12 +83,12 @@ class Triangulate {
 		void AddContours(const std::vector< std::vector<glm::vec2> >& contours);
 		void Clear();
 	protected :
-		static void HandleBegin(GLenum which);
-		static void HandleEnd();
-		static void HandleVertexData(void *vertex_data, void *polygon_data);
-		static void HandleCombineData(GLdouble coords[3], void *vertex_data[4], GLfloat weight[4], void **outData, void *polygon_data);
-		static void HandleErrorData(GLenum errno, void *polygon_data);
-		static void HandleEdgeFlag(GLboolean flag);
+		static CALLBACK void HandleBegin(GLenum which);
+		static CALLBACK void HandleEnd();
+		static CALLBACK void HandleVertexData(void *vertex_data, void *polygon_data);
+		static CALLBACK void HandleCombineData(GLdouble coords[3], void *vertex_data[4], GLfloat weight[4], void **outData, void *polygon_data);
+		static CALLBACK void HandleErrorData(GLenum errno, void *polygon_data);
+		static CALLBACK void HandleEdgeFlag(GLboolean flag);
 	private :
 		void FreeNewVertices();
 	private :

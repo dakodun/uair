@@ -1,6 +1,6 @@
 /* **************************************************************** **
-**	
-**	Copyright (c) 20XX Iain M. Crawford
+**	Uair Engine
+**	Copyright (c) 2010 - 2016, Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable

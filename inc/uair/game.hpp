@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 20XX Iain M. Crawford
+**	Copyright (c) 2010 - 2016, Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -40,6 +40,7 @@
 #include "timer.hpp"
 #include "window.hpp"
 #include "openglcontext.hpp"
+#include "entitysystem.hpp"
 
 namespace uair {
 class Game {
@@ -149,6 +150,9 @@ class Game {
 			throw std::runtime_error("invalid resource manager conversion");
 		}
 		
+		// entity system related helper functions
+		EntitySystem& GetEntitySystem();
+		
 		// 
 		const FT_Library& GetFTLibrary() const {
 			return mFTLibrary;
@@ -182,6 +186,8 @@ class Game {
 		
 		static bool mDefaultShaderExists;
 		ShaderProgram mDefaultShader;
+		
+		EntitySystem mEntitySystem;
 		
 		FT_Library mFTLibrary;
 };

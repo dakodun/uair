@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 2013 Iain M. Crawford
+**	Copyright (c) 2010 - 2016, Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -25,22 +25,11 @@
 **		   source distribution.
 ** **************************************************************** */
 
-/** 
-* \file		main.cpp
-* \brief	Defines WinMain entry point if OS is Windows.
-**/
-
 #if defined(_WIN32) || defined(__WIN32__)
 	#include <windows.h>
 	
 	extern int main(int argc, char* argv[]);
 	
-	/** 
-	* \brief	Windows entry point.
-	* \details	By defining WinMain like this we will be able to use
-	* 			main as our entry point across various systems
-	*			(including Windows), allowing for better portability.
-	**/
 	int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, INT) {
 		return main(__argc, __argv);
 	}

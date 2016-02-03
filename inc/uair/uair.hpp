@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 20XX Iain M. Crawford
+**	Copyright (c) 2010 - 2016, Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -37,6 +37,7 @@
 #include "windowevent.hpp"
 #include "windowstyles.hpp"
 
+#include "manager.hpp"
 #include "exception.hpp"
 #include "scene.hpp"
 #include "scenemanager.hpp"
@@ -44,8 +45,11 @@
 #include "util.hpp"
 #include "file.hpp"
 
+#include "entitysystem.hpp"
+
 #include "polygon.hpp"
-#include "transformable.hpp"
+#include "transformable2d.hpp"
+#include "transformable3d.hpp"
 #include "triangulate.hpp"
 
 #include "font.hpp"

@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 20XX Iain M. Crawford
+**	Copyright (c) 2010 - 2016, Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -56,12 +56,12 @@ Triangulate::Triangulate() {
 	if (mTesselator) {
 		gluTessNormal(mTesselator, 0.0d, 0.0d, 1.0d);
 		
-		gluTessCallback(mTesselator, GLU_TESS_BEGIN,        (Callback)HandleBegin);
-		gluTessCallback(mTesselator, GLU_TESS_END,          (Callback)HandleEnd);
-		gluTessCallback(mTesselator, GLU_TESS_VERTEX_DATA,  (Callback)HandleVertexData);
-		gluTessCallback(mTesselator, GLU_TESS_COMBINE_DATA, (Callback)HandleCombineData);
-		gluTessCallback(mTesselator, GLU_TESS_ERROR_DATA,   (Callback)HandleErrorData);
-		gluTessCallback(mTesselator, GLU_TESS_EDGE_FLAG,    (Callback)HandleEdgeFlag);
+		gluTessCallback(mTesselator, GLU_TESS_BEGIN,        (void (CALLBACK *)())HandleBegin);
+		gluTessCallback(mTesselator, GLU_TESS_END,          (void (CALLBACK *)())HandleEnd);
+		gluTessCallback(mTesselator, GLU_TESS_VERTEX_DATA,  (void (CALLBACK *)())HandleVertexData);
+		gluTessCallback(mTesselator, GLU_TESS_COMBINE_DATA, (void (CALLBACK *)())HandleCombineData);
+		gluTessCallback(mTesselator, GLU_TESS_ERROR_DATA,   (void (CALLBACK *)())HandleErrorData);
+		gluTessCallback(mTesselator, GLU_TESS_EDGE_FLAG,    (void (CALLBACK *)())HandleEdgeFlag);
 	}
 }
 

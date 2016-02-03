@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 2013 Iain M. Crawford
+**	Copyright (c) 2010 - 2016, Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -24,11 +24,6 @@
 **		3. This notice may not be removed or altered from any
 **		   source distribution.
 ** **************************************************************** */
-
-/** 
-* \file		timer.cpp
-* \brief	Timer.
-**/
 
 #include "timer.hpp"
 

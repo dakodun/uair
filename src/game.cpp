@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 20XX Iain M. Crawford
+**	Copyright (c) 2010 - 2016, Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -536,6 +536,10 @@ void Game::SetResourceManager(ResourceManager* resMan) {
 
 ResourceManagerPtr Game::GetResourceManager() {
 	return mResourceManager;
+}
+
+EntitySystem& Game::GetEntitySystem() {
+	return mEntitySystem;
 }
 
 Game GAME;

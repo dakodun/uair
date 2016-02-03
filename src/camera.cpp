@@ -1,6 +1,6 @@
 /* **************************************************************** **
 **	Uair Engine
-**	Copyright (c) 20XX Iain M. Crawford
+**	Copyright (c) 2010 - 2016, Iain M. Crawford
 **
 **	This software is provided 'as-is', without any express or
 **	implied warranty. In no event will the authors be held liable
@@ -81,7 +81,7 @@ void Camera::UpdateAngle(float& oldAngle, const float& angleChange) {
 }
 
 void Camera::UpdatePosition(const float& distanceChange, const int& axisIndex) {
-	if (!util::CompareFloats(distance, util::Equals, 0.0f)) { // if the amount to move is not zero (avoid unnecessary calculations)...
+	if (!util::CompareFloats(distanceChange, util::Equals, 0.0f)) { // if the amount to move is not zero (avoid unnecessary calculations)...
 		UpdateView(); // ensure view matrix is up to date
 		
 		glm::vec3 positionChange; // the values from the view matrix relating to the required axis
