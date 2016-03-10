@@ -28,8 +28,14 @@
 #include "entitymanager.hpp"
 
 namespace uair {
-Entity::Entity(EntityManager* entityManager, const unsigned int& entityID) : mEntityManagerPtr(entityManager), mEntityID(entityID) {
+Entity::Entity(EntityManager* entityManager, const unsigned int& entityID, const std::string& entityName) : mEntityManagerPtr(entityManager),
+		mEntityID(entityID), mName(entityName) {
 	
+	
+}
+
+Entity::Entity(Entity&& other) : Entity(other.mEntityManagerPtr, 0u) {
+	swap(*this, other);
 }
 
 Entity::~Entity() {
@@ -42,16 +48,32 @@ Entity::~Entity() {
 	}
 }
 
+Entity& Entity::operator=(Entity other) {
+	swap(*this, other);
+	
+	return *this;
+}
+
+void swap(Entity& first, Entity& second) {
+	std::swap(first.mEntityManagerPtr, second.mEntityManagerPtr);
+	std::swap(first.mComponents, second.mComponents);
+	std::swap(first.mEntityID, second.mEntityID);
+}
+
+std::vector<Manager<Component>::Handle> Entity::GetComponents() {
+	return mComponents;
+}
+
 
 EntityManager::EntityManager(Manager<Component>& componentManager) : mComponentManager(componentManager) {
 	
 }
 
-EntityManager::Handle EntityManager::Add() {
+EntityManager::Handle EntityManager::Add(const std::string& entityName) {
 	std::pair<unsigned int, unsigned int> indexCounterPair; // the index and counter (validity) of the new entity
 	
 	try {
-		indexCounterPair = mStore.Add<EntityManager*>(this, mEntityCount); // add a new entry to the store and save the index and counter value returned
+		indexCounterPair = mStore.Add<EntityManager*, unsigned int, std::string>(this, mEntityCount, entityName); // add a new entry to the store and save the index and counter value returned
 	} catch (std::exception& e) {
 		throw;
 	}

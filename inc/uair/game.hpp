@@ -107,9 +107,11 @@ class Game {
 		bool GetKeyboardDown(const Keyboard & key) const;
 		bool GetKeyboardPressed(const Keyboard & key) const;
 		bool GetKeyboardReleased(const Keyboard & key) const;
+		unsigned int GetKeyboardState(const Keyboard& key) const;
 		bool GetMouseDown(const Mouse & button) const;
 		bool GetMousePressed(const Mouse & button) const;
 		bool GetMouseReleased(const Mouse & button) const;
+		unsigned int GetMouseState(const Mouse& button) const;
 		int GetMouseWheel() const;
 		void SetMouseCoords(const glm::ivec2& newCoords, const CoordinateSpace& coordinateSpace = CoordinateSpace::Local);
 		glm::ivec2 GetMouseCoords(const CoordinateSpace& coordinateSpace = CoordinateSpace::Local) const;
@@ -119,6 +121,7 @@ class Game {
 		bool GetDeviceButtonDown(const int& deviceID, const unsigned int& button) const;
 		bool GetDeviceButtonPressed(const int& deviceID, const unsigned int& button) const;
 		bool GetDeviceButtonReleased(const int& deviceID, const unsigned int& button) const;
+		unsigned int GetDeviceButtonState(const int& deviceID, const unsigned int& button) const;
 		unsigned int GetDeviceControlCount(const int& deviceID) const;
 		bool DeviceHasControl(const int& deviceID, const Device& control) const;
 		int GetDeviceControl(const int& deviceID, const Device& control) const;

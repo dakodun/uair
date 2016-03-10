@@ -124,17 +124,29 @@ void Game::Input() {
 	if (mSceneManager->mCurrScene) {
 		mSceneManager->mCurrScene->Input();
 	}
+	
+	for (unsigned int i = 0u; i < mEntitySystem.mMessageSystem.mMessageQueue.size(); ++i) {
+		mEntitySystem.mMessageSystem.mMessageQueue.at(i).mMessageStatus |= MessageSystem::MessageState::Input;
+	}
 }
 
 void Game::Process() {
 	if (mSceneManager->mCurrScene) {
 		mSceneManager->mCurrScene->Process();
 	}
+	
+	for (unsigned int i = 0u; i < mEntitySystem.mMessageSystem.mMessageQueue.size(); ++i) {
+		mEntitySystem.mMessageSystem.mMessageQueue.at(i).mMessageStatus |= MessageSystem::MessageState::Process;
+	}
 }
 
 void Game::PostProcess(const unsigned int & processed) {
 	if (mSceneManager->mCurrScene) {
 		mSceneManager->mCurrScene->PostProcess(processed);
+	}
+	
+	for (unsigned int i = 0u; i < mEntitySystem.mMessageSystem.mMessageQueue.size(); ++i) {
+		mEntitySystem.mMessageSystem.mMessageQueue.at(i).mMessageStatus |= MessageSystem::MessageState::PostProcess;
 	}
 }
 
@@ -144,6 +156,10 @@ void Game::Render(const unsigned int & pass) {
 	}
 	
 	glFlush();
+	
+	for (unsigned int i = 0u; i < mEntitySystem.mMessageSystem.mMessageQueue.size(); ++i) {
+		mEntitySystem.mMessageSystem.mMessageQueue.at(i).mMessageStatus |= MessageSystem::MessageState::Render;
+	}
 }
 
 void Game::Init() {
@@ -385,6 +401,10 @@ bool Game::GetKeyboardReleased(const Keyboard & key) const {
 	return mInputManager->GetKeyboardReleased(key);
 }
 
+unsigned int Game::GetKeyboardState(const Keyboard& key) const {
+	return mInputManager->GetKeyboardState(key);
+}
+
 bool Game::GetMouseDown(const Mouse & button) const {
 	return mInputManager->GetMouseDown(button);
 }
@@ -395,6 +415,10 @@ bool Game::GetMousePressed(const Mouse & button) const {
 
 bool Game::GetMouseReleased(const Mouse & button) const {
 	return mInputManager->GetMouseReleased(button);
+}
+
+unsigned int Game::GetMouseState(const Mouse& button) const {
+	return mInputManager->GetMouseState(button);
 }
 
 int Game::GetMouseWheel() const {
@@ -442,6 +466,10 @@ bool Game::GetDeviceButtonPressed(const int& deviceID, const unsigned int& butto
 
 bool Game::GetDeviceButtonReleased(const int& deviceID, const unsigned int& button) const {
 	return mInputManager->GetDeviceButtonReleased(deviceID, button);
+}
+
+unsigned int Game::GetDeviceButtonState(const int& deviceID, const unsigned int& button) const {
+	return mInputManager->GetDeviceButtonState(deviceID, button);
 }
 
 unsigned int Game::GetDeviceControlCount(const int& deviceID) const {

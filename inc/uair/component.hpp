@@ -37,7 +37,7 @@ class Component {
 		}
 		
 		// derived classes must implement this function and return a unique id (unique amongst other derived classes)
-		virtual unsigned int GetTypeID() = 0;
+		virtual unsigned int GetTypeID() const = 0;
 };
 }
 

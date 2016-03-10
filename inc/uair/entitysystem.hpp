@@ -32,38 +32,71 @@
 #include "manager.hpp"
 #include "entitymanager.hpp"
 #include "systemmanager.hpp"
+#include "messagesystem.hpp"
 
 namespace uair {
 // the main class of the ECS architecture that pulls the three concepts (of entity, component and system) together into one package
 class EntitySystem {
+	friend class Game;
+	
 	public :
 		typedef Manager<Component>::Handle ComponentHandle;
 		typedef EntityManager::Handle EntityHandle;
 	public :
 		EntitySystem();
 		
-		// convenience functions that invoke behaviour of the respective underlying manager
+		// component manager helpers
 		template <typename T>
 		void RegisterComponentType();
 		
-		EntityHandle AddEntity();
+		template <typename T>
+		T& GetComponent(const ComponentHandle& handle);
+		
+		// entity manager helpers
+		EntityHandle AddEntity(const std::string& entityName = "");
 		void RemoveEntity(const EntityHandle& handle);
 		Entity& GetEntity(const EntityHandle& handle);
 		
+		// system manager helpers
 		template <typename T>
 		void RegisterSystem();
 		
 		template <typename T>
 		T& GetSystem();
+		
+		// message system helpers
+		template <class T>
+		void PushMessage(const unsigned int& systemTypeID, const T& messageIn);
+		void PushMessageString(const unsigned int& systemTypeID, const unsigned int& messageTypeID, const std::string& messageString);
+		
+		unsigned int GetMessageCount();
+		unsigned int GetSystemType(const unsigned int& index);
+		unsigned int GetMessageType(const unsigned int& index);
+		int GetMessageState(const unsigned int& index);
+		
+		template <class T>
+		T PeekMessage(const unsigned int& index);
+		
+		template <class T>
+		T GetMessage(const unsigned int& index);
+		
+		void PopMessage(const unsigned int& index);
 	private :
 		Manager<Component> mComponentManager;
 		EntityManager mEntityManager;
 		SystemManager mSystemManager;
+		
+		MessageSystem mMessageSystem;
 };
 
 template <typename T>
 void EntitySystem::RegisterComponentType() {
 	mComponentManager.Register<T>();
+}
+
+template <typename T>
+T& EntitySystem::GetComponent(const ComponentHandle& handle) {
+	return mComponentManager.Get<T>(handle);
 }
 
 template <typename T>
@@ -74,6 +107,33 @@ void EntitySystem::RegisterSystem() {
 template <typename T>
 T& EntitySystem::GetSystem() {
 	return mSystemManager.Get<T>();
+}
+
+template <class T>
+void EntitySystem::PushMessage(const unsigned int& systemTypeID, const T& messageIn) {
+	try {
+		mMessageSystem.PushMessage<T>(systemTypeID, messageIn);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+template <class T>
+T EntitySystem::PeekMessage(const unsigned int& index) {
+	try {
+		return mMessageSystem.PeekMessage<T>(index);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+template <class T>
+T EntitySystem::GetMessage(const unsigned int& index) {
+	try {
+		return mMessageSystem.GetMessage<T>(index);
+	} catch (std::exception& e) {
+		throw;
+	}
 }
 }
 

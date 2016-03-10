@@ -27,7 +27,13 @@
 
 #include "systemmanager.hpp"
 
+#include "messagesystem.hpp"
+
 namespace uair {
+System::System(SystemManager* systemManager) : mSystemManagerPtr(systemManager) {
+	
+}
+
 System::~System() {
 	
 }
@@ -36,9 +42,69 @@ void System::RegisterEntity(EntityManager::Handle handle) {
 	mRegisteredEntities.push_back(std::move(handle));
 }
 
+EntityManager::Handle System::AddEntity(const std::string& entityName) {
+	try {
+		return mSystemManagerPtr->GetEntityManager().Add(entityName);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
 
-SystemManager::SystemManager(EntityManager& entityManager, Manager<Component>& componentManager) : mEntityManager(entityManager),
-		mComponentManager(componentManager) {
+void System::RemoveEntity(const EntityManager::Handle& handle) {
+	try {
+		mSystemManagerPtr->GetEntityManager().Remove(handle);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+Entity& System::GetEntity(const EntityManager::Handle& handle) {
+	try {
+		return mSystemManagerPtr->GetEntityManager().Get(handle);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+void System::PushMessageString(const unsigned int& systemTypeID, const unsigned int& messageTypeID, const std::string& messageString) {
+	mSystemManagerPtr->GetMessageSystem().PushMessageString(systemTypeID, messageTypeID, messageString);
+}
+
+unsigned int System::GetMessageCount() {
+	return mSystemManagerPtr->GetMessageSystem().GetMessageCount();
+}
+
+unsigned int System::GetSystemType(const unsigned int& index) {
+	try {
+		return mSystemManagerPtr->GetMessageSystem().GetSystemType(index);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+unsigned int System::GetMessageType(const unsigned int& index) {
+	try {
+		return mSystemManagerPtr->GetMessageSystem().GetMessageType(index);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+int System::GetMessageState(const unsigned int& index) {
+	try {
+		return mSystemManagerPtr->GetMessageSystem().GetMessageState(index);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+void System::PopMessage(const unsigned int& index) {
+	mSystemManagerPtr->GetMessageSystem().PopMessage(index);
+}
+
+
+SystemManager::SystemManager(EntityManager& entityManager, Manager<Component>& componentManager, MessageSystem& messageSystem) :
+		mEntityManager(entityManager), mComponentManager(componentManager), mMessageSystem(messageSystem) {
 	
 	
 }
@@ -55,5 +121,9 @@ EntityManager& SystemManager::GetEntityManager() {
 
 Manager<Component>& SystemManager::GetComponentManager() {
 	return mComponentManager;
+}
+
+MessageSystem& SystemManager::GetMessageSystem() {
+	return mMessageSystem;
 }
 }

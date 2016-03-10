@@ -38,14 +38,31 @@ class EntityManager;
 class Entity {
 	public :
 		// assign a pointer to the manager that creates this entity and a unique id
-		Entity(EntityManager* entityManager, const unsigned int& entityID);
+		Entity(EntityManager* entityManager, const unsigned int& entityID, const std::string& entityName = "");
+		
+		// 
+		Entity(const Entity& other) = delete;
+		
+		// 
+		Entity(Entity&& other);
 		
 		// remove all associated components
 		~Entity();
 		
+		// 
+		Entity& operator=(Entity other);
+		
+		// 
+		friend void swap(Entity& first, Entity& second);
+		
 		// create and associate a custom component with this entity
 		template<typename T, typename ...Ps>
-		void AddComponent(const Ps&... params);
+		Manager<Component>::Handle AddComponent(const Ps&... params);
+		
+		// remove
+		
+		// return an array of handles to the components associated with this entity
+		std::vector<Manager<Component>::Handle> GetComponents();
 		
 		unsigned int GetEntityID() const {
 			return mEntityID;
@@ -55,6 +72,7 @@ class Entity {
 		std::vector<Manager<Component>::Handle> mComponents; // store of component handles belonging to this entity
 		
 		unsigned int mEntityID = 0u;
+		std::string mName = "";
 };
 
 
@@ -78,7 +96,7 @@ class EntityManager {
 		EntityManager(Manager<Component>& componentManager);
 		
 		// add a new blank entity to the store and return a handle to it
-		Handle Add();
+		Handle Add(const std::string& entityName = "");
 		
 		// remove an entity from the store via its handle
 		void Remove(const Handle& handle);
@@ -96,8 +114,10 @@ class EntityManager {
 };
 
 template<typename T, typename ...Ps>
-void Entity::AddComponent(const Ps&... params) {
-	mComponents.push_back(mEntityManagerPtr->GetComponentManager().Add<T>(params...));
+Manager<Component>::Handle Entity::AddComponent(const Ps&... params) {
+	Manager<Component>::Handle newComponentHandle = mEntityManagerPtr->GetComponentManager().Add<T>(params...);
+	mComponents.push_back(newComponentHandle);
+	return newComponentHandle;
 }
 }
 

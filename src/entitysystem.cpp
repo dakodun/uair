@@ -29,13 +29,13 @@
 
 namespace uair {
 EntitySystem::EntitySystem() : mEntityManager(mComponentManager),
-		mSystemManager(mEntityManager, mComponentManager) {
+		mSystemManager(mEntityManager, mComponentManager, mMessageSystem) {
 	
 }
 
-EntitySystem::EntityHandle EntitySystem::AddEntity() {
+EntitySystem::EntityHandle EntitySystem::AddEntity(const std::string& entityName) {
 	try {
-		return mEntityManager.Add();
+		return mEntityManager.Add(entityName);
 	} catch (std::exception& e) {
 		throw;
 	}
@@ -55,5 +55,41 @@ Entity& EntitySystem::GetEntity(const EntitySystem::EntityHandle& handle) {
 	} catch (std::exception& e) {
 		throw;
 	}
+}
+
+void EntitySystem::PushMessageString(const unsigned int& systemTypeID, const unsigned int& messageTypeID, const std::string& messageString) {
+	mMessageSystem.PushMessageString(systemTypeID, messageTypeID, messageString);
+}
+
+unsigned int EntitySystem::GetMessageCount() {
+	return mMessageSystem.GetMessageCount();
+}
+
+unsigned int EntitySystem::GetSystemType(const unsigned int& index) {
+	try {
+		return mMessageSystem.GetSystemType(index);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+unsigned int EntitySystem::GetMessageType(const unsigned int& index) {
+	try {
+		return mMessageSystem.GetMessageType(index);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+int EntitySystem::GetMessageState(const unsigned int& index) {
+	try {
+		return mMessageSystem.GetMessageState(index);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+void EntitySystem::PopMessage(const unsigned int& index) {
+	mMessageSystem.PopMessage(index);
 }
 }
