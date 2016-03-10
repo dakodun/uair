@@ -29,8 +29,9 @@
 #define UAIRINPUTENUMS_HPP
 
 namespace uair {
-enum class Keyboard {
-	A,
+enum class Keyboard : unsigned int {
+	Unknown = 0u,
+	A = 1u,
 	B,
 	C,
 	D,
@@ -131,21 +132,24 @@ enum class Keyboard {
 	F14,
 	F15,
 	Break,
-	Unknown
+	Count
 };
 
-enum class Mouse {
-	Left,
+enum class Mouse : unsigned int {
+	Unknown = 0u,
+	Left = 1u,
 	Middle,
 	Right,
 	M4,
-	M5
+	M5,
+	Count
 };
 
 static const unsigned int BUTTONCOUNT = 64u; // the maximum amount of buttons allowed
 static const unsigned int DEVICECOUNT = 10u; // the count of known device controls
-enum class Device { // input device controls
-	AxisX,
+enum class Device : unsigned int { // input device controls
+	Unknown = 0u,
+	AxisX = 1u,
 	AxisY,
 	AxisZ,
 	AxisRx,
@@ -155,7 +159,7 @@ enum class Device { // input device controls
 	Dial,
 	Wheel,
 	HatSwitch,
-	Unknown
+	Count
 };
 }
 

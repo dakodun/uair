@@ -90,6 +90,15 @@ bool InputManager::InputDevice::GetButtonReleased(const unsigned int& button) co
 	return false; // button is not released
 }
 
+unsigned int InputManager::InputDevice::GetButtonState(const unsigned int& button) const {
+	auto buttonState = mButtonStates.find(button); // get the state of the button
+	if (buttonState != mButtonStates.end()) { // if the button was valid...
+		return buttonState->second; // return the current state of the button
+	}
+	
+	return 0u; // otherwise return default of 'up'
+}
+
 unsigned int InputManager::InputDevice::GetControlCount() const {
 	return mControlCount; // return the number of controls reported by the device
 }
@@ -272,19 +281,19 @@ InputManager::InputManager() {
 
 void InputManager::Process() {
 	for (auto iter = mKeyboardStates.begin(); iter != mKeyboardStates.end(); ++iter) { // update all keyboard states
-		if (iter->second == 2u) { // if state is pressed
+		if (iter->second == 2u) { // if state is pressed...
 			iter->second = 1u; // it is now down
 		}
-		else if (iter->second == 3u) { // if state is released
+		else if (iter->second == 3u) { // if state is released...
 			iter->second = 0u; // it is now up
 		}
 	}
 	
 	for (auto iter = mMouseStates.begin(); iter != mMouseStates.end(); ++iter) { // update all mouse states
-		if (iter->second == 2u) { // if state is pressed
+		if (iter->second == 2u) { // if state is pressed...
 			iter->second = 1u; // it is now down
 		}
-		else if (iter->second == 3u) { // if state is released
+		else if (iter->second == 3u) { // if state is released...
 			iter->second = 0u; // it is now up
 		}
 	}
@@ -293,10 +302,10 @@ void InputManager::Process() {
 	
 	for (auto device = mInputDevices.begin(); device != mInputDevices.end(); ++device) {
 		for (auto iter = device->second.mButtonStates.begin(); iter != device->second.mButtonStates.end(); ++iter) { // update all device button states
-			if (iter->second == 2u) { // if state is pressed
+			if (iter->second == 2u) { // if state is pressed...
 				iter->second = 1u; // it is now down
 			}
-			else if (iter->second == 3u) { // if state is released
+			else if (iter->second == 3u) { // if state is released...
 				iter->second = 0u; // it is now up
 			}
 		}
@@ -336,6 +345,15 @@ bool InputManager::GetKeyboardReleased(const Keyboard & key) const {
 	return false; // key was not released
 }
 
+unsigned int InputManager::GetKeyboardState(const Keyboard& key) const {
+	auto iter = mKeyboardStates.find(key); // get the state of the key
+	if (iter != mKeyboardStates.end()) { // if the key was valid
+		return iter->second; // return the current state of the key
+	}
+	
+	return 0u; // otherwise return default of 'up'
+}
+
 bool InputManager::GetMouseDown(const Mouse & button) const {
 	auto iter = mMouseStates.find(button); // get the state of the button
 	if (iter != mMouseStates.end()) { // if the button was valid
@@ -367,6 +385,15 @@ bool InputManager::GetMouseReleased(const Mouse & button) const {
 	}
 	
 	return false; // button was not released
+}
+
+unsigned int InputManager::GetMouseState(const Mouse& button) const {
+	auto iter = mMouseStates.find(button); // get the state of the button
+	if (iter != mMouseStates.end()) { // if the button was valid
+		return iter->second; // return the current state of the button
+	}
+	
+	return 0u; // otherwise return default of 'up'
 }
 
 int InputManager::GetMouseWheel() const {
@@ -417,6 +444,10 @@ bool InputManager::GetDeviceButtonPressed(const int& deviceID, const unsigned in
 
 bool InputManager::GetDeviceButtonReleased(const int& deviceID, const unsigned int& button) const {
 	return GetDevice(deviceID).GetButtonReleased(button);
+}
+
+unsigned int InputManager::GetDeviceButtonState(const int& deviceID, const unsigned int& button) const {
+	return GetDevice(deviceID).GetButtonState(button);
 }
 
 unsigned int InputManager::GetDeviceControlCount(const int& deviceID) const {

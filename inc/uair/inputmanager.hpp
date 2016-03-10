@@ -65,6 +65,7 @@ class InputManager {
 				bool GetButtonDown(const unsigned int& button) const; // returns true if the button is held down
 				bool GetButtonPressed(const unsigned int& button) const; // returns true if the button has been pressed (fires once)
 				bool GetButtonReleased(const unsigned int& button) const; // returns true if the button has been released (fires once)
+				unsigned int GetButtonState(const unsigned int& button) const;
 				
 				unsigned int GetControlCount() const; // get the number of controls reported by the input device
 				bool HasControl(const Device& control) const; // check if the specified control is present on the input device
@@ -92,10 +93,12 @@ class InputManager {
 		bool GetKeyboardDown(const Keyboard& key) const;
 		bool GetKeyboardPressed(const Keyboard& key) const;
 		bool GetKeyboardReleased(const Keyboard& key) const;
+		unsigned int GetKeyboardState(const Keyboard& key) const;
 		
 		bool GetMouseDown(const Mouse& button) const;
 		bool GetMousePressed(const Mouse& button) const;
 		bool GetMouseReleased(const Mouse& button) const;
+		unsigned int GetMouseState(const Mouse& button) const;
 		
 		int GetMouseWheel() const;
 		void SetMouseCoords(const glm::ivec2& newCoords, const CoordinateSpace& coordinateSpace = CoordinateSpace::Local);
@@ -108,6 +111,7 @@ class InputManager {
 		bool GetDeviceButtonDown(const int& deviceID, const unsigned int& button) const; // helper function
 		bool GetDeviceButtonPressed(const int& deviceID, const unsigned int& button) const; // helper function
 		bool GetDeviceButtonReleased(const int& deviceID, const unsigned int& button) const; // helper function
+		unsigned int GetDeviceButtonState(const int& deviceID, const unsigned int& button) const;
 		
 		unsigned int GetDeviceControlCount(const int& deviceID) const; // helper function
 		bool DeviceHasControl(const int& deviceID, const Device& control) const; // helper function
