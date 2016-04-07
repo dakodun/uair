@@ -45,16 +45,19 @@ class System {
 		// register an entity handle to the system indicating it should be processed by the system
 		void RegisterEntity(EntityManager::Handle handle);
 		
+		// component manager helpers
 		template <typename T>
 		void RegisterComponentType();
 		
 		template <typename T>
 		T& GetComponent(const Manager<Component>::Handle& handle);
 		
+		// entity manager helpers
 		EntityManager::Handle AddEntity(const std::string& entityName = "");
 		void RemoveEntity(const EntityManager::Handle& handle);
 		Entity& GetEntity(const EntityManager::Handle& handle);
 		
+		// message system helpers
 		template <class T>
 		void PushMessage(const unsigned int& systemTypeID, const T& messageIn);
 		void PushMessageString(const unsigned int& systemTypeID, const unsigned int& messageTypeID, const std::string& messageString);
@@ -88,9 +91,9 @@ class SystemManager {
 		
 		~SystemManager();
 		
-		// register a system to the system manager (creates a single instance of it)
+		// register a system to the system manager (creates a single instance of it) and return a reference
 		template <typename T>
-		void Register();
+		T& Register();
 		
 		// remove a system from the system manager
 		template <typename T>
@@ -114,23 +117,6 @@ class SystemManager {
 		MessageSystem& mMessageSystem; // a reference to the message system associated with this system manager
 		std::map<unsigned int, System*> mStore;
 };
-
-template <typename T>
-void SystemManager::Register() {
-	if (!std::is_base_of<System, T>::value) { // if the system being registered doesn't inherit from base class...
-		throw std::runtime_error("not of base type"); // an error has occurred, don't register system
-	}
-	
-	T tempT(nullptr); // create a temporary object of the system being registered
-	unsigned int typeID = tempT.GetTypeID(); // retrieve the unique type id from the temp
-	
-	auto storeResult = mStore.find(typeID); // search the registered systems store for a match with the unique id
-	if (storeResult != mStore.end()) { // if a match was found...
-		throw std::runtime_error("type already registered"); // an error has occurred, don't register system
-	}
-	
-	mStore.insert(std::make_pair(typeID, new T(this))); // add a new instance of the system to the store
-}
 
 template <typename T>
 void System::RegisterComponentType() {
@@ -177,6 +163,24 @@ T System::GetMessage(const unsigned int& index) {
 	}
 }
 
+
+template <typename T>
+T& SystemManager::Register() {
+	if (!std::is_base_of<System, T>::value) { // if the system being registered doesn't inherit from base class...
+		throw std::runtime_error("not of base type"); // an error has occurred, don't register system
+	}
+	
+	T tempT(nullptr); // create a temporary object of the system being registered
+	unsigned int typeID = tempT.GetTypeID(); // retrieve the unique type id from the temp
+	
+	auto storeResult = mStore.find(typeID); // search the registered systems store for a match with the unique id
+	if (storeResult != mStore.end()) { // if a match was found...
+		throw std::runtime_error("type already registered"); // an error has occurred, don't register system
+	}
+	
+	T* systemPtr = static_cast<T*>((mStore.insert(std::make_pair(typeID, new T(this))).first)->second); // add a new instance of the system to the store and cast it to its derived type
+	return *systemPtr; // return a reference
+}
 
 template <typename T>
 void SystemManager::Remove() {

@@ -59,7 +59,7 @@ class EntitySystem {
 		
 		// system manager helpers
 		template <typename T>
-		void RegisterSystem();
+		T& RegisterSystem();
 		
 		template <typename T>
 		T& GetSystem();
@@ -91,22 +91,38 @@ class EntitySystem {
 
 template <typename T>
 void EntitySystem::RegisterComponentType() {
-	mComponentManager.Register<T>();
+	try {
+		mComponentManager.Register<T>();
+	} catch (std::exception& e) {
+		throw;
+	}
 }
 
 template <typename T>
 T& EntitySystem::GetComponent(const ComponentHandle& handle) {
-	return mComponentManager.Get<T>(handle);
+	try {
+		return mComponentManager.Get<T>(handle);
+	} catch (std::exception& e) {
+		throw;
+	}
 }
 
 template <typename T>
-void EntitySystem::RegisterSystem() {
-	mSystemManager.Register<T>();
+T& EntitySystem::RegisterSystem() {
+	try {
+		return mSystemManager.Register<T>();
+	} catch (std::exception& e) {
+		throw;
+	}
 }
 
 template <typename T>
 T& EntitySystem::GetSystem() {
-	return mSystemManager.Get<T>();
+	try {
+		return mSystemManager.Get<T>();
+	} catch (std::exception& e) {
+		throw;
+	}
 }
 
 template <class T>
