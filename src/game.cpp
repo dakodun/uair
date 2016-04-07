@@ -570,5 +570,65 @@ EntitySystem& Game::GetEntitySystem() {
 	return mEntitySystem;
 }
 
+EntitySystem::EntityHandle Game::AddEntity(const std::string& entityName) {
+	try {
+		return mEntitySystem.AddEntity(entityName);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+void Game::RemoveEntity(const EntitySystem::EntityHandle& handle) {
+	try {
+		mEntitySystem.RemoveEntity(handle);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+Entity& Game::GetEntity(const EntitySystem::EntityHandle& handle) {
+	try {
+		return mEntitySystem.GetEntity(handle);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+void Game::PushMessageString(const unsigned int& systemTypeID, const unsigned int& messageTypeID, const std::string& messageString) {
+	mEntitySystem.PushMessageString(systemTypeID, messageTypeID, messageString);
+}
+
+unsigned int Game::GetMessageCount() {
+	return mEntitySystem.GetMessageCount();
+}
+
+unsigned int Game::GetSystemType(const unsigned int& index) {
+	try {
+		return mEntitySystem.GetSystemType(index);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+unsigned int Game::GetMessageType(const unsigned int& index) {
+	try {
+		return mEntitySystem.GetMessageType(index);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+int Game::GetMessageState(const unsigned int& index) {
+	try {
+		return mEntitySystem.GetMessageState(index);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+void Game::PopMessage(const unsigned int& index) {
+	mEntitySystem.PopMessage(index);
+}
+
 Game GAME;
 }

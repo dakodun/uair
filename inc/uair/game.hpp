@@ -156,6 +156,37 @@ class Game {
 		// entity system related helper functions
 		EntitySystem& GetEntitySystem();
 		
+		template <typename T>
+		void RegisterComponentType();
+		
+		template <typename T>
+		T& GetComponent(const EntitySystem::ComponentHandle& handle);
+		
+		template <typename T>
+		T& RegisterSystem();
+		
+		template <typename T>
+		T& GetSystem();
+		
+		template <class T>
+		void PushMessage(const unsigned int& systemTypeID, const T& messageIn);
+		
+		template <class T>
+		T PeekMessage(const unsigned int& index);
+		
+		template <class T>
+		T GetMessage(const unsigned int& index);
+		
+		EntitySystem::EntityHandle AddEntity(const std::string& entityName = "");
+		void RemoveEntity(const EntitySystem::EntityHandle& handle);
+		Entity& GetEntity(const EntitySystem::EntityHandle& handle);
+		void PushMessageString(const unsigned int& systemTypeID, const unsigned int& messageTypeID, const std::string& messageString);
+		unsigned int GetMessageCount();
+		unsigned int GetSystemType(const unsigned int& index);
+		unsigned int GetMessageType(const unsigned int& index);
+		int GetMessageState(const unsigned int& index);
+		void PopMessage(const unsigned int& index);
+		
 		// 
 		const FT_Library& GetFTLibrary() const {
 			return mFTLibrary;
@@ -194,6 +225,69 @@ class Game {
 		
 		FT_Library mFTLibrary;
 };
+
+template <typename T>
+void Game::RegisterComponentType() {
+	try {
+		mEntitySystem.RegisterComponentType<T>();
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+template <typename T>
+T& Game::GetComponent(const EntitySystem::ComponentHandle& handle) {
+	try {
+		return mEntitySystem.GetComponent<T>(handle);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+template <typename T>
+T& Game::RegisterSystem() {
+	try {
+		return mEntitySystem.RegisterSystem<T>();
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+template <typename T>
+T& Game::GetSystem() {
+	try {
+		return mEntitySystem.GetSystem<T>();
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+template <class T>
+void Game::PushMessage(const unsigned int& systemTypeID, const T& messageIn) {
+	try {
+		mEntitySystem.PushMessage<T>(systemTypeID, messageIn);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+template <class T>
+T Game::PeekMessage(const unsigned int& index) {
+	try {
+		return mEntitySystem.PeekMessage<T>(index);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+template <class T>
+T Game::GetMessage(const unsigned int& index) {
+	try {
+		return mEntitySystem.GetMessage<T>(index);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
 
 extern Game GAME;
 }
