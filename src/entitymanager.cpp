@@ -58,10 +58,30 @@ void swap(Entity& first, Entity& second) {
 	std::swap(first.mEntityManagerPtr, second.mEntityManagerPtr);
 	std::swap(first.mComponents, second.mComponents);
 	std::swap(first.mEntityID, second.mEntityID);
+	std::swap(first.mName, second.mName);
 }
 
-std::vector<Manager<Component>::Handle> Entity::GetComponents() {
+void Entity::RemoveAllComponents() {
+	for (auto iter = mComponents.begin(); iter != mComponents.end(); ++iter) { // for all component attached to entity...
+		try {
+			mEntityManagerPtr->GetComponentManager().Remove(*iter); // invoke removal via the component manager
+		} catch (std::exception& e) {
+			throw;
+		}
+	}
+}
+
+
+std::vector<Manager<Component>::Handle> Entity::GetAllComponents() {
 	return mComponents;
+}
+
+unsigned int Entity::GetEntityID() const {
+	return mEntityID;
+}
+
+std::string Entity::GetName() const {
+	return mName;
 }
 
 

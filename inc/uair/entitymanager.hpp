@@ -40,33 +40,50 @@ class Entity {
 		// assign a pointer to the manager that creates this entity and a unique id
 		Entity(EntityManager* entityManager, const unsigned int& entityID, const std::string& entityName = "");
 		
-		// 
+		// entities shouldn't be copied
 		Entity(const Entity& other) = delete;
 		
-		// 
+		// entities can be moved (required by manager)
 		Entity(Entity&& other);
 		
 		// remove all associated components
 		~Entity();
 		
-		// 
 		Entity& operator=(Entity other);
 		
-		// 
 		friend void swap(Entity& first, Entity& second);
 		
 		// create and associate a custom component with this entity
 		template<typename T, typename ...Ps>
 		Manager<Component>::Handle AddComponent(const Ps&... params);
 		
-		// remove
+		// remove all components from the entity
+		void RemoveAllComponents();
 		
-		// return an array of handles to the components associated with this entity
+		// remove all components of a type from the entity
+		template<typename T>
+		void RemoveComponents();
+		
+		// remove all components of a type with the specified name from the entity
+		template<typename T>
+		void RemoveComponents(const std::string& name);
+		
+		// return an array of handles to all components associated with this entity
+		std::vector<Manager<Component>::Handle> GetAllComponents();
+		
+		// return an array of handles to all components of a type associated with this entity
+		template<typename T>
 		std::vector<Manager<Component>::Handle> GetComponents();
 		
-		unsigned int GetEntityID() const {
-			return mEntityID;
-		}
+		// return an array of handles to all components of a type with the specified name associated with this entity
+		template<typename T>
+		std::vector<Manager<Component>::Handle> GetComponents(const std::string& name);
+		
+		// return the unique id assigned to this entity
+		unsigned int GetEntityID() const;
+		
+		// return the name (if any) assigned to this entity
+		std::string GetName() const;
 	private :
 		EntityManager* mEntityManagerPtr; // a pointer to the entity manager that created this entity
 		std::vector<Manager<Component>::Handle> mComponents; // store of component handles belonging to this entity
@@ -118,6 +135,82 @@ Manager<Component>::Handle Entity::AddComponent(const Ps&... params) {
 	Manager<Component>::Handle newComponentHandle = mEntityManagerPtr->GetComponentManager().Add<T>(params...);
 	mComponents.push_back(newComponentHandle);
 	return newComponentHandle;
+}
+
+template<typename T>
+void Entity::RemoveComponents() {
+	T temp;
+	
+	for (unsigned int i = 0u; i < mComponents.size(); ) {
+		if (mComponents.at(i).mTypeID == temp.GetTypeID()) {
+			try {
+				mEntityManagerPtr->GetComponentManager().Remove(*(mComponents.begin() + i)); // invoke removal via the component manager
+				mComponents.erase(mComponents.begin() + i);
+			} catch (std::exception& e) {
+				throw;
+			}
+			
+			continue;
+		}
+		
+		++i;
+	}
+}
+
+template<typename T>
+void Entity::RemoveComponents(const std::string& name) {
+	T temp;
+	
+	for (unsigned int i = 0u; i < mComponents.size(); ) {
+		if (mComponents.at(i).mTypeID == temp.GetTypeID()) {
+			Component& component = mEntityManagerPtr->GetComponentManager().Get<T>(mComponents.at(i));
+			
+			if (component.GetName() == name) {
+				try {
+					mEntityManagerPtr->GetComponentManager().Remove(*(mComponents.begin() + i)); // invoke removal via the component manager
+					mComponents.erase(mComponents.begin() + i);
+				} catch (std::exception& e) {
+					throw;
+				}
+				
+				continue;
+			}
+		}
+		
+		++i;
+	}
+}
+
+template<typename T>
+std::vector<Manager<Component>::Handle> Entity::GetComponents() {
+	std::vector<Manager<Component>::Handle> components;
+	T temp;
+	
+	for (auto iter = mComponents.begin(); iter != mComponents.end(); ++iter) {
+		if (iter->mTypeID == temp.GetTypeID()) {
+			components.push_back(*iter);
+		}
+	}
+	
+	return components;
+}
+
+template<typename T>
+std::vector<Manager<Component>::Handle> Entity::GetComponents(const std::string& name) {
+	std::vector<Manager<Component>::Handle> components;
+	T temp;
+	
+	for (auto iter = mComponents.begin(); iter != mComponents.end(); ++iter) {
+		if (iter->mTypeID == temp.GetTypeID()) {
+			Component& component = mEntityManagerPtr->GetComponentManager().Get<T>(*iter);
+			
+			if (component.GetName() == name) {
+				components.push_back(*iter);
+			}
+		}
+	}
+	
+	return components;
 }
 }
 
