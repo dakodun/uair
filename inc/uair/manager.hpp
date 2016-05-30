@@ -34,6 +34,7 @@
 #include <map>
 #include <list>
 #include <functional>
+#include <memory>
 
 namespace uair {
 // abstract base class that all typed stores inherit from ensuring they have the same base pointer
@@ -59,14 +60,14 @@ class Store : public StoreBase {
 		class StoreEntry {
 			public :
 				template <typename ...Ps>
-				StoreEntry(const std::string& name, const Ps&... params) : mName(name), mData(params...) {
+				StoreEntry(const std::string& name, const Ps&... params) : mName(name), mData(new T(params...)) {
 					
 				}
 			public :
 				std::string mName = ""; // the non-unique name associated with this entry
 				bool mActive = true; // is the entry active (i.e., has it been removed)
 				unsigned int mCounter = 0u; // the counter that ensures handles are still valid (i.e., its resource hasn't been removed and replaced)
-				T mData; // an object of the type that this store handles
+				std::unique_ptr<T> mData; // a pointer to an object of the type that this store handles
 		};
 		
 		Store() {
@@ -109,6 +110,7 @@ class Store : public StoreBase {
 			if (index < mStore.size() && mStore.at(index).mActive && mStore.at(index).mCounter == counter) {
 				mStore.at(index).mActive = false; // indicate the resource has been removed
 				++mStore.at(index).mCounter; // increment the counter to invalidate existing handles
+				mStore.at(index).mData.reset(nullptr); // delete the handled object
 				mFreeIndices.push(index); // add its index to the sorted queue of now free indices
 			}
 			else {
@@ -122,6 +124,7 @@ class Store : public StoreBase {
 				if (mStore.at(i).mActive && mStore.at(i).mName == name) {
 					mStore.at(i).mActive = false; // indicate the resource has been removed
 					++mStore.at(i).mCounter; // increment the counter to invalidate existing handles
+					mStore.at(i).mData.reset(nullptr); // delete the handled object
 					mFreeIndices.push(i); // add its index to the sorted queue of now free indices
 				}
 			}
@@ -131,7 +134,7 @@ class Store : public StoreBase {
 		T& Get(const unsigned int& index, const unsigned int& counter) {
 			// if the index is valid, the resource has not been removed and the counters match...
 			if (index < mStore.size() && mStore.at(index).mActive && mStore.at(index).mCounter == counter) {
-				return mStore.at(index).mData; // return a reference to the object stored
+				return *(mStore.at(index).mData.get()); // return a reference to the object stored
 			}
 			
 			throw std::runtime_error("handle is invalid"); // an error has occurred, handle is invalid
@@ -143,7 +146,7 @@ class Store : public StoreBase {
 			
 			for (auto iter = mStore.begin(); iter != mStore.end(); ++iter) { // for all resources in the store...
 				if (iter->mActive && iter->mName == name) { // if the name matches...
-					result.push_back(std::ref(iter->mData)); // add a reference to the resource to the list
+					result.push_back(std::ref(*(iter->mData.get()))); // add a reference to the resource to the list
 				}
 			}
 			
@@ -176,10 +179,26 @@ class Manager {
 				std::string mName = ""; // a name that the handled resource can be identified by (non-unique)
 		};
 		
+		Manager() = default;
+		Manager(const Manager& other) = delete;
+		Manager(Manager&& other) : Manager() {
+			swap(*this, other);
+		}
+		
 		~Manager() {
 			for (auto iter = mLookup.begin(); iter != mLookup.end(); ++iter) { // for all types of resource in the table...
 				delete iter->second; // delete the resource store via the base pointer
 			}
+		}
+		
+		Manager& operator=(Manager other) {
+			swap(*this, other);
+			
+			return *this;
+		}
+		
+		friend void swap(Manager& first, Manager& second) {
+			std::swap(first.mLookup, second.mLookup);
 		}
 		
 		// register a derived resource type with the manager
@@ -189,8 +208,7 @@ class Manager {
 				throw std::runtime_error("not of base type"); // an error has occurred, don't register resource type
 			}
 			
-			T tempT; // create a temporary object of the resource type
-			unsigned int typeID = tempT.GetTypeID(); // get the type id relating to the resource type
+			unsigned int typeID = T::GetTypeID(); // get the type id relating to the resource type
 			
 			auto lookupResult = mLookup.find(typeID); // search for the resource type in the lookup table
 			if (lookupResult != mLookup.end()) { // if the type id relating to the resource type is already registered...
@@ -207,8 +225,7 @@ class Manager {
 				throw std::runtime_error("not of base type"); // an error has occurred, resource type is invalid
 			}
 			
-			T tempT; // create a temporary object of the resource type
-			unsigned int typeID = tempT.GetTypeID(); // get the type id relating to the resource type
+			unsigned int typeID = T::GetTypeID(); // get the type id relating to the resource type
 			
 			auto lookupResult = mLookup.find(typeID); // search for the resource type in the lookup table
 			if (lookupResult == mLookup.end()) { // if the type id relating to the resource type isn't registered...
@@ -230,8 +247,7 @@ class Manager {
 		// remove a resource of the specified type from the store
 		template <typename T>
 		void Remove(const Handle& handle) {
-			T tempT; // create a temporary object of the resource type
-			unsigned int typeID = tempT.GetTypeID(); // get the type id relating to the resource type
+			unsigned int typeID = T::GetTypeID(); // get the type id relating to the resource type
 			
 			if (handle.mTypeID != typeID) { // if the handle and temporary object's unique type identifier don't match...
 				throw std::runtime_error("handle/type mismatch"); // an error has occurred, handle is invalid
@@ -251,11 +267,10 @@ class Manager {
 			}
 		}
 		
-		// remove all resources of the specified type with the sepcified name from the store
+		// remove all resources of the specified type with the specified name from the store
 		template <typename T>
 		void Remove(const std::string& name) {
-			T tempT; // create a temporary object of the resource type
-			unsigned int typeID = tempT.GetTypeID(); // get the type id relating to the resource type
+			unsigned int typeID = T::GetTypeID(); // get the type id relating to the resource type
 			
 			auto lookupResult = mLookup.find(typeID); // search for the resource type in the lookup table
 			if (lookupResult == mLookup.end()) { // if the type id relating to the resource type isn't registered...
@@ -300,8 +315,7 @@ class Manager {
 		// return a reference to a resource pointed to by the supplied handle
 		template <typename T>
 		T& Get(const Handle& handle) {
-			T tempT; // create a temporary object of the resource type
-			unsigned int typeID = tempT.GetTypeID(); // get the type id relating to the resource type
+			unsigned int typeID = T::GetTypeID(); // get the type id relating to the resource type
 			
 			if (handle.mTypeID != typeID) { // if the handle and temporary object's unique type identifier don't match...
 				throw std::runtime_error("handle/type mismatch"); // an error has occurred, handle is invalid
@@ -324,8 +338,7 @@ class Manager {
 		// return a list of references matching name
 		template <typename T>
 		std::list< std::reference_wrapper<T> > Get(const std::string& name) {
-			T tempT; // create a temporary object of the resource type
-			unsigned int typeID = tempT.GetTypeID(); // get the type id relating to the resource type
+			unsigned int typeID = T::GetTypeID(); // get the type id relating to the resource type
 			
 			auto lookupResult = mLookup.find(typeID); // search for the resource type in the lookup table
 			if (lookupResult == mLookup.end()) { // if the type id relating to the resource type isn't registered...
@@ -335,7 +348,7 @@ class Manager {
 			Store<T>* storePtr = static_cast< Store<T>* >(lookupResult->second); // get the correct type of store from the lookup and cast it from its base pointer
 			
 			try {
-				return storePtr->Get(name); // return a reference to the stored resource 
+				return storePtr->Get(name); // return a list of references to the stored resources 
 			} catch (std::exception& e) {
 				throw;
 			}
