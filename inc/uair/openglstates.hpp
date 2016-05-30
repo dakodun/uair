@@ -38,25 +38,13 @@ class OpenGLStates {
 		// bind and store currently bound target
 		static bool BindArrayBuffer(const GLuint& id);
 		static bool BindElementArrayBuffer(const GLuint& id);
+		static bool BindVertexArray(const GLuint& id);
 		static bool UseProgram(const GLuint& id);
 		static bool BindTexture(const GLuint& id);
 		static bool BindFBO(const GLuint& id);
 		static bool BindRenderBuffer(const GLuint& id);
 		static bool BindPBOPack(const GLuint& id);
 		static bool BindPBOUnpack(const GLuint& id);
-		
-		// shader variable locations
-		static GLint mVertexLocation;
-		static GLint mNormalLocation;
-		static GLint mColourLocation;
-		static GLint mTexCoordLocation;
-		static GLint mTexLocation;
-		static GLint mTypeLocation;
-		static GLint mExtraLocation;
-		
-		static GLint mProjectionMatrixLocation;
-		static GLint mViewMatrixLocation;
-		static GLint mModelMatrixLocation;
 		
 		// matrices for rendering
 		static glm::mat4 mProjectionMatrix;
@@ -66,6 +54,7 @@ class OpenGLStates {
 		// currently bound target
 		static GLuint mCurrentArrayBuffer;
 		static GLuint mCurrentElementArrayBuffer;
+		static GLuint mCurrentVertexArray;
 		static GLuint mCurrentProgram;
 		static GLuint mCurrentTexture;
 		static GLuint mCurrentFBO;

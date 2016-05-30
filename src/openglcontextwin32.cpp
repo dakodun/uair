@@ -38,7 +38,7 @@ namespace uair {
 OpenGLContextWin32::OpenGLContextWin32() {
 	try {
 		SetUpContext();
-	} catch (UairException& e) {
+	} catch (std::exception& e) {
 		std::cout << e.what() << std::endl;
 		throw;
 	}
@@ -47,7 +47,7 @@ OpenGLContextWin32::OpenGLContextWin32() {
 OpenGLContextWin32::OpenGLContextWin32(Window& window) {
 	try {
 		SetUpContext(window);
-	} catch (UairException& e) {
+	} catch (std::exception& e) {
 		std::cout << e.what() << std::endl;
 		throw;
 	}
@@ -113,7 +113,7 @@ void OpenGLContextWin32::SetUpContext(Window& window) {
 	WGLEWContext dummyGlewContextWin32; // create a temporary wglew context
 	
 	if (!dummyRenderContext) { // if we failed to create a valid render context...
-		throw UairException("Error creating dummy rendering context."); // throw exception
+		throw std::runtime_error("Error creating dummy rendering context."); // throw exception
 	}
 	
 	InitGlew(window.mDeviceContext, dummyRenderContext, dummyGlewContext, dummyGlewContextWin32); // initialise glew for the temporary context
@@ -143,7 +143,7 @@ void OpenGLContextWin32::SetUpContext(Window& window) {
 		wglMakeCurrent(storedDeviceContext, storedRenderContext); // restore the previous dc/rc combo
 		CURRENTCONTEXT = storedGlewContext; // restore the previous glew context
 		CURRENTCONTEXTWIN32 = storedGlewContextWin32; // restore the previous wglew context
-		throw UairException("Error creating rendering context."); // throw exception
+		throw std::runtime_error("Error creating rendering context."); // throw exception
 	}
 	
 	InitGlew(window.mDeviceContext, mRenderContext, mGlewContext, mGlewContextWin32); // initialise glew for the actual context
@@ -181,13 +181,13 @@ void OpenGLContextWin32::InitGlew(HDC& deviceContext, HGLRC& renderContext, GLEW
 	GLenum err = glewContextInit(&glewContext); // initialise the current glew context
 	if (err != GLEW_OK) { // if initialisation wasn't successful...
 		std::string glewError = reinterpret_cast<const char*>(glewGetErrorString(err)); // get the error string
-		throw UairException(glewError); // throw an exception
+		throw std::runtime_error(glewError); // throw an exception
 	}
 	
 	err = wglewContextInit(&glewContextWin32); // initialise the current win32 glew context
 	if (err != GLEW_OK) { // if initialisation wasn't successful...
 		std::string glewError = reinterpret_cast<const char*>(glewGetErrorString(err)); // get the error string
-		throw UairException(glewError); // throw an exception
+		throw std::runtime_error(glewError); // throw an exception
 	}
 }
 

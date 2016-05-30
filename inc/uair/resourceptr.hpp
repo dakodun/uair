@@ -31,8 +31,24 @@
 #include <iostream>
 
 namespace uair {
+class ResourcePtrBase {
+	friend class Resource;
+	
+	private :
+		virtual void Reset() = 0;
+		
+		unsigned int GetID() const {
+			return mID;
+		}
+	
+	protected :
+		unsigned int mID = 0u;
+};
+
 template<class T>
-class ResourcePtr {
+class ResourcePtr : public ResourcePtrBase {
+	friend class Resource;
+	
 	public :
 		ResourcePtr() = default;
 		
@@ -57,8 +73,7 @@ class ResourcePtr {
 		
 		~ResourcePtr() {
 			RemoveReference();
-			mPtr = nullptr;
-			mID = 0u;
+			Reset();
 		}
 		
 		ResourcePtr<T>& operator=(ResourcePtr<T> other) {
@@ -75,7 +90,7 @@ class ResourcePtr {
 			second.AddReference(second.mID);
 		}
 		
-		void SetResource(T* ptr) {
+		void Set(T* ptr) {
 			if (ptr != mPtr) {
 				RemoveReference();
 				
@@ -84,16 +99,36 @@ class ResourcePtr {
 			}
 		}
 		
-		T* GetResource() {
+		T& operator*() const {
+			return *mPtr;
+		}
+		
+		T* operator->() const {
 			return mPtr;
 		}
 		
-		const T* GetConstResource() const {
+		T* Get() {
 			return mPtr;
 		}
 		
-		void UnsetResource() {
+		const T* GetConst() const {
+			return mPtr;
+		}
+		
+		void Unset() {
 			RemoveReference();
+			Reset();
+		}
+		
+		explicit operator bool() const {
+			if (mPtr) {
+				return true;
+			}
+			
+			return false;
+		}
+	private :
+		void Reset() {
 			mPtr = nullptr;
 			mID = 0u;
 		}
@@ -109,21 +144,8 @@ class ResourcePtr {
 				mID = mPtr->RemoveReference(this);
 			}
 		}
-		
-		unsigned int GetID() const {
-			return mID;
-		}
-		
-		bool IsValid() {
-			if (mPtr) {
-				return true;
-			}
-			
-			return false;
-		}
 	private :
 		T* mPtr = nullptr;
-		unsigned int mID = 0u;
 };
 }
 

@@ -32,7 +32,7 @@
 #include "resource.hpp"
 
 namespace uair {
-class RenderBuffer : public Resource<RenderBuffer> {
+class RenderBuffer : public Resource {
 	public :
 		RenderBuffer() = default;
 		RenderBuffer(const RenderBuffer& other) = delete;
@@ -51,6 +51,8 @@ class RenderBuffer : public Resource<RenderBuffer> {
 		unsigned int GetRenderBufferID() const;
 		unsigned int GetWidth() const;
 		unsigned int GetHeight() const;
+		
+		static unsigned int GetTypeID();
 	private :
 		GLuint mRenderBufferID = 0;
 		

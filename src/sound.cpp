@@ -90,8 +90,8 @@ void Sound::FromBuffer(ResourcePtr<SoundBuffer> buffer) {
 	mSampleDataPtr = nullptr; // unset the pointer to the samples array
 	
 	mSoundBuffer = buffer; // set the new buffer resource pointer
-	mSampleDataPtr = &mSoundBuffer.GetResource()->mSampleData; // set the pointer to the new samples array
-	mNumChannels = mSoundBuffer.GetResource()->mNumChannels; // update the number of channels
+	mSampleDataPtr = &(mSoundBuffer->mSampleData); // set the pointer to the new samples array
+	mNumChannels = mSoundBuffer->mNumChannels; // update the number of channels
 	OpenRtAudioStream(mNumChannels); // open the new rtaudio stream [!] params
 }
 

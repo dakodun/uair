@@ -249,4 +249,8 @@ unsigned int Texture::GetDepth() const {
 Texture::LayerData Texture::GetData(const std::size_t& index) const {
 	return mLayerData.at(index); // return the texture data at the requested index
 }
+
+unsigned int Texture::GetTypeID() {
+	return static_cast<unsigned int>(Resources::Texture);
+}
 }

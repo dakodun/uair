@@ -44,7 +44,7 @@ namespace uair {
 class RenderBatch;
 class Polygon;
 
-class Font : public Resource<Font> {
+class Font : public Resource {
 	public :
 		struct Glyph {
 			Shape mBaseShape = Shape(); // a textured shape representing the glyph
@@ -82,6 +82,8 @@ class Font : public Resource<Font> {
 		unsigned int GetTextureID() const; // return the assigned id of the font's texture
 		unsigned int GetTextureWidth() const; // return the font's texture's width
 		unsigned int GetTextureHeight() const; // return the font's texture's height
+		
+		static unsigned int GetTypeID();
 	private :
 		Shape CreateGlyphShape(const char32_t& charCode, Glyph& glyphObject); // create a shape of a glyph from a font file
 		void UpdateTexture(const std::vector< std::pair<char32_t, Shape> >& newShapes); // update the font's texture with new glyph shapes
@@ -89,6 +91,9 @@ class Font : public Resource<Font> {
 		
 		Glyph Pack(Shape& shape); // pack a flyph shape into the font's texture
 		void PositionBase(Shape& baseShape, const unsigned int& padding); // position a glyph shape at the origin
+	
+	public :
+		static FT_Library* mFTLibraryPtr;
 	private :
 		FT_Face mFTFace = nullptr; // pointer to the face object of a font file
 		unsigned int mFontSize = 1u; // the base size of the font

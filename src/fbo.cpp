@@ -52,7 +52,7 @@ void swap(FBO& first, FBO& second) {
 }
 
 bool FBO::AttachTexture(ResourcePtr<Texture> texture, const GLenum& attachmentPoint, const GLint& textureLayer, const GLint& mipmapLevel) {
-	return AttachTexture(texture.GetResource(), attachmentPoint, textureLayer, mipmapLevel); // call member function with raw pointer
+	return AttachTexture(texture.Get(), attachmentPoint, textureLayer, mipmapLevel); // call member function with raw pointer
 }
 
 bool FBO::AttachTexture(Texture* texture, const GLenum& attachmentPoint, const GLint& textureLayer, const GLint& mipmapLevel) {
@@ -77,7 +77,7 @@ bool FBO::AttachTexture(Texture* texture, const GLenum& attachmentPoint, const G
 }
 
 bool FBO::AttachRenderBuffer(ResourcePtr<RenderBuffer> renderBuffer, const GLenum& attachmentPoint) {
-	return AttachRenderBuffer(renderBuffer.GetResource(), attachmentPoint); // call member function with raw pointer
+	return AttachRenderBuffer(renderBuffer.Get(), attachmentPoint); // call member function with raw pointer
 }
 
 bool FBO::AttachRenderBuffer(RenderBuffer* renderBuffer, const GLenum& attachmentPoint) {

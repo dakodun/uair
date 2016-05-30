@@ -34,6 +34,7 @@
 #include <glm/glm.hpp>
 
 #include "init.hpp"
+#include "shader.hpp"
 
 namespace uair {
 class RenderBatchData;
@@ -53,6 +54,8 @@ class Renderable {
 		void SetColour(const glm::vec3& newColour);
 		float GetAlpha() const;
 		void SetAlpha(const float& newAlpha);
+		ResourcePtr<Shader> GetShader() const;
+		void SetShader(ResourcePtr<Shader> shader);
 	protected :
 		virtual std::list<RenderBatchData> Upload() = 0;
 	public :
@@ -63,6 +66,8 @@ class Renderable {
 		float mDepth = 0.0f;
 		glm::vec3 mColour = glm::vec3(1.0f, 1.0f, 1.0f);
 		float mAlpha = 1.0f;
+		
+		ResourcePtr<Shader> mShader;
 };
 }
 

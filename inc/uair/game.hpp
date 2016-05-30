@@ -35,11 +35,12 @@
 
 #include "scenemanager.hpp"
 #include "inputmanager.hpp"
-#include "resourcemanager.hpp"
-#include "shaderprogram.hpp"
+#include "shader.hpp"
 #include "timer.hpp"
 #include "window.hpp"
 #include "openglcontext.hpp"
+#include "resource.hpp"
+#include "manager.hpp"
 #include "entitysystem.hpp"
 
 namespace uair {
@@ -65,7 +66,6 @@ class Game {
 		void Clear();
 		
 		void CreateDefaultShader();
-		void SetShader();
 		
 		// scene manager related helper functions
 		SceneManagerPtr GetSceneManager();
@@ -131,27 +131,26 @@ class Game {
 		unsigned int GetDeviceLinkID(const int& deviceID, const Device& control) const;
 		
 		// resource manager related helper functions
-		void SetResourceManager(ResourceManager* resMan);
-		ResourceManagerPtr GetResourceManager();
+		template <typename T>
+		void RegisterResourceType();
 		
-		template<typename T>
-		std::shared_ptr<T> GetResourceManagerCast() {
-			try {
-				return CastResourceManager<T>(mResourceManager);
-			} catch (...) {
-				throw;
-			}
-		}
+		template <typename T, typename ...Ps>
+		ResourceHandle AddResource(const std::string& name, const Ps&... params);
 		
-		template<typename T>
-		std::shared_ptr<T> CastResourceManager(ResourceManagerPtr resManPtr) {
-			std::shared_ptr<T> converted = std::dynamic_pointer_cast<T>(resManPtr);
-			if (converted) {
-				return converted;
-			}
-			
-			throw std::runtime_error("invalid resource manager conversion");
-		}
+		template <typename T>
+		void RemoveResource(const ResourceHandle& handle);
+		
+		template <typename T>
+		void RemoveResource(const std::string& name);
+		
+		void RemoveResource(const ResourceHandle& handle);
+		void RemoveResource(const std::string& name);
+		
+		template <typename T>
+		T& GetResource(const ResourceHandle& handle);
+		
+		template <typename T>
+		std::list< std::reference_wrapper<T> > GetResource(const std::string& name);
 		
 		// entity system related helper functions
 		EntitySystem& GetEntitySystem();
@@ -186,16 +185,6 @@ class Game {
 		unsigned int GetMessageType(const unsigned int& index);
 		int GetMessageState(const unsigned int& index);
 		void PopMessage(const unsigned int& index);
-		
-		// 
-		const FT_Library& GetFTLibrary() const {
-			return mFTLibrary;
-		}
-	public :
-		float mFrameLowerLimit = 0.02f;
-		float mFrameUpperLimit = 1.0f;
-		
-		unsigned int mRenderPasses = 1u;
 	private :
 		void HandleEventQueue(const WindowEvent& e);
 		
@@ -205,6 +194,12 @@ class Game {
 		void AddContext();
 		void AddContext(WindowPtr windowPtr);
 		void MakeCurrent(WindowPtr windowPtr, OpenGLContextPtr contextPtr);
+	
+	public :
+		float mFrameLowerLimit = 0.02f;
+		float mFrameUpperLimit = 1.0f;
+		
+		unsigned int mRenderPasses = 1u;
 	private :
 		float mTotalFrameTime = 0.0f;
 		float mAccumulator = 0.0f;
@@ -216,15 +211,69 @@ class Game {
 		
 		SceneManagerPtr mSceneManager;
 		InputManagerPtr mInputManager;
-		ResourceManagerPtr mResourceManager;
+		Manager<Resource> mResourceManager;
 		
-		static bool mDefaultShaderExists;
-		ShaderProgram mDefaultShader;
+		bool mDefaultShaderExists;
+		Shader mDefaultShader;
 		
 		EntitySystem mEntitySystem;
 		
 		FT_Library mFTLibrary;
 };
+
+template <typename T>
+void Game::RegisterResourceType() {
+	try {
+		mResourceManager.Register<T>();
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+template <typename T, typename ...Ps>
+ResourceHandle Game::AddResource(const std::string& name, const Ps&... params) {
+	try {
+		return mResourceManager.Add<T, Ps...>(name, params...);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+template <typename T>
+void Game::RemoveResource(const ResourceHandle& handle) {
+	try {
+		mResourceManager.Remove<T>(handle);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+template <typename T>
+void Game::RemoveResource(const std::string& name) {
+	try {
+		mResourceManager.Remove<T>(name);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+template <typename T>
+T& Game::GetResource(const ResourceHandle& handle) {
+	try {
+		return mResourceManager.Get<T>(handle);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+template <typename T>
+std::list< std::reference_wrapper<T> > Game::GetResource(const std::string& name) {
+	try {
+		return mResourceManager.Get<T>(name);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
 
 template <typename T>
 void Game::RegisterComponentType() {
@@ -288,8 +337,6 @@ T Game::GetMessage(const unsigned int& index) {
 		throw;
 	}
 }
-
-extern Game GAME;
 }
 
 #endif

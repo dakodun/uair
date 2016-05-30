@@ -33,82 +33,92 @@
 #include "renderable.hpp"
 
 namespace uair {
-void RenderBatch::Add(Renderable& renderable, const unsigned int& pass) {
-	std::vector<RenderBatchData>& vecRender = ((mRenderData.insert(IndexedRenderBatchData(pass, {}))).first)->second; // create a new vector for the specified pass, or return the existing one
-	const std::list<RenderBatchData>& rbd = renderable.Upload(); // call the renderables upload function
-	for (auto iter = rbd.begin(); iter != rbd.end(); ++iter) {
-		vecRender.push_back(*iter);
+void RenderBatch::Add(Renderable& renderable, const unsigned int& pass) {	
+	// call the renderables upload function and store the returned render data
+	std::list<RenderBatchData> rbd = renderable.Upload();
+	
+	for (auto iter = rbd.begin(); iter != rbd.end(); ++iter) { // for all render data in the returned list...
+		if (!iter->mShader) { // if the render data doesn't have a shader associated with it...
+			iter->mShader = VBO::mDefaultShader; // assign the default shader
+		}
+		
+		iter->mPass = pass; // set the pass that the data is to be rendered on
+		mRenderData.push_back(*iter); // add the data to the array
 	}
 }
 
 void RenderBatch::Upload() {
-	std::map< unsigned int, std::vector<SegmentInfo> > segmentInfo; // container holding segment data
-	std::vector<uair::VBOVertex> verts; // final container for all vertex data
-	std::vector<uair::VBOIndex> inds; // final container for all index data
+	std::vector<VBOVertex> vertices; // final container for all vertex data
+	std::vector<VBOIndex> indices; // final container for all index data
+	std::vector<Segment> segments; // container holding segment data
 	
-	GLuint offset = 0;
+	std::size_t vertexCount = 0u; // the total current vertex count for the vbo
+	GLuint offset = 0u;
+	unsigned int min = std::numeric_limits<unsigned int>::max();
+	unsigned int max = 0u;
 	
-	std::size_t vertCount = 0; // the total current vertex count for the vbo
+	std::sort(mRenderData.begin(), mRenderData.end(), RenderDataSort); // sort the data first by pass, then by shader id and finally by texture id
 	
-	for (auto iter = mRenderData.begin(); iter != mRenderData.end(); ++iter) {
-		unsigned int pass = iter->first; // get the render pass from the iterator
-		std::vector<RenderBatchData>& vecRender = iter->second; // get the vector from the iterator
-		std::vector<SegmentInfo>& vecSegment = ((segmentInfo.insert(IndexedSegmentInfo(pass, {}))).first)->second;
-		
-		if (vecRender.size() > 0) {
-			// a lambda that is used to sort data by texture id (to ensure fewer binds)
-			auto sortDataLambda = [](const RenderBatchData & first, const RenderBatchData & second)->bool {
-				return (first.mTexID < second.mTexID);
-			};
-			
-			std::sort(vecRender.begin(), vecRender.end(), sortDataLambda); // sort the data by texture id
-			
-			GLuint count = 0;
-			GLuint min = std::numeric_limits<GLuint>::max();
-			GLuint max = 0;
-			
-			for (unsigned int i = 0u; i < vecRender.size(); ++i) { // for all batches of data...
-				for (unsigned int j = 0u; j < vecRender.at(i).mIndData.size(); ++j) { // for all indices in the batch...
-					vecRender.at(i).mIndData[j] += vertCount; // add the total vertex count to each of the indices
-					
-					min = std::min(min, vecRender.at(i).mIndData[j]); // store the smallest index
-					max = std::max(max, vecRender.at(i).mIndData[j]); // store the largest index
-				}
-				
-				vertCount += vecRender.at(i).mVertData.size(); // add the current batches vertex count to the total
-			}
-			
-			min = std::min(min, max);
-			GLuint currentTex = vecRender.at(0).mTexID; // the current texture id we are checking
-			GLenum currentRenderMode = vecRender.at(0).mRenderMode; // the current render mode we are checking
-			for (unsigned int i = 0u; i < vecRender.size(); ++i) { // for all batches of data...
-				if (vecRender.at(i).mTexID != currentTex || vecRender.at(i).mRenderMode != currentRenderMode) { // if the texture ids or render modes don't match...
-					vecSegment.emplace_back(currentTex, currentRenderMode, count, offset, min, max); // add the current segment info to the container
-					
-					currentTex = vecRender.at(i).mTexID; // update the current texture id
-					currentRenderMode = vecRender.at(i).mRenderMode; // update the current render mode
-					offset += count;
-					count = 0;
-				}
-				
-				count += vecRender.at(i).mIndData.size(); // add the current index count to the end limit
-			}
-			
-			vecSegment.emplace_back(currentTex, currentRenderMode, count, offset, min, max); // add the final segment info
-			offset += count;
-			
-			for (unsigned int i = 0u; i < vecRender.size(); ++i) { // for all batches of data
-				// add the data to the final containers
-				verts.insert(verts.end(), vecRender.at(i).mVertData.begin(), vecRender.at(i).mVertData.end());
-				inds.insert(inds.end(), vecRender.at(i).mIndData.begin(), vecRender.at(i).mIndData.end());
-			}
-			
-			vecRender.clear(); // clear any stored batch data
+	unsigned int currentPass = mRenderData.at(0).mPass;
+	ResourcePtr<Shader> currentShader = mRenderData.at(0).mShader;
+	GLuint currentTextureID = mRenderData.at(0).mTextureID;
+	GLuint currentRenderMode = mRenderData.at(0).mRenderMode;
+	unsigned int currentMin = std::numeric_limits<unsigned int>::max();
+	unsigned int currentMax = 0u;
+	std::size_t currentCount = 0u;
+	
+	for (unsigned int i = 0u; i < mRenderData.size(); ++i) { // for all render data...
+		if (!mRenderData.at(i).mShader) { // if render data has an invalid shader...
+			continue; // skip data
 		}
+		
+		for (unsigned int j = 0u; j < mRenderData.at(i).mIndexData.size(); ++j) { // for all indices in the current render data...
+			mRenderData.at(i).mIndexData.at(j) += vertexCount; // add the total vertex count to each of the indices
+			
+			min = std::min(min, mRenderData.at(i).mIndexData.at(j)); // store the smallest index
+			max = std::max(max, mRenderData.at(i).mIndexData.at(j)); // store the largest index
+		}
+		
+		vertexCount += mRenderData.at(i).mVertexData.size(); // add the current batch's vertex count to the total
+		
+		if (mRenderData.at(i).mPass != currentPass || mRenderData.at(i).mShader->GetProgramID() != currentShader->GetProgramID() ||
+				mRenderData.at(i).mTextureID != currentTextureID || mRenderData.at(i).mRenderMode != currentRenderMode) {
+			
+			currentMin = std::min(currentMin, currentMax); // ensure the minimum is smaller than the maximum
+			segments.emplace_back(currentPass, 0u, currentShader, currentTextureID, currentRenderMode, currentCount, offset, currentMin, currentMax);
+			offset += currentCount;
+			
+			// reset current statuses to match current render data...
+			currentPass = mRenderData.at(i).mPass;
+			currentShader = mRenderData.at(i).mShader;
+			currentTextureID = mRenderData.at(i).mTextureID;
+			currentRenderMode = mRenderData.at(i).mRenderMode;
+			currentMin = std::numeric_limits<unsigned int>::max();
+			currentMax = 0u;
+			currentCount = 0u;
+			// ...end
+		}
+		
+		currentCount += mRenderData.at(i).mIndexData.size(); // 
+		
+		// update the current minimum and maximum index for the current batch...
+		currentMin = std::min(currentMin, min);
+		currentMax = std::max(currentMax, max);
+		min = std::numeric_limits<unsigned int>::max();
+		max = 0;
+		// ...end
+		
+		// add the current render data to the vertex and index arrays...
+		vertices.insert(vertices.end(), mRenderData.at(i).mVertexData.begin(), mRenderData.at(i).mVertexData.end());
+		indices.insert(indices.end(), mRenderData.at(i).mIndexData.begin(), mRenderData.at(i).mIndexData.end());
+		// ...end
 	}
 	
-	mVBO.AddData(verts, inds, segmentInfo); // add the vertices, indices and segment data to the vbo
-	mRenderData.clear(); // clear (now empty) batch data containers
+	currentMin = std::min(currentMin, currentMax); // ensure the minimum is smaller than the maximum
+	segments.emplace_back(currentPass, 0u, currentShader, currentTextureID, currentRenderMode, currentCount, offset, currentMin, currentMax);
+	
+	mVBO.AddData(vertices, indices, segments); // add the vertices, indices and segment data to the vbo
+	mRenderData.clear(); // clear batch data containers
 }
 
 void RenderBatch::Draw(const unsigned int& pass) {
@@ -117,5 +127,33 @@ void RenderBatch::Draw(const unsigned int& pass) {
 
 void RenderBatch::Draw(const FBO& fbo, const unsigned int& pass) {
 	mVBO.Draw(fbo, pass); // draw the vbo
+}
+
+bool RenderBatch::RenderDataSort(const RenderBatchData& first, const RenderBatchData& second) {
+	if (!first.mShader || !second.mShader) { // if either render data has an invalid shader...
+		return true; // enforce no change in order (invalid entry will be skipped anyway)
+	}
+	
+	if (first.mPass < second.mPass) { // first check if data can be sorted by pass...
+		return true;
+	}
+	else if (first.mPass == second.mPass) {
+		// ...then check if data can be sorted by shader id...
+		if (first.mShader.GetConst()->GetProgramID() < second.mShader.GetConst()->GetProgramID()) {
+			return true;
+		}
+		else if (first.mShader.GetConst()->GetProgramID() == second.mShader.GetConst()->GetProgramID()) {
+			if (first.mTextureID < second.mTextureID) { // ...then check if data can be sorted by texture id...
+				return true;
+			}
+			else if (first.mTextureID == second.mTextureID) {
+				if (first.mRenderMode == second.mRenderMode) { // ...finally check if data can be sorted by rendermode
+					return true;
+				}
+			}
+		}
+	}
+	
+	return false;
 }
 }

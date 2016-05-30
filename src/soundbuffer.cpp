@@ -52,8 +52,12 @@ void SoundBuffer::LoadFromFile(const std::string& filename) {
 	
 	std::ifstream oggFile(filename.c_str(), std::ios::in | std::ios::binary); // open the ogg file on disk
 	
-	uair::SoundLoaderOgg slo;
+	SoundLoaderOgg slo;
 	slo.Decode(oggFile, std::bind(&SoundBuffer::DecoderCallback, this, _1, _2, _3, _4)); // decode the entire ogg file
+}
+
+unsigned int SoundBuffer::GetTypeID() {
+	return static_cast<unsigned int>(Resources::SoundBuffer);
 }
 
 int SoundBuffer::DecoderCallback(const int& serial, const int& numChannels, const int& numSamples, std::vector<int>& samples) {

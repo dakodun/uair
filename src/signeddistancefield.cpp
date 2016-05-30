@@ -46,7 +46,7 @@ std::pair<std::vector<unsigned char>, glm::ivec2> SignedDistanceField::GenerateF
 
 std::pair<std::vector<unsigned char>, glm::ivec2> SignedDistanceField::GenerateFromTexture(Texture* texture, const unsigned int& layer) {
 	if (texture->GetWidth() == 0u || texture->GetHeight() == 0u || texture->GetDepth() == 0u) { // if input is invalid...
-		throw UairException("invalid input texture"); // throw exception and break
+		throw std::runtime_error("invalid input texture"); // throw exception and break
 	}
 	
 	std::vector<unsigned char> inputData; // the input texture data as unsigned chars (in the form RGBA)

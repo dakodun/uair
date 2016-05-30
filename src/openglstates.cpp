@@ -50,6 +50,21 @@ bool OpenGLStates::BindElementArrayBuffer(const GLuint& id) {
 	return false;
 }
 
+bool OpenGLStates::BindVertexArray(const GLuint& id) {
+	if (OpenGLStates::mCurrentVertexArray != id) {
+		glBindVertexArray(id);
+		OpenGLStates::mCurrentVertexArray = id;
+		
+		GLint elementBinding;
+		glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &elementBinding);
+		OpenGLStates::mCurrentElementArrayBuffer = elementBinding;
+		
+		return true;
+	}
+	
+	return false;
+}
+
 bool OpenGLStates::UseProgram(const GLuint& id) {
 	if (OpenGLStates::mCurrentProgram != id) {
 		glUseProgram(id);
@@ -116,24 +131,13 @@ bool OpenGLStates::BindPBOUnpack(const GLuint& id) {
 	return false;
 }
 
-GLint OpenGLStates::mVertexLocation = -1;
-GLint OpenGLStates::mNormalLocation = -1;
-GLint OpenGLStates::mColourLocation = -1;
-GLint OpenGLStates::mTexCoordLocation = -1;
-GLint OpenGLStates::mTexLocation = -1;
-GLint OpenGLStates::mTypeLocation = -1;
-GLint OpenGLStates::mExtraLocation = -1;
-
-GLint OpenGLStates::mProjectionMatrixLocation = -1;
-GLint OpenGLStates::mViewMatrixLocation = -1;
-GLint OpenGLStates::mModelMatrixLocation = -1;
-
 glm::mat4 OpenGLStates::mProjectionMatrix = glm::mat4(1.0f);
 glm::mat4 OpenGLStates::mViewMatrix = glm::mat4(1.0f);
 glm::mat4 OpenGLStates::mModelMatrix = glm::mat4(1.0f);
 
 GLuint OpenGLStates::mCurrentArrayBuffer = 0;
 GLuint OpenGLStates::mCurrentElementArrayBuffer = 0;
+GLuint OpenGLStates::mCurrentVertexArray = 0;
 GLuint OpenGLStates::mCurrentProgram = 0;
 GLuint OpenGLStates::mCurrentTexture = 0;
 GLuint OpenGLStates::mCurrentFBO = 0;

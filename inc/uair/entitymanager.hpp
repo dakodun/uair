@@ -99,35 +99,42 @@ class EntityManager {
 		// a handle that is used to refer to resources handled instead of a pointer
 		class Handle {
 			public :
-				Handle(const unsigned int& index, const unsigned int& counter) : 
-						mIndex(index), mCounter(counter) {
+				Handle(const unsigned int& index, const unsigned int& counter, const std::string& name = "") : 
+						mIndex(index), mCounter(counter), mName(name) {
 					
 					
 				}
 			public :
 				unsigned int mIndex = 0u; // the index of the resource in the store
 				unsigned int mCounter = 0u; // the counter value of the index used to validate the handle
+				std::string mName = ""; // a name that the handled resource can be identified by (non-unique)
 		};
 	public :
 		// assign a reference to the associated component manager allowing created entities to attach custom components
 		EntityManager(Manager<Component>& componentManager);
 		
-		// add a new blank entity to the store and return a handle to it
-		Handle Add(const std::string& entityName = "");
+		// add a new entity with the specified name to the store and return a custom handle to it
+		Handle Add(const std::string& name);
 		
-		// remove an entity from the store via its handle
+		// remove an entity from the store
 		void Remove(const Handle& handle);
 		
-		// return a reference to an entity pointed to by its handle
+		// remove all entities owith the specified name from the store
+		void Remove(const std::string& name);
+		
+		// return a reference to an entity pointed to by the supplied handle
 		Entity& Get(const Handle& handle);
+		
+		// return a list of references matching name
+		std::list< std::reference_wrapper<Entity> > Get(const std::string& name);
 		
 		// return a reference to the component manager associated with this entity manager
 		Manager<Component>& GetComponentManager();
 	private :
 		Manager<Component>& mComponentManager; // a reference to the component manager associated with this entity manager
-		Store<Entity> mStore;
+		Store<Entity> mStore; // the store used to hold entities (see manager<T> class)
 		
-		unsigned int mEntityCount = 1u;
+		unsigned int mEntityCount = 1u; // the counter used to assign a unique id to an entity
 };
 
 template<typename T, typename ...Ps>

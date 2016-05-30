@@ -30,19 +30,32 @@
 #include <iostream>
 
 #include "openglstates.hpp"
+#include "shape.hpp"
+#include "font.hpp"
+#include "soundbuffer.hpp"
 
 namespace uair {
-bool Game::mDefaultShaderExists = false;
-
 Game::Game() {
 	mSceneManager = std::make_shared<SceneManager>();
 	mInputManager = std::make_shared<InputManager>();
-	mResourceManager = std::make_shared<ResourceManager>();
+	
+	try {
+		RegisterResourceType<Texture>();
+		RegisterResourceType<Font>();
+		RegisterResourceType<RenderBuffer>();
+		RegisterResourceType<Shader>();
+		RegisterResourceType<SoundBuffer>();
+	} catch (std::exception& e) {
+		
+	}
 	
 	FT_Error ftError = FT_Init_FreeType(&mFTLibrary);
 	if (ftError != 0) {
 		std::cout << "unable to initiate the freetype2 library: " << ftError << std::endl;
 	}
+	
+	Shape::mFrameLowerLimit = mFrameLowerLimit;
+	Font::mFTLibraryPtr = &mFTLibrary; // set the freetype library used by the font class to the newly initialised one
 }
 
 Game::~Game() {
@@ -203,6 +216,7 @@ OpenGLContextPtr Game::GetContext() {
 void Game::AddWindow() {
 	mWindow.reset(); // remove any current window
 	mWindow = WindowPtr(new Window); // add a new default window
+	InputManager::mWindowPtr = mWindow;
 }
 
 void Game::AddWindow(const std::string & windowTitle, const WindowDisplaySettings & settings,
@@ -210,6 +224,7 @@ void Game::AddWindow(const std::string & windowTitle, const WindowDisplaySetting
 	
 	mWindow.reset(); // remove any current window
 	mWindow = WindowPtr(new Window(windowTitle, settings, windowStyle)); // add a new custom window
+	InputManager::mWindowPtr = mWindow;
 }
 
 void Game::AddContext() {
@@ -228,6 +243,7 @@ void Game::MakeCurrent(WindowPtr windowPtr, OpenGLContextPtr contextPtr) {
 		
 		if (mDefaultShaderExists == false) { // if we don't yet have a default shader...
 			CreateDefaultShader(); // create a default shader
+			VBO::mDefaultShader.Set(&mDefaultShader);
 			mDefaultShaderExists = true; // indicate that a default shader now exists
 		}
 	}
@@ -240,7 +256,7 @@ void Game::Quit() {
 void Game::Clear() {
 	mDefaultShader.Clear(); // remove the default shader
 	mSceneManager->Clear(); // clear the scene manager
-	mResourceManager->Clear(); // clear the resource manager
+	mResourceManager = std::move(Manager<Resource>());
 	
 	mContext.reset(); // remove the context
 	mWindow.reset(); // remove the window
@@ -255,12 +271,12 @@ uniform mat4 vertModel;
 uniform mat4 vertView;
 uniform mat4 vertProj;
 
-in vec4 vertPos;
-in vec3 vertNormal;
-in vec4 vertColour;
-in vec3 vertTexCoord;
-in float vertType;
-in float[2] vertExtra;
+layout(location = 0) in vec4 vertPos;
+layout(location = 1) in vec3 vertNormal;
+layout(location = 2) in vec4 vertColour;
+layout(location = 3) in vec3 vertTexCoord;
+layout(location = 4) in float vertType;
+layout(location = 5) in float[2] vertExtra;
 
 flat out vec4 fragColour;
 smooth out vec3 fragTexCoord;
@@ -294,7 +310,7 @@ flat in float fragType;
 flat in float[2] fragExtra;
 
 vec4 finalColour;
-out vec4 fragData;
+layout(location = 0) out vec4 fragData;
 
 const float smoothing = 64.0f;
 
@@ -339,26 +355,7 @@ void main() {
 	mDefaultShader.FragmentFromString(fragStr);
 	
 	mDefaultShader.LinkProgram();
-	SetShader();
-}
-
-void Game::SetShader() {
-	OpenGLStates::mVertexLocation = glGetAttribLocation(mDefaultShader.GetProgramID(), "vertPos");
-	OpenGLStates::mNormalLocation = glGetAttribLocation(mDefaultShader.GetProgramID(), "vertNormal");
-	OpenGLStates::mColourLocation = glGetAttribLocation(mDefaultShader.GetProgramID(), "vertColour");
-	OpenGLStates::mTexCoordLocation = glGetAttribLocation(mDefaultShader.GetProgramID(), "vertTexCoord");
-	OpenGLStates::mTypeLocation = glGetAttribLocation(mDefaultShader.GetProgramID(), "vertType");
-	OpenGLStates::mExtraLocation = glGetAttribLocation(mDefaultShader.GetProgramID(), "vertExtra");
-	OpenGLStates::mTexLocation = glGetUniformLocation(mDefaultShader.GetProgramID(), "fragBaseTex");
-	
-	OpenGLStates::mProjectionMatrixLocation = glGetUniformLocation(mDefaultShader.GetProgramID(), "vertProj");
-	OpenGLStates::mViewMatrixLocation = glGetUniformLocation(mDefaultShader.GetProgramID(), "vertView");
-	OpenGLStates::mModelMatrixLocation = glGetUniformLocation(mDefaultShader.GetProgramID(), "vertModel");
-	
-	glBindFragDataLocation(mDefaultShader.GetProgramID(), 0, "fragData");
-	
-	mDefaultShader.UseProgram();
-	glUniform1i(OpenGLStates::mTexLocation, 0);
+	mDefaultShader.InitCallback();
 }
 
 SceneManagerPtr Game::GetSceneManager() {
@@ -426,18 +423,7 @@ int Game::GetMouseWheel() const {
 }
 
 void Game::SetMouseCoords(const glm::ivec2& newCoords, const CoordinateSpace& coordinateSpace) {
-	std::pair<glm::ivec2, glm::ivec2> mousePos = mWindow->SetMouseCoords(newCoords, coordinateSpace);
-	
-	mInputManager->mLocalMouseCoords = mousePos.first;
-	mInputManager->mGlobalMouseCoords = mousePos.second;
-	
-	WindowEvent e;
-	e.mType = WindowEvent::MouseMoveType;
-	e.mMouseMove.mGlobalX = mousePos.second.x; e.mMouseMove.mGlobalY = mousePos.second.y;
-	e.mMouseMove.mLocalX = mousePos.first.x; e.mMouseMove.mLocalY = mousePos.first.y;
-	mWindow->mEventQueue.push_back(e);
-	
-	// or remove any previous mouse move events currently in queue to prevent them over-writing our new coords
+	mInputManager->SetMouseCoords(newCoords, coordinateSpace);
 }
 
 glm::ivec2 Game::GetMouseCoords(const CoordinateSpace& coordinateSpace) const {
@@ -500,6 +486,22 @@ unsigned int Game::GetDeviceLinkID(const int& deviceID, const Device& control) c
 	return mInputManager->GetDeviceLinkID(deviceID, control);
 }
 
+void Game::RemoveResource(const ResourceHandle& handle) {
+	try {
+		mResourceManager.Remove(handle);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+void Game::RemoveResource(const std::string& name) {
+	try {
+		mResourceManager.Remove(name);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
 void Game::HandleEventQueue(const WindowEvent& e) {
 	switch (e.mType) {
 		case WindowEvent::CloseType : {
@@ -524,11 +526,6 @@ void Game::HandleEventQueue(const WindowEvent& e) {
 		}
 		case WindowEvent::MouseWheelType : {
 			mInputManager->mMouseWheel += e.mMouseWheel.mAmount;
-			break;
-		}
-		case WindowEvent::MouseMoveType : {
-			mInputManager->HandleMouseMove(glm::ivec2(e.mMouseMove.mLocalX, e.mMouseMove.mLocalY),
-					glm::ivec2(e.mMouseMove.mGlobalX, e.mMouseMove.mGlobalY));
 			break;
 		}
 		case WindowEvent::DeviceChangedType : { // an input device has been connect or disconnected
@@ -556,14 +553,6 @@ void Game::HandleEventQueue(const WindowEvent& e) {
 	if (mSceneManager->mCurrScene) {
 		mSceneManager->mCurrScene->HandleEventQueue(e);
 	}
-}
-
-void Game::SetResourceManager(ResourceManager* resMan) {
-	mResourceManager = std::make_shared<ResourceManager>();
-}
-
-ResourceManagerPtr Game::GetResourceManager() {
-	return mResourceManager;
 }
 
 EntitySystem& Game::GetEntitySystem() {
@@ -629,6 +618,4 @@ int Game::GetMessageState(const unsigned int& index) {
 void Game::PopMessage(const unsigned int& index) {
 	mEntitySystem.PopMessage(index);
 }
-
-Game GAME;
 }

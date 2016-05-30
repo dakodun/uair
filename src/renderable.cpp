@@ -55,4 +55,12 @@ float Renderable::GetAlpha() const {
 void Renderable::SetAlpha(const float& newAlpha) {
 	mAlpha = newAlpha;
 }
+
+ResourcePtr<Shader> Renderable::GetShader() const {
+	return mShader;
+}
+
+void Renderable::SetShader(ResourcePtr<Shader> shader) {
+	mShader = shader;
+}
 }

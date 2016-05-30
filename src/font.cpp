@@ -41,6 +41,8 @@
 #include "file.hpp"
 
 namespace uair {
+FT_Library* Font::mFTLibraryPtr = nullptr;
+
 Font::Font(const unsigned int& textureSize) {
 	mTextureSize = util::NextPowerOf2(textureSize); // ensure the texture width and height is a power of 2
 	
@@ -173,9 +175,8 @@ void Font::CreateCache(const std::string& cacheFilename) {
 		if (!mKernMap.empty()) {
 			for (auto kerningData = mKernMap.begin(); kerningData != mKernMap.end(); ++kerningData) {
 				std::stringstream strStream;
-				strStream << std::hex << kerningData->first.first << " " << kerningData->first.second;
+				strStream << std::hex << kerningData->first.first << " " << kerningData->first.second << " " << std::dec << kerningData->second;
 				outString += strStream.str() + " ";
-				outString += kerningData->second + " ";
 			}
 		}
 		else {
@@ -230,7 +231,7 @@ bool Font::LoadFromCache(const std::string& cacheFilename) {
 		{ // verify the tag is correct
 			std::string tag = cacheFile.mBuffer.at(0);
 			if (tag != "UaFCa") {
-				throw UairException("invalid cache file: invalid tag " + tag);
+				throw std::runtime_error("invalid cache file: invalid tag " + tag);
 			}
 		}
 		
@@ -369,13 +370,18 @@ bool Font::LoadFromCache(const std::string& cacheFilename) {
 }
 
 bool Font::LoadFromFile(const std::string& filename, const unsigned int& pointSize) {
+	if (mFTLibraryPtr == nullptr) {
+		std::cout << "pointer to freetype library is invalid" << std::endl;
+		return false;
+	}
+	
 	if (mFTFace) { // if we already have a font face...
 		FT_Done_Face(mFTFace); // clean it up
 		mFTFace = nullptr; // reset pointer
 	}
 	
 	mFontSize = std::max(1u, pointSize); // ensure font size is at least 1
-	FT_Error ftError = FT_New_Face(GAME.GetFTLibrary(), filename.c_str(), 0, &mFTFace); // get pointer to face object within the font file
+	FT_Error ftError = FT_New_Face(*mFTLibraryPtr, filename.c_str(), 0, &mFTFace); // get pointer to face object within the font file
 	if (ftError != 0) {
 		mFTFace = nullptr;
 		std::cout << "error loading face: " << ftError << std::endl;
@@ -408,7 +414,7 @@ void Font::LoadGlyphs(const std::vector<char32_t>& charCodes) {
 		if (result.second) { // if the character code didn't already exist...
 			try {
 				glyphs.push_back(std::make_pair(*charCode, CreateGlyphShape(*charCode, (result.first->second)))); // create and add the glyph shape to the store
-			} catch(UairException& e) {
+			} catch(std::exception& e) {
 				mGlyphs.erase(*charCode); // remove the newly added character code
 			}
 		}
@@ -427,7 +433,7 @@ Font::Glyph Font::GetGlyph(const char32_t& codePoint) {
 		return result->second; // return the associated glyph object
 	}
 	
-	throw UairException("font: code point not found");
+	throw std::runtime_error("font: code point not found");
 }
 
 int Font::GetKerning(const char32_t& firstCodePoint, const char32_t& secondCodePoint) {
@@ -459,6 +465,10 @@ unsigned int Font::GetTextureHeight() const {
 	return mTexture.GetHeight();
 }
 
+unsigned int Font::GetTypeID() {
+	return static_cast<unsigned int>(Resources::Font);
+}
+
 Shape Font::CreateGlyphShape(const char32_t& charCode, Glyph& glyphObject) {
 	if (mFTFace) {
 		FT_Load_Char(mFTFace, charCode, FT_LOAD_NO_BITMAP); // load the glyph into the face
@@ -466,7 +476,7 @@ Shape Font::CreateGlyphShape(const char32_t& charCode, Glyph& glyphObject) {
 		if (mFTFace->glyph->format != FT_GLYPH_FORMAT_OUTLINE) { // if the outline is not valid...
 			std::cout << "glyph is not an outline" << std::endl;
 			
-			throw UairException("font: wrong glyph type");
+			throw std::runtime_error("font: wrong glyph type");
 		}
 		
 		{
@@ -566,7 +576,7 @@ Shape Font::CreateGlyphShape(const char32_t& charCode, Glyph& glyphObject) {
 		}
 	}
 	
-	throw UairException("font: invalid face object");
+	throw std::runtime_error("font: invalid face object");
 }
 
 void Font::UpdateTexture(const std::vector< std::pair<char32_t, Shape> >& newShapes) {
@@ -643,7 +653,7 @@ void Font::UpdateTexture(const std::vector< std::pair<char32_t, Shape> >& newSha
 			OpenGLStates::BindFBO(0);
 			
 			// create a signed distance field of our glyph texture and store it
-			uair::SignedDistanceField sdfGen;
+			SignedDistanceField sdfGen;
 			std::pair<std::vector<unsigned char>, glm::ivec2> sdfTexData = sdfGen.GenerateFromTexture(&texture, 0u);
 			textures.back().AddFromMemory(sdfTexData.first, sdfTexData.second.x, sdfTexData.second.y, false);
 			textures.back().CreateTexture();
@@ -677,7 +687,7 @@ void Font::UpdateTexture(const std::vector< std::pair<char32_t, Shape> >& newSha
 			glyphIter->second.mDimensions = glyphDetails.mDimensions;
 			glyphIter->second.mTexCoords = glyphDetails.mTexCoords;
 			glyphIter->second.mLayer = glyphDetails.mLayer;
-		} catch (UairException& e) {
+		} catch (std::exception& e) {
 			std::cout << "unable to pack glyph: skipping" << std::endl;
 			mGlyphs.erase(glyph); // remove the glyph object from the store
 		}
@@ -829,7 +839,7 @@ Font::Glyph Font::Pack(Shape& shape) {
 		return glyph;
 	}
 	
-	throw(UairException("unable to pack glyph"));
+	throw std::runtime_error("unable to pack glyph");
 }
 
 void Font::PositionBase(Shape& baseShape, const unsigned int& padding) {

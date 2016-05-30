@@ -97,4 +97,8 @@ unsigned int RenderBuffer::GetWidth() const {
 unsigned int RenderBuffer::GetHeight() const {
 	return mHeight; // return the height
 }
+
+unsigned int RenderBuffer::GetTypeID() {
+	return static_cast<unsigned int>(Resources::RenderBuffer);
+}
 }

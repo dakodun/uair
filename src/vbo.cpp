@@ -34,6 +34,12 @@
 #include "fbo.hpp"
 
 namespace uair {
+ResourcePtr<Shader> VBO::mDefaultShader;
+
+VBO::VBO(VBO&& other) : VBO() {
+	swap(*this, other);
+}
+
 VBO::~VBO() {
 	if (mVertVBOID != 0) {
 		if (OpenGLStates::mCurrentArrayBuffer == mVertVBOID) {
@@ -52,38 +58,91 @@ VBO::~VBO() {
 		glDeleteBuffers(1, &mIndVBOID);
 		mIndVBOID = 0;
 	}
+	
+	for (auto iter = mVAOStore.begin(); iter != mVAOStore.end(); ++iter) { // for all VAOs...
+		if (OpenGLStates::mCurrentVertexArray == iter->second) {
+			OpenGLStates::BindVertexArray(0);
+		}
+		
+		glDeleteVertexArrays(1, &(iter->second));
+	}
+	
+	mVAOStore.clear(); // clear the VAO ID map
+}
+
+VBO& VBO::operator=(VBO other) {
+	swap(*this, other);
+	
+	return *this;
+}
+
+void swap(VBO& first, VBO& second) {
+	std::swap(first.mType, second.mType);
+	std::swap(first.mMinimumSize, second.mMinimumSize);
+	
+	std::swap(first.mVertVBOID, second.mVertVBOID);
+	std::swap(first.mIndVBOID, second.mIndVBOID);
+	
+	std::swap(first.mSegmentInfo, second.mSegmentInfo);
+	std::swap(first.mVAOStore, second.mVAOStore);
 }
 
 void VBO::AddData(const std::vector<VBOVertex>& vertData, const std::vector<VBOIndex>& indData) {
-	std::vector<SegmentInfo> vecSegment; // container holding segment data
-	vecSegment.emplace_back(0, GL_TRIANGLES, indData.size(), 0, 0, indData.size());
+	unsigned int min = std::numeric_limits<unsigned int>::max();
+	unsigned int max = 0u;
 	
-	std::map< unsigned int, std::vector<SegmentInfo> > segmentInfo;
-	segmentInfo.insert(IndexedSegmentInfo(0, vecSegment));
-	AddData(vertData, indData, segmentInfo);
+	for (auto iter = indData.begin(); iter != indData.end(); ++iter) {
+		min = std::min(min, *iter);
+		max = std::max(max, *iter);
+	}
+	
+	Segment segmentInfo(0u, 0u, mDefaultShader, 0u, GL_TRIANGLES, indData.size(), 0u, min, max);
+	AddData(vertData, indData, {segmentInfo});
 }
 
-void VBO::AddData(const std::vector<VBOVertex>& vertData, const std::vector<VBOIndex>& indData, const std::map< unsigned int, std::vector<SegmentInfo> >& segmentInfo) {
-	EnsureInitialised();
+void VBO::AddData(const std::vector<VBOVertex>& vertData, const std::vector<VBOIndex>& indData, const std::vector<Segment>& segments) {
+	Initialise(); // ensure buffers have been generated
 	
-	if (OpenGLStates::mCurrentArrayBuffer != mVertVBOID) {
-		glBindBuffer(GL_ARRAY_BUFFER, mVertVBOID);
-		OpenGLStates::mCurrentArrayBuffer = mVertVBOID;
-	}
+	OpenGLStates::BindVertexArray(0); // ensure no VAO is bound before we modify buffers
+	OpenGLStates::BindArrayBuffer(mVertVBOID); // bind the vertex buffer
+	// calculate the size that the vertex buffer should be and ensure it is greater than the minimum
+	std::size_t vertSize = std::max((mMinimumSize * 1048576), (vertData.size() * sizeof(VBOVertex)));
+	glBufferData(GL_ARRAY_BUFFER, vertSize, vertData.data(), mType); // initialise the buffer's store
 	
-	std::size_t vertSize = std::max((mMinimumSize * 1024 * 1024), (vertData.size() * sizeof(uair::VBOVertex)));
-	glBufferData(GL_ARRAY_BUFFER, vertSize, vertData.data(), mType);
-	
-	if (OpenGLStates::mCurrentElementArrayBuffer != mIndVBOID) {
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndVBOID);
-		OpenGLStates::mCurrentElementArrayBuffer = mIndVBOID;
-	}
-	
-	std::size_t indSize = std::max((mMinimumSize * 1024 * 1024), (indData.size() * sizeof(uair::VBOIndex)));
+	OpenGLStates::BindElementArrayBuffer(mIndVBOID);
+	std::size_t indSize = std::max((mMinimumSize * 1048576), (indData.size() * sizeof(VBOIndex)));
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indSize, indData.data(), mType);
 	
-	mSegmentInfo.clear();
-	mSegmentInfo.insert(segmentInfo.begin(), segmentInfo.end());
+	mSegmentInfo.clear(); // clear any existing segment info from previous data adds
+	
+	for (auto iter = segments.begin(); iter != segments.end(); ++iter) { // for all segments in the store...
+		if (iter->mShader) {
+			GLuint shaderID = iter->mShader.GetConst()->GetProgramID();
+			
+			GLuint vaoID = 0u;
+			auto result = mVAOStore.find(shaderID); // attempt to find matching vao
+			if (result != mVAOStore.end()) { // if a matching vao was found...
+				vaoID = result->second;
+			}
+			else {
+				glGenVertexArrays(1, &vaoID); // create a new VAO and return its ID
+				OpenGLStates::BindVertexArray(vaoID); // bind the newly created vertex array object
+				
+				OpenGLStates::BindElementArrayBuffer(mIndVBOID);
+				iter->mShader->VAOCallback(); // perform vao initialisation according to the shader's needs
+				
+				OpenGLStates::BindVertexArray(0); // unbind the vertex array object
+				
+				mVAOStore.emplace(shaderID, vaoID); // add new shaderid/vaoid pair
+			}
+			
+			// create or return the segment info array for current pass and add the current segment info to it
+			std::pair< unsigned int, std::vector<Segment> > newPair; newPair.first = iter->mPass;
+			std::vector<Segment>& segmentInfo = (mSegmentInfo.insert(newPair).first)->second;
+			segmentInfo.push_back(*iter);
+			segmentInfo.back().mVAOID = vaoID; // update the VAO ID of the segment
+		}
+	}
 }
 
 void VBO::Draw(const unsigned int& pass) {
@@ -94,7 +153,7 @@ void VBO::Draw(const FBO& fbo, const unsigned int& pass) {
 	Draw(fbo.GetFBOID(), pass);
 }
 
-void VBO::EnsureInitialised() {
+void VBO::Initialise() {
 	if (mVertVBOID == 0) {
 		glGenBuffers(1, &mVertVBOID);
 	}
@@ -105,46 +164,30 @@ void VBO::EnsureInitialised() {
 }
 
 void VBO::Draw(const unsigned int& targetID, const unsigned int& pass) {
-	std::vector<SegmentInfo>& segmentInfo = ((mSegmentInfo.insert(IndexedSegmentInfo(pass, {}))).first)->second; // either create a new segment info vector or get the existing one
-	
-	if (!segmentInfo.empty()) { // if we have something to render this pass...
+	auto segmentInfo = mSegmentInfo.find(pass);
+	if (segmentInfo != mSegmentInfo.end()) {
 		OpenGLStates::BindArrayBuffer(mVertVBOID);
-		OpenGLStates::BindElementArrayBuffer(mIndVBOID);
+		OpenGLStates::BindFBO(targetID);
 		
-		glUniformMatrix4fv(uair::OpenGLStates::mViewMatrixLocation, 1, GL_FALSE, &uair::OpenGLStates::mViewMatrix[0][0]);
-		glUniformMatrix4fv(uair::OpenGLStates::mModelMatrixLocation, 1, GL_FALSE, &uair::OpenGLStates::mModelMatrix[0][0]);
-		glUniformMatrix4fv(uair::OpenGLStates::mProjectionMatrixLocation, 1, GL_FALSE, &uair::OpenGLStates::mProjectionMatrix[0][0]);
+		GLuint previousShader = 0u;
 		
-		glEnableVertexAttribArray(uair::OpenGLStates::mVertexLocation);
-		glEnableVertexAttribArray(uair::OpenGLStates::mNormalLocation);
-		glEnableVertexAttribArray(uair::OpenGLStates::mColourLocation);
-		glEnableVertexAttribArray(uair::OpenGLStates::mTexCoordLocation);
-		glEnableVertexAttribArray(uair::OpenGLStates::mTypeLocation);
-		glEnableVertexAttribArray(uair::OpenGLStates::mExtraLocation);
-		
-		glVertexAttribPointer(uair::OpenGLStates::mVertexLocation, 3, GL_FLOAT, GL_TRUE, sizeof(uair::VBOVertex), (void*)(offsetof(uair::VBOVertex, mX)));
-		glVertexAttribPointer(uair::OpenGLStates::mNormalLocation, 3, GL_FLOAT, GL_TRUE, sizeof(uair::VBOVertex), (void*)(offsetof(uair::VBOVertex, mNX)));
-		glVertexAttribPointer(uair::OpenGLStates::mColourLocation, 4, GL_FLOAT, GL_TRUE, sizeof(uair::VBOVertex), (void*)(offsetof(uair::VBOVertex, mR)));
-		glVertexAttribPointer(uair::OpenGLStates::mTexCoordLocation, 3, GL_FLOAT, GL_TRUE, sizeof(uair::VBOVertex), (void*)(offsetof(uair::VBOVertex, mS)));
-		glVertexAttribPointer(uair::OpenGLStates::mTypeLocation, 1, GL_FLOAT, GL_TRUE, sizeof(uair::VBOVertex), (void*)(offsetof(uair::VBOVertex, mType)));
-		glVertexAttribPointer(uair::OpenGLStates::mExtraLocation, 2, GL_FLOAT, GL_TRUE, sizeof(uair::VBOVertex), (void*)(offsetof(uair::VBOVertex, mExtra)));
-		
-		if (OpenGLStates::mCurrentFBO != targetID) {
-			glBindFramebuffer(GL_FRAMEBUFFER, targetID);
-			OpenGLStates::mCurrentFBO = targetID;
+		for (auto iter = segmentInfo->second.begin(); iter != segmentInfo->second.end(); ++iter) {
+			// if the shader is valid and differs from the currently bound shader...
+			if (iter->mShader && iter->mShader->GetProgramID() != previousShader) {
+				OpenGLStates::UseProgram(iter->mShader->GetProgramID()); // set the new current shader
+				iter->mShader->RenderCallback(); // call any neccesary setup before rendering (uniforms, textures, etc)
+				previousShader = iter->mShader->GetProgramID(); // update the previous shader id to current
+				
+				OpenGLStates::BindVertexArray(iter->mVAOID); // bind the vertex array (no effect if already bound)
+			}
+			
+			OpenGLStates::BindTexture(iter->mTextureID); // bind the required texture (no effect if already bound)
+			
+			glDrawRangeElements(iter->mRenderMode, iter->mMinIndex, iter->mMaxIndex,
+					iter->mIndicesCount, GL_UNSIGNED_INT, (const GLuint*)(0) + iter->mIndicesOffset);
 		}
 		
-		for (unsigned int i = 0u; i < segmentInfo.size(); ++i) {
-			OpenGLStates::BindTexture(segmentInfo[i].mTexID);
-			glDrawRangeElements(segmentInfo[i].mRenderMode, segmentInfo[i].mMinIndex, segmentInfo[i].mMaxIndex, segmentInfo[i].mIndicesCount, GL_UNSIGNED_INT, (const GLuint*)(0) + segmentInfo[i].mIndicesOffset);
-		}
-		
-		glDisableVertexAttribArray(uair::OpenGLStates::mExtraLocation);
-		glDisableVertexAttribArray(uair::OpenGLStates::mTypeLocation);
-		glDisableVertexAttribArray(uair::OpenGLStates::mTexCoordLocation);
-		glDisableVertexAttribArray(uair::OpenGLStates::mColourLocation);
-		glDisableVertexAttribArray(uair::OpenGLStates::mNormalLocation);
-		glDisableVertexAttribArray(uair::OpenGLStates::mVertexLocation);
+		OpenGLStates::BindVertexArray(0); // unbind current VAO to prevent accidental overwriting
 	}
 }
 }

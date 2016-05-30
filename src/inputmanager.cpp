@@ -29,9 +29,11 @@
 
 #include <iostream>
 
-#include "game.hpp"
+#include "window.hpp"
 
 namespace uair {
+std::weak_ptr<Window> InputManager::mWindowPtr = std::weak_ptr<Window>();
+
 InputManager::InputDevice::InputDevice() : mButtonCount(0u), mControlCount(0u) {
 	
 }
@@ -401,15 +403,26 @@ int InputManager::GetMouseWheel() const {
 }
 
 void InputManager::SetMouseCoords(const glm::ivec2& newCoords, const CoordinateSpace& coordinateSpace) {
-	GAME.SetMouseCoords(newCoords, coordinateSpace);
+	if (auto mSharedWindowPtr = mWindowPtr.lock()) {
+		mSharedWindowPtr->SetMouseCoords(newCoords, coordinateSpace);
+	}
+	else {
+		std::cout << "pointer to window object is invalid" << std::endl;
+	}
 }
 
 glm::ivec2 InputManager::GetMouseCoords(const CoordinateSpace& coordinateSpace) const {
-	if (coordinateSpace == CoordinateSpace::Global) {
-		return mGlobalMouseCoords;
+	if (auto mSharedWindowPtr = mWindowPtr.lock()) {
+		if (coordinateSpace == CoordinateSpace::Global) {
+			return mSharedWindowPtr->GetMouseCoords().second;
+		}
+		
+		return mSharedWindowPtr->GetMouseCoords().first;
 	}
-	
-	return mLocalMouseCoords;
+	else {
+		std::cout << "pointer to window object is invalid" << std::endl;
+		return glm::ivec2(0, 0);
+	}
 }
 
 bool InputManager::DeviceExists(const unsigned int& deviceID) const {
@@ -539,18 +552,6 @@ void InputManager::HandleMouseButtons(const Mouse & button, const unsigned int &
 			}
 			
 			break;
-	}
-}
-
-void InputManager::HandleMouseMove(const glm::ivec2 & local, const glm::ivec2 & global) {
-	if (local.x != mLocalMouseCoords.x || local.y != mLocalMouseCoords.y) {
-		mLocalMouseCoords.x = local.x;
-		mLocalMouseCoords.y = local.y;
-	}
-	
-	if (global.x != mGlobalMouseCoords.x ||global.y != mGlobalMouseCoords.y) {
-		mGlobalMouseCoords.x = global.x;
-		mGlobalMouseCoords.y = global.y;
 	}
 }
 

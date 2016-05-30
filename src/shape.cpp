@@ -36,6 +36,8 @@
 #include "util.hpp"
 
 namespace uair {
+float Shape::mFrameLowerLimit = 0.0f;
+
 Shape::Shape(const std::vector<Contour>& contours, const CoordinateSpace& coordinateSpace) {
 	AddContours(contours, coordinateSpace);
 }
@@ -223,7 +225,7 @@ void Shape::Process() {
 		}
 		
 		mCurrentFrame = currentFrame; // set current animation frame
-		mAnimationTimer += GAME.mFrameLowerLimit; // increment animation timer
+		mAnimationTimer += mFrameLowerLimit; // increment animation timer
 	}
 }
 
@@ -253,7 +255,7 @@ void Shape::AddColour(const std::vector<glm::vec4>& colour) {
 }
 
 void Shape::AddFrame(ResourcePtr<Texture> texture, const unsigned int& layer) {
-	Texture* tex = texture.GetResource();
+	Texture* tex = texture.Get();
 	
 	if (tex) {
 		if (layer < tex->GetDepth()) {
@@ -279,7 +281,7 @@ void Shape::AddFrame(ResourcePtr<Texture> texture, const unsigned int& layer) {
 }
 
 void Shape::AddFrameCoords(ResourcePtr<Texture> texture, const unsigned int& layer, std::vector<glm::vec2> textureCoords) {
-	Texture* tex = texture.GetResource();
+	Texture* tex = texture.Get();
 	
 	if (tex) {
 		if (layer < tex->GetDepth()) {
@@ -316,7 +318,7 @@ void Shape::AddFrameCoords(ResourcePtr<Texture> texture, const unsigned int& lay
 }
 
 void Shape::AddFrameRect(ResourcePtr<Texture> texture, const unsigned int& layer, const std::vector<glm::vec2>& textureRect) {
-	Texture* tex = texture.GetResource();
+	Texture* tex = texture.Get();
 	
 	if (tex) {
 		if (layer < tex->GetDepth()) {
@@ -352,7 +354,7 @@ void Shape::AddFrameRect(ResourcePtr<Texture> texture, const unsigned int& layer
 void Shape::AddFrameStrip(ResourcePtr<Texture> texture, const unsigned int& layer, const unsigned int& numFrames, const unsigned int& numPerRow,
 		const unsigned int& numPerCol, const glm::ivec2& offset) {
 	
-	Texture* tex = texture.GetResource();
+	Texture* tex = texture.Get();
 	
 	if (tex) {
 		if (layer < tex->GetDepth()) {
@@ -528,7 +530,7 @@ std::list<RenderBatchData> Shape::Upload() {
 				renderMode = GL_TRIANGLES; // set render mode to triangles
 				
 				if (mIndices.at(indexType).empty() && mVertices.empty()) { // if indices and vertices haven't been calculated yet...
-					uair::Triangulate triangulate; // get a triangulator instance
+					Triangulate triangulate; // get a triangulator instance
 					
 					size_t offset = 0u;
 					for (auto count = vertCounts.begin(); count != vertCounts.end(); ++count) {
@@ -593,18 +595,20 @@ std::list<RenderBatchData> Shape::Upload() {
 		CreateVBOVertices(rbd, verticesTransformed, texCoords, colours);
 	}
 	
-	rbd.mIndData.insert(rbd.mIndData.end(), mIndices.at(indexType).begin(), mIndices.at(indexType).end()); // copy indices into render batch data
+	rbd.mIndexData.insert(rbd.mIndexData.end(), mIndices.at(indexType).begin(), mIndices.at(indexType).end()); // copy indices into render batch data
 	if (util::CompareFloats(mScale.x, util::LessThan, 0.0f) ^ util::CompareFloats(mScale.y, util::LessThan, 0.0f)) { // if ONE of the x or y scales is negative...
-		std::reverse(rbd.mIndData.begin(), rbd.mIndData.end());
+		std::reverse(rbd.mIndexData.begin(), rbd.mIndexData.end());
 	}
 	
-	rbd.mTexID = 0; // set texture id
+	rbd.mTextureID = 0; // set texture id
 	rbd.mRenderMode = renderMode; // set render mode
 	rbd.mTag = GetTag(); // set renderables tag
 	
+	rbd.mShader = GetShader();
+	
 	if (mCurrentFrame < mFrames.size()) { // if shape is textured...
-		if (mFrames.at(mCurrentFrame).mTexture.IsValid()) {
-			rbd.mTexID = mFrames.at(mCurrentFrame).mTexture.GetResource()->GetTextureID(); // set texture id
+		if (mFrames.at(mCurrentFrame).mTexture) {
+			rbd.mTextureID = mFrames.at(mCurrentFrame).mTexture->GetTextureID(); // set texture id
 		}
 	}
 	
@@ -654,7 +658,7 @@ void Shape::CreateVBOVertices(RenderBatchData& batchData, const std::vector<glm:
 		vert.mR = colours.at(i).x; vert.mG = colours.at(i).y; vert.mB = colours.at(i).z; vert.mA = colours.at(i).w;
 		vert.mType = 0.0f; vert.mExtra[0] = texAvailable; vert.mExtra[1] = 0.0f;
 		
-		batchData.mVertData.push_back(vert); // add rendering vertex to rendering data
+		batchData.mVertexData.push_back(vert); // add rendering vertex to rendering data
 	}
 }
 

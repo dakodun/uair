@@ -74,15 +74,13 @@ class System {
 		T GetMessage(const unsigned int& index);
 		
 		void PopMessage(const unsigned int& index);
-		
-		// derived systems must implement this function and return a unique id (unique amongst other derived systems)
-		virtual unsigned int GetTypeID() const = 0;
 	protected :
 		SystemManager* mSystemManagerPtr; // a pointer to the system manager that this system is registered to
 		std::vector<EntityManager::Handle> mRegisteredEntities;
 };
 
 
+// a specialised version of the manager<T> class that handles creation, retrieval and removal of system objects
 class SystemManager {
 	public :
 		// assign a reference to the associated entity and component managers as well as the
@@ -170,8 +168,7 @@ T& SystemManager::Register() {
 		throw std::runtime_error("not of base type"); // an error has occurred, don't register system
 	}
 	
-	T tempT(nullptr); // create a temporary object of the system being registered
-	unsigned int typeID = tempT.GetTypeID(); // retrieve the unique type id from the temp
+	unsigned int typeID = T::GetTypeID(); // get the type id relating to the resource type
 	
 	auto storeResult = mStore.find(typeID); // search the registered systems store for a match with the unique id
 	if (storeResult != mStore.end()) { // if a match was found...
@@ -184,8 +181,7 @@ T& SystemManager::Register() {
 
 template <typename T>
 void SystemManager::Remove() {
-	T tempT(nullptr); // create a temporary object of the system being removed
-	unsigned int typeID = tempT.GetTypeID(); // retrieve the unique type id from the temp
+	unsigned int typeID = T::GetTypeID(); // get the type id relating to the resource type
 	
 	auto storeResult = mStore.find(typeID); // search the registered systems store for a match with the unique id 
 	if (storeResult == mStore.end()) { // if a match was not found... 
@@ -198,8 +194,7 @@ void SystemManager::Remove() {
 
 template <typename T>
 T& SystemManager::Get() {
-	T tempT(nullptr); // create a temporary object of the system being removed
-	unsigned int typeID = tempT.GetTypeID(); // retrieve the unique type id from the temp
+	unsigned int typeID = T::GetTypeID(); // get the type id relating to the resource type
 	
 	auto storeResult = mStore.find(typeID); // search the registered systems store for a match with the unique id 
 	if (storeResult == mStore.end()) { // if a match was not found... 

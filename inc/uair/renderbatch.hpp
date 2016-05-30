@@ -37,26 +37,32 @@
 namespace uair {
 // render data from a renderable that is to be sent to vbo
 struct RenderBatchData {
-	std::vector<VBOVertex> mVertData; // vertices to send to vbo
-	std::vector<VBOIndex> mIndData; // indices to send to vbo
+	std::vector<VBOVertex> mVertexData; // vertices to send to vbo
+	std::vector<VBOIndex> mIndexData; // indices to send to vbo
 	
-	GLuint mTexID = 0u; // the texture id to bind in vbo
-	GLenum mRenderMode = GL_TRIANGLES;
+	unsigned int mPass = 0u;
+	ResourcePtr<Shader> mShader;
+	GLuint mTextureID = 0u; // the texture id to bind in vbo
+	GLenum mRenderMode = GL_TRIANGLES; // the mode to use when rendering this renderable
 	std::string mTag = ""; // the tag (type) of the underlying renderable
 };
 
-// a segment of vertices in vbo that share the same texture
-struct SegmentInfo {
-	SegmentInfo() = default;
-	SegmentInfo(const GLuint& texID, const GLenum& renderMode, const GLuint& count, const GLuint& offset, const GLuint& min, const GLuint& max) :
-			mTexID(texID), mRenderMode(renderMode), mIndicesCount(count), mIndicesOffset(offset), mMinIndex(min), mMaxIndex(max) {
-		
+// 
+struct Segment {
+	Segment() = default;
+	Segment(const unsigned int& pass, const GLuint& vaoID, ResourcePtr<Shader> shader, const GLuint& textureID,
+			const GLenum& renderMode, const GLuint& count, const GLuint& offset, const GLuint& min, const GLuint& max) :
+			mPass(pass), mVAOID(vaoID), mShader(shader), mTextureID(textureID),
+			mRenderMode(renderMode), mIndicesCount(count), mIndicesOffset(offset), mMinIndex(min), mMaxIndex(max) {
 		
 	}
 	
-	GLuint mTexID = 0u; // the texture id of the segment
-	GLenum mRenderMode = GL_TRIANGLE_FAN;
+	unsigned int mPass = 0u;
+	GLuint mVAOID = 0u;
+	ResourcePtr<Shader> mShader;
+	GLuint mTextureID = 0u;
 	
+	GLenum mRenderMode = GL_TRIANGLE_FAN;
 	GLuint mIndicesCount = 0u;
 	GLuint mIndicesOffset = 0u;
 	GLuint mMinIndex = 0u;
@@ -68,15 +74,15 @@ class Renderable; // forward declare the renderable class
 // a batch of renderable objects that is processed and uploaded to a vbo
 class RenderBatch {
 	public :
-		void Add(Renderable& renderable, const unsigned int& pass = 0); // add a renderable to the batch for the specified render pass
+		void Add(Renderable& renderable, const unsigned int& pass = 0u); // add a renderable to the batch for the specified render pass
 		void Upload(); // upload the batch to vbo
-		void Draw(const unsigned int& pass = 0); // draw the specified pass to the default framebuffer
+		void Draw(const unsigned int& pass = 0u); // draw the specified pass to the default framebuffer
 		void Draw(const FBO& fbo, const unsigned int& pass); // draw the specified pass to the specified framebuffer
 	private :
-		typedef std::pair< unsigned int, std::vector<RenderBatchData> > IndexedRenderBatchData; // unsigned int/render batch data vector pair
-		typedef std::pair< unsigned int, std::vector<SegmentInfo> > IndexedSegmentInfo; // unsigned int/segment info vector pair
-		
-		std::map< unsigned int, std::vector<RenderBatchData> > mRenderData;
+		static bool RenderDataSort(const RenderBatchData& first, const RenderBatchData& second);
+	
+	private :
+		std::vector<RenderBatchData> mRenderData; // holds the data to be rendered for each pass
 		
 		VBO mVBO; // vertex buffer object (vbo) used for rendering
 };

@@ -86,6 +86,9 @@ class WindowWin32 {
 		unsigned int GetActualHeight() const;
 		
 		void MakeCurrent(OpenGLContext& context);
+		
+		std::pair<glm::ivec2, glm::ivec2> GetMouseCoords();
+		std::pair<glm::ivec2, glm::ivec2> SetMouseCoords(const glm::ivec2& newCoords, const CoordinateSpace& coordinateSpace = CoordinateSpace::Local);
 	protected :
 		struct InputDevice { // an input device connected to the system
 			int mID = 0; // the id assigned to the input device
@@ -109,8 +112,6 @@ class WindowWin32 {
 		bool RegisterInputDevice(HANDLE deviceHandle); // adds an input device to the store
 		bool GetDeviceCapabilities(const PHIDP_PREPARSED_DATA& preparsedData, HIDP_CAPS& caps, PHIDP_BUTTON_CAPS& buttonCaps,
 				std::unique_ptr<BYTE[]>& buttonCapsBuffer, PHIDP_VALUE_CAPS& valueCaps, std::unique_ptr<BYTE[]>& valueCapsBuffer); // gets the capabilities reported by the device
-		
-		std::pair<glm::ivec2, glm::ivec2> SetMouseCoords(const glm::ivec2& newCoords, const CoordinateSpace& coordinateSpace = CoordinateSpace::Local);
 	protected :
 		static unsigned int mWindowCount;
 		
@@ -130,8 +131,8 @@ class WindowWin32 {
 		bool mHasFocus;
 		unsigned int mCaptureCount;
 		
-		glm::ivec2 storedGlobalMouse;
-		glm::ivec2 storedLocalMouse;
+		glm::ivec2 mGlobalMouse;
+		glm::ivec2 mLocalMouse;
 		std::map<HANDLE, InputDevice> mInputDevices; // a store of input devices currently connected to the system
 		int mInputDeviceIDCounter = 0; // the counter used to assign a unique id to a connected device
 };

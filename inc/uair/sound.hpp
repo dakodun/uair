@@ -69,7 +69,7 @@ class Sound {
 		
 		unsigned int mSamplePosition = 0u; // the current playback offset in the samples array
 		std::vector<int>* mSampleDataPtr = nullptr; // a pointer to the samples in the current resource
-		uair::ResourcePtr<SoundBuffer> mSoundBuffer; // a resource pointer to a sound buffer where sample data comes from
+		ResourcePtr<SoundBuffer> mSoundBuffer; // a resource pointer to a sound buffer where sample data comes from
 };
 }
 

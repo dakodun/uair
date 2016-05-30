@@ -55,7 +55,7 @@ void File::LoadFromFile(const std::string & filename) {
 			file.close(); // clean up after ourselves
 		}
 		else {
-			throw UairException("unable to open the file: " + filename); // throw an error
+			throw std::runtime_error("unable to open the file: " + filename); // throw an error
 		}
 	} catch (std::exception & e) {
 		if (file.is_open()) { // if we've already opened the file
@@ -80,7 +80,7 @@ void File::SaveToFile(const std::string & filename) {
 			file.close(); // clean up after ourselves
 		}
 		else {
-			throw UairException("unable to open the file: " + filename); // throw an error
+			throw std::runtime_error("unable to open the file: " + filename); // throw an error
 		}
 	} catch (std::exception& e) {
 		if (file.is_open()) { // if we've already opened the file

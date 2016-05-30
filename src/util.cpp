@@ -88,7 +88,7 @@ extern glm::mat3 GetTranslationMatrix(const glm::vec2& translation) {
 }
 
 extern glm::mat3 GetRotationMatrix(const float& angle) {
-	float angleRad = (angle * (uair::util::PI / 180)); // convert the angle to radians
+	float angleRad = (angle * (util::PI / 180)); // convert the angle to radians
 	
 	glm::mat3 result;
 	result[0][0] = std::cos(angleRad);	result[0][1] = -std::sin(angleRad);	result[0][2] = 0.0f;
@@ -109,8 +109,8 @@ extern glm::mat3 GetScalingMatrix(const glm::vec2& scale) {
 
 extern glm::mat3 GetSkewingMatrix(const glm::vec2& skew) {
 	// clamp the skew tangent to -90 < angle < 90 on both axes
-	glm::vec2 angleRad((std::max(-89.9f, std::min(skew.x, 89.9f)) * (uair::util::PI / 180)),
-			(std::max(-89.9f, std::min(skew.y, 89.9f)) * (uair::util::PI / 180)));
+	glm::vec2 angleRad((std::max(-89.9f, std::min(skew.x, 89.9f)) * (util::PI / 180)),
+			(std::max(-89.9f, std::min(skew.y, 89.9f)) * (util::PI / 180)));
 
 	
 	glm::mat3 result;

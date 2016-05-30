@@ -45,7 +45,7 @@ WindowWin32::WindowWin32(const std::string & windowTitle, const WindowDisplaySet
 	
 	try {
 		SetUpWindow(); // set up the window
-	} catch (UairException& e) {
+	} catch (std::exception& e) {
 		std::cout << e.what() << std::endl;
 		throw;
 	}
@@ -103,8 +103,8 @@ void swap(WindowWin32& first, WindowWin32& second) {
 	std::swap(first.mHasFocus, second.mHasFocus);
 	std::swap(first.mCaptureCount, second.mCaptureCount);
 	
-	std::swap(first.storedGlobalMouse, second.storedGlobalMouse);
-	std::swap(first.storedLocalMouse, second.storedLocalMouse);
+	std::swap(first.mGlobalMouse, second.mGlobalMouse);
+	std::swap(first.mLocalMouse, second.mLocalMouse);
 }
 
 void WindowWin32::Process() {
@@ -124,8 +124,8 @@ void WindowWin32::Process() {
 		localMouse.y = globalMouse.y;
 		ScreenToClient(mWindowHandle, &localMouse);
 		
-		if ((globalMouse.x != storedGlobalMouse.x || globalMouse.y != storedGlobalMouse.y) ||
-				(localMouse.x != storedLocalMouse.x || localMouse.y != storedLocalMouse.y)) {
+		if ((globalMouse.x != mGlobalMouse.x || globalMouse.y != mGlobalMouse.y) ||
+				(localMouse.x != mLocalMouse.x || localMouse.y != mLocalMouse.y)) {
 			
 			WindowEvent e;
 			e.mType = WindowEvent::MouseMoveType;
@@ -133,8 +133,8 @@ void WindowWin32::Process() {
 			e.mMouseMove.mLocalX = localMouse.x; e.mMouseMove.mLocalY = localMouse.y;
 			mEventQueue.push_back(e);
 			
-			storedGlobalMouse.x = globalMouse.x; storedGlobalMouse.y = globalMouse.y;
-			storedLocalMouse.x = localMouse.x; storedLocalMouse.y = localMouse.y;
+			mGlobalMouse.x = globalMouse.x; mGlobalMouse.y = globalMouse.y;
+			mLocalMouse.x = localMouse.x; mLocalMouse.y = localMouse.y;
 		}
 	}
 }
@@ -212,6 +212,46 @@ void WindowWin32::MakeCurrent(OpenGLContext& context) {
 	CURRENTCONTEXTWIN32 = &context.mGlewContextWin32;
 }
 
+std::pair<glm::ivec2, glm::ivec2> WindowWin32::GetMouseCoords() {
+	return std::make_pair(mLocalMouse, mGlobalMouse);
+}
+
+std::pair<glm::ivec2, glm::ivec2> WindowWin32::SetMouseCoords(const glm::ivec2& newCoords, const CoordinateSpace& coordinateSpace) {
+	POINT localMouse;
+	localMouse.x = newCoords.x;
+	localMouse.y = newCoords.y;
+	
+	POINT globalMouse;
+	globalMouse.x = newCoords.x;
+	globalMouse.y = newCoords.y;
+	
+	if (coordinateSpace == CoordinateSpace::Local) {
+		ClientToScreen(mWindowHandle, &globalMouse);
+	}
+	else {
+		ScreenToClient(mWindowHandle, &localMouse);
+	}
+	
+	if ((globalMouse.x != mGlobalMouse.x || globalMouse.y != mGlobalMouse.y) ||
+			(localMouse.x != mLocalMouse.x || localMouse.y != mLocalMouse.y)) {
+		
+		SetCursorPos(globalMouse.x, globalMouse.y);
+		
+		{
+			WindowEvent e;
+			e.mType = WindowEvent::MouseMoveType;
+			e.mMouseMove.mGlobalX = globalMouse.x; e.mMouseMove.mGlobalY = globalMouse.y;
+			e.mMouseMove.mLocalX = localMouse.x; e.mMouseMove.mLocalY = localMouse.y;
+			mEventQueue.push_back(e);
+			
+			mGlobalMouse.x = globalMouse.x; mGlobalMouse.y = globalMouse.y;
+			mLocalMouse.x = localMouse.x; mLocalMouse.y = localMouse.y;
+		}
+	}
+	
+	return std::make_pair(mLocalMouse, mGlobalMouse);
+}
+
 void WindowWin32::SetUpWindow() {
 	if (mWindowCount == 0u) {
 		// create window attributes
@@ -285,12 +325,12 @@ void WindowWin32::SetUpWindow() {
 		0, 0, GetModuleHandle(0), this);
 	
 	if (!mWindowHandle) { // if we didn't recieve a valid window handle
-		throw UairException("Unable to get a valid window handle."); // throw an exception
+		throw std::runtime_error("Unable to get a valid window handle."); // throw an exception
 	}
 	
 	mDeviceContext = GetDC(mWindowHandle); // get the device context for our window
 	if (!mDeviceContext) { // if we didn't recieve a valid device context
-		throw UairException("Unable to get a valid device context."); // throw an exception
+		throw std::runtime_error("Unable to get a valid device context."); // throw an exception
 	}
 	
 	PIXELFORMATDESCRIPTOR pfd = {
@@ -315,12 +355,12 @@ void WindowWin32::SetUpWindow() {
 	// find an appropriate pixel format supported by the device context that matches the given PFD
 	int indPixelFormat = ChoosePixelFormat(mDeviceContext, &pfd);
 	if (indPixelFormat == 0) {
-		throw UairException("No appropiate Pixel Format was found."); // an error has occured
+		throw std::runtime_error("No appropiate Pixel Format was found."); // an error has occured
 	}
 	
 	// set the pixel format of the device context to the pixel format found previously (indPixelFormat)
 	if (SetPixelFormat(mDeviceContext, indPixelFormat, &pfd) == false) {
-		throw UairException("Unable to set Pixel Format."); // an error has occured
+		throw std::runtime_error("Unable to set Pixel Format."); // an error has occured
 	}
 	
 	mOpen = true; // indicate window is now created and open
@@ -354,8 +394,8 @@ void WindowWin32::SetUpWindow() {
 			e.mMouseMove.mLocalX = localMouse.x; e.mMouseMove.mLocalY = localMouse.y;
 			mEventQueue.push_back(e);
 			
-			storedGlobalMouse.x = globalMouse.x; storedGlobalMouse.y = globalMouse.y;
-			storedLocalMouse.x = localMouse.x; storedLocalMouse.y = localMouse.y;
+			mGlobalMouse.x = globalMouse.x; mGlobalMouse.y = globalMouse.y;
+			mLocalMouse.x = localMouse.x; mLocalMouse.y = localMouse.y;
 		}
 	}
 }
@@ -1240,33 +1280,5 @@ bool WindowWin32::GetDeviceCapabilities(const PHIDP_PREPARSED_DATA& preparsedDat
 	}
 	
 	return true; // successfully retrieved input device capabilities
-}
-
-std::pair<glm::ivec2, glm::ivec2> WindowWin32::SetMouseCoords(const glm::ivec2& newCoords, const CoordinateSpace& coordinateSpace) {
-	POINT localMouse;
-	localMouse.x = newCoords.x;
-	localMouse.y = newCoords.y;
-	
-	POINT globalMouse;
-	globalMouse.x = newCoords.x;
-	globalMouse.y = newCoords.y;
-	
-	if (coordinateSpace == CoordinateSpace::Local) {
-		ClientToScreen(mWindowHandle, &globalMouse);
-	}
-	else {
-		ScreenToClient(mWindowHandle, &localMouse);
-	}
-	
-	SetCursorPos(globalMouse.x, globalMouse.y);
-	
-	if ((globalMouse.x != storedGlobalMouse.x || globalMouse.y != storedGlobalMouse.y) ||
-			(localMouse.x != storedLocalMouse.x || localMouse.y != storedLocalMouse.y)) {
-		
-		storedGlobalMouse.x = globalMouse.x; storedGlobalMouse.y = globalMouse.y;
-		storedLocalMouse.x = localMouse.x; storedLocalMouse.y = localMouse.y;
-	}
-	
-	return std::make_pair(storedLocalMouse, storedGlobalMouse);
 }
 }

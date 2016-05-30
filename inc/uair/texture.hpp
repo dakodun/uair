@@ -37,7 +37,7 @@
 namespace uair {
 class FBO;
 
-class Texture : public Resource<Texture> {
+class Texture : public Resource {
 	public :
 		struct LayerData { // data relating to an individual layer in a texture array
 			unsigned int mWidth; // the width of the layer without padding
@@ -69,6 +69,8 @@ class Texture : public Resource<Texture> {
 		unsigned int GetHeight() const; // return the height
 		unsigned int GetDepth() const; // return the number of layers
 		LayerData GetData(const std::size_t& index) const; // return a copy of the texture data
+		
+		static unsigned int GetTypeID();
 	private :
 		GLuint mTextureID = 0; // the assigned id
 		

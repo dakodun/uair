@@ -48,7 +48,7 @@ void RenderString::SetFont(ResourcePtr<Font> font) {
 }
 
 void RenderString::SetFont(Font* font) {
-	mFont.SetResource(font);
+	mFont.Set(font);
 	mQuads.clear(); // reset the stored glyph quads
 	SetSize(mSize); // update the size of the font
 }
@@ -61,8 +61,8 @@ void RenderString::SetText(const std::u32string& newText) {
 void RenderString::SetSize(const unsigned int& size) {
 	mSize = size;
 	
-	if (mFont.IsValid()) { // if we have a valid font...
-		float fontSize = static_cast<float>(mFont.GetResource()->GetFontSize()); // get the size of the font
+	if (mFont) { // if we have a valid font...
+		float fontSize = static_cast<float>(mFont->GetFontSize()); // get the size of the font
 		mScale = glm::vec2(mSize / fontSize, mSize / fontSize); // calculate the scale factor for the render string
 	}
 }
@@ -86,7 +86,7 @@ std::list<RenderBatchData> RenderString::Upload() {
 		int advanceAccum = 0; // the accumulated horizontal advance for the current line
 		int kemingAccum = 0; // the accumulated kerning offset for the current line
 		int lineOffset = 0; // the vertical offset of the current line
-		int lineHeight = mFont.GetResource()->GetLineHeight(); // retrieve and store the new line offset
+		int lineHeight = mFont->GetLineHeight(); // retrieve and store the new line offset
 		
 		for (unsigned int i = 0u; i < mString.size(); ++i) { // for all characters in the string...
 			char32_t codePoint = mString.at(i); // get the current character
@@ -99,7 +99,7 @@ std::list<RenderBatchData> RenderString::Upload() {
 			}
 			
 			try {
-				const Font::Glyph& glyph = mFont.GetResource()->GetGlyph(codePoint); // get the glyph object for the current character
+				const Font::Glyph& glyph = mFont->GetGlyph(codePoint); // get the glyph object for the current character
 				Shape shape = glyph.mBaseShape; // get the glyph shape from the glyph object
 				
 				glm::vec2 pos = glm::vec2((advanceAccum + kemingAccum) + glyph.mBearing.x, glyph.mDrop + lineOffset); // calculate the position of the glyph shape
@@ -121,9 +121,9 @@ std::list<RenderBatchData> RenderString::Upload() {
 				
 				advanceAccum += glyph.mAdvance; // increment the horizontal advance accumulator by the current glyph's advance metric
 				if (i != mString.size() - 1) { // if this is not the final character in the string...
-					kemingAccum += mFont.GetResource()->GetKerning(codePoint, mString.at(i + 1)); // increment the kerning offset by the kerning value of this and the next character
+					kemingAccum += mFont->GetKerning(codePoint, mString.at(i + 1)); // increment the kerning offset by the kerning value of this and the next character
 				}
-			} catch(UairException& e) {
+			} catch(std::exception& e) {
 				std::cout << "unknown codepoint: " << codePoint << std::endl;
 			}
 		}
@@ -159,15 +159,17 @@ std::list<RenderBatchData> RenderString::Upload() {
 		RenderBatchData rbd; // rendering data struct
 		
 		quad->CreateVBOVertices(rbd, vertices, texCoords, {}); // create vbo vertices of the shape
-		for (auto vbovert = rbd.mVertData.begin(); vbovert != rbd.mVertData.end(); ++vbovert) { // for all new vbo vertices...
+		for (auto vbovert = rbd.mVertexData.begin(); vbovert != rbd.mVertexData.end(); ++vbovert) { // for all new vbo vertices...
 			vbovert->mType = 1.0f; // set the type of vertex to 1
 		}
 		
-		rbd.mIndData = {0u, 1u, 2u, 0u, 2u, 3u};
+		rbd.mIndexData = {0u, 1u, 2u, 0u, 2u, 3u};
 		
-		rbd.mTexID = mFont.GetResource()->GetTextureID(); // set the texture to the font's texture
+		rbd.mTextureID = mFont->GetTextureID(); // set the texture to the font's texture
 		rbd.mRenderMode = GL_TRIANGLES;
 		rbd.mTag = GetTag();
+		
+		rbd.mShader = GetShader();
 		
 		rbdList.push_back(std::move(rbd));
 	}

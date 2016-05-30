@@ -30,11 +30,14 @@
 
 #include <map>
 #include <vector>
+#include <memory>
 
 #include "init.hpp"
+#include "resourceptr.hpp"
+#include "shader.hpp"
 
 namespace uair {
-class SegmentInfo;
+class Segment;
 class FBO;
 
 typedef unsigned int VBOIndex;
@@ -51,29 +54,34 @@ struct VBOVertex {
 class VBO {
 	public :
 		VBO() = default;
-		VBO(const VBO& copyFrom) = delete;
+		VBO(const VBO& other) = delete;
+		VBO(VBO&& other);
 		~VBO();
 		
-		VBO & operator=(const VBO& other) = delete;
+		VBO& operator=(VBO other);
+		
+		friend void swap(VBO& first, VBO& second);
+		
+		void Initialise();
 		
 		void AddData(const std::vector<VBOVertex>& vertData, const std::vector<VBOIndex>& indData);
-		void AddData(const std::vector<VBOVertex>& vertData, const std::vector<VBOIndex>& indData, const std::map< unsigned int, std::vector<SegmentInfo> >& segmentInfo);
+		void AddData(const std::vector<VBOVertex>& vertData, const std::vector<VBOIndex>& indData, const std::vector<Segment>& segments);
 		void Draw(const unsigned int& pass = 0u);
 		void Draw(const FBO& fbo, const unsigned int& pass = 0u);
-		
-		void EnsureInitialised();
 	private :
 		void Draw(const unsigned int& targetID, const unsigned int& pass);
+	
 	public :
+		static ResourcePtr<Shader> mDefaultShader;
+		
 		GLenum mType = GL_DYNAMIC_DRAW;
 		std::size_t mMinimumSize = 0;
 	private :
-		typedef std::pair< unsigned int, std::vector<SegmentInfo> > IndexedSegmentInfo; // unsigned int/segment info vector pair
-		
 		GLuint mVertVBOID = 0;
 		GLuint mIndVBOID = 0;
 		
-		std::map< unsigned int, std::vector<SegmentInfo> > mSegmentInfo;
+		std::map< unsigned int, std::vector<Segment> > mSegmentInfo;
+		std::map<GLuint, GLuint> mVAOStore;
 };
 }
 

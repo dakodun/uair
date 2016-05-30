@@ -38,6 +38,8 @@
 #include "inputenums.hpp"
 
 namespace uair {
+class Window;
+
 class InputManager {
 	friend class Game;
 	
@@ -127,21 +129,21 @@ class InputManager {
 		void HandleKeyboardKeys(const Keyboard& key, const unsigned int& type);
 		
 		void HandleMouseButtons(const Mouse& button, const unsigned int& type);
-		void HandleMouseMove(const glm::ivec2& local, const glm::ivec2& global);
 		
 		void AddDevice(const int& deviceID, const unsigned int& buttonCount, const unsigned int& controlCount,
 				const InputDeviceCaps& caps); // adds an input device to the store when it is connected to the system
 		void RemoveDevice(const int& deviceID); // removes an input device from the store when it is disconnected from the system
 		void HandleDeviceButtons(const unsigned int& button, const unsigned int& type, const int& deviceID); // handles the updating of the states of input device controls
 		void HandleDeviceControls(const Device& control, const int& value, const int& deviceID); // handles the updating of the states of input device controls
+	
+	public :
+		static std::weak_ptr<Window> mWindowPtr;
 	private :
 		std::map<Keyboard, unsigned int> mKeyboardStates;
 		
 		std::map<Mouse, unsigned int> mMouseStates;
 		
 		int mMouseWheel;
-		glm::ivec2 mLocalMouseCoords;
-		glm::ivec2 mGlobalMouseCoords;
 		
 		std::map<int, InputDevice> mInputDevices; // a store of all input devices currently connected to the system
 		InputDevice mDefaultDevice; // the default device that is used when an invalid device is requested

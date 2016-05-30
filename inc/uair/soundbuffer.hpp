@@ -35,7 +35,7 @@
 #include "soundloaderogg.hpp"
 
 namespace uair {
-class SoundBuffer : public uair::Resource<SoundBuffer> {
+class SoundBuffer : public Resource {
 	public :
 		SoundBuffer() = default;
 		SoundBuffer(const SoundBuffer& other) = delete;
@@ -47,6 +47,8 @@ class SoundBuffer : public uair::Resource<SoundBuffer> {
 		friend void swap(SoundBuffer& first, SoundBuffer& second);
 		
 		void LoadFromFile(const std::string& filename);
+		
+		static unsigned int GetTypeID();
 	private :
 		int DecoderCallback(const int& serial, const int& numChannels, const int& numSamples, std::vector<int>& samples);
 	public :

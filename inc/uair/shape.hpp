@@ -36,6 +36,7 @@
 #include "triangulate.hpp"
 
 namespace uair {
+class Game;
 class RenderBatch;
 
 struct AnimationFrame {
@@ -116,6 +117,9 @@ class Shape : public Polygon, public Renderable {
 		
 		// recalculate the texture coords for extra vertices added during triangulation
 		void CalculateExtraTexCoords(AnimationFrame& frame);
+	
+	public :
+		static float mFrameLowerLimit;
 	private :
 		WindingRule mWindingRule = WindingRule::Odd; // winding rule for triangulation
 		std::vector< std::vector<VBOIndex> > mIndices = {{}, {}, {}, {}, {}}; // indices used to render this shape in various styles (line, fill, etc) stored for efficiency

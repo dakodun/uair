@@ -89,23 +89,32 @@ EntityManager::EntityManager(Manager<Component>& componentManager) : mComponentM
 	
 }
 
-EntityManager::Handle EntityManager::Add(const std::string& entityName) {
-	std::pair<unsigned int, unsigned int> indexCounterPair; // the index and counter (validity) of the new entity
+EntityManager::Handle EntityManager::Add(const std::string& name) {
+	std::pair<unsigned int, unsigned int> indexCounterPair;
 	
 	try {
-		indexCounterPair = mStore.Add<EntityManager*, unsigned int, std::string>(this, mEntityCount, entityName); // add a new entry to the store and save the index and counter value returned
+		// add a new entry to the store and save the index and counter value returned
+		indexCounterPair = mStore.Add<EntityManager*, unsigned int, std::string>(name, this, mEntityCount, name);
 	} catch (std::exception& e) {
 		throw;
 	}
 	
-	++mEntityCount; // increment the entity count
-	return Handle(indexCounterPair.first, indexCounterPair.second); // return a handle to the newly added resource
+	++mEntityCount;
+	return Handle(indexCounterPair.first, indexCounterPair.second, name); // return a handle to the newly added entity
 }
 
 void EntityManager::Remove(const Handle& handle) {
 	try {
-		// remove the resource from the store using its index and counter (validity) value (using the base pointer)
+		// remove the entity from the store using its index and counter (validity) value
 		mStore.Remove(handle.mIndex, handle.mCounter);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+void EntityManager::Remove(const std::string& name) {
+	try {
+		mStore.Remove(name); // remove all entities from the store with matching name
 	} catch (std::exception& e) {
 		throw;
 	}
@@ -113,7 +122,16 @@ void EntityManager::Remove(const Handle& handle) {
 
 Entity& EntityManager::Get(const Handle& handle) {
 	try {
-		return mStore.Get(handle.mIndex, handle.mCounter); // return a reference to the stored resource using its index and counter (validity) value
+		// return a reference to the stored entity using its index and counter (validity) value
+		return mStore.Get(handle.mIndex, handle.mCounter);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+std::list< std::reference_wrapper<Entity> > EntityManager::Get(const std::string& name) {
+	try {
+		return mStore.Get(name); // return a list of references to the stored entities 
 	} catch (std::exception& e) {
 		throw;
 	}

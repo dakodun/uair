@@ -25,24 +25,59 @@
 **		   source distribution.
 ** **************************************************************** */
 
-#ifndef UAIRCOMPONENT_HPP
-#define UAIRCOMPONENT_HPP
+#ifndef UAIRSHADER_HPP
+#define UAIRSHADER_HPP
 
 #include <string>
+#include <functional>
+
+#include "init.hpp"
+#include "resource.hpp"
 
 namespace uair {
-// base class for all components allowing them to be handled as the same resource (via base pointers)
-class Component {
+class Shader : public Resource {
 	public :
-		// derived classes should implement a constructer that optionally takes a name to identify this component
-		Component(const std::string& componentName = "");
+		typedef std::function<void ()> SetupCallback;
 		
-		virtual ~Component();
+		Shader() = default;
+		Shader(const Shader& other) = delete;
+		Shader(Shader&& other);
+		~Shader();
 		
-		// return the name (if any) assigned to this component
-		std::string GetName() const;
+		Shader& operator=(Shader other);
+		
+		friend void swap(Shader& first, Shader& second);
+		
+		void LinkProgram();
+		void UseProgram();
+		
+		void VertexFromFile(const std::string& vertexShaderFile);
+		void VertexFromString(const std::string& vertexShaderString);
+		
+		void FragmentFromFile(const std::string& fragmentShaderFile);
+		void FragmentFromString(const std::string& fragmentShaderString);
+		
+		virtual void InitCallback();
+		virtual void VAOCallback();
+		virtual void RenderCallback();
+		
+		void Initialise();
+		void Clear();
+		
+		GLuint GetProgramID() const;
+		
+		static unsigned int GetTypeID();
+	
 	protected :
-		std::string mName = ""; // name associated with this component
+		GLuint mProgramID = 0;
+		
+		std::string mVertShaderString;
+		std::string mFragShaderString;
+	private :
+		GLint mProjectionMatrixLocation;
+		GLint mViewMatrixLocation;
+		GLint mModelMatrixLocation;
+		GLint mTextureLocation;
 };
 }
 
