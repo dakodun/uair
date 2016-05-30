@@ -31,17 +31,21 @@
 #include <map>
 
 #include "resourceptr.hpp"
+#include "manager.hpp"
 
 namespace uair {
-template<class T>
 class Resource {
 	public :
 		~Resource() {
-			mStore.clear(); // remove all referenced resource pointers
+			for (auto iter = mStore.begin(); iter != mStore.end(); ++iter) { // for all resourceptrs pointing to this resource...
+				iter->second->Reset(); // reset the resourceptr back to default
+			}
+			
+			mStore.clear(); // remove all resourceptrs
 			mPtrCount = 1u; // set the reference count back to default
 		}
 		
-		unsigned int AddReference(ResourcePtr<T>* resPtr, const unsigned int &id = 0u) {
+		unsigned int AddReference(ResourcePtrBase* resPtr, const unsigned int &id = 0u) {
 			if (id == 0u) { // if no id was supplied...
 				mStore.insert(std::make_pair(mPtrCount, resPtr)); // add to the end of the container
 				return mPtrCount++; // return reference count and increment it
@@ -52,7 +56,7 @@ class Resource {
 			}
 		}
 		
-		unsigned int RemoveReference(ResourcePtr<T>* resPtr) {
+		unsigned int RemoveReference(ResourcePtrBase* resPtr) {
 			mStore.erase(resPtr->GetID()); // remove the reference from the store
 			
 			if (mStore.empty()) { // if there are no references left...
@@ -62,8 +66,17 @@ class Resource {
 			return 0;
 		}
 	protected :
-		std::map<unsigned int, ResourcePtr<T>*> mStore; // container holding references and associated id
+		std::map<unsigned int, ResourcePtrBase*> mStore; // container holding references and associated id
 		unsigned int mPtrCount = 1u; // reference counter - current count implies reference id (1-index)
+};
+
+typedef Manager<Resource>::Handle ResourceHandle;
+enum class Resources : unsigned int {
+	Texture = 1u,
+	Font,
+	RenderBuffer,
+	Shader,
+	SoundBuffer
 };
 }
 
