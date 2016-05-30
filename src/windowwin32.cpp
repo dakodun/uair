@@ -30,7 +30,6 @@
 #include <iostream>
 
 #include "openglcontext.hpp"
-#include "exception.hpp"
 #include "inputenums.hpp"
 
 namespace uair {

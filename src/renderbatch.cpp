@@ -147,7 +147,7 @@ bool RenderBatch::RenderDataSort(const RenderBatchData& first, const RenderBatch
 				return true;
 			}
 			else if (first.mTextureID == second.mTextureID) {
-				if (first.mRenderMode == second.mRenderMode) { // ...finally check if data can be sorted by rendermode
+				if (first.mRenderMode < second.mRenderMode) { // ...finally check if data can be sorted by rendermode
 					return true;
 				}
 			}

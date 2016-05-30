@@ -32,7 +32,6 @@
 #include <string>
 
 #include "window.hpp"
-#include "exception.hpp"
 
 namespace uair {
 OpenGLContextWin32::OpenGLContextWin32() {

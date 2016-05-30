@@ -30,8 +30,6 @@
 #include <iostream>
 #include <fstream>
 
-#include "exception.hpp"
-
 namespace uair {
 File::File(const std::string & filename) {
 	LoadFromFile(filename); // load the specified file

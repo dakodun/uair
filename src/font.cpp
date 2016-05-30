@@ -35,7 +35,6 @@
 #include "openglstates.hpp"
 #include "polygon.hpp"
 #include "renderbatch.hpp"
-#include "exception.hpp"
 #include "pbo.hpp"
 #include "signeddistancefield.hpp"
 #include "file.hpp"

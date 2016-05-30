@@ -34,7 +34,6 @@
 #include "renderbatch.hpp"
 #include "util.hpp"
 #include "shape.hpp"
-#include "exception.hpp"
 
 namespace uair {
 std::string RenderString::GetTag() const {

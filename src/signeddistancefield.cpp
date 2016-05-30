@@ -32,7 +32,6 @@
 #include <glm/gtx/fast_square_root.hpp>
 
 #include "openglstates.hpp"
-#include "exception.hpp"
 
 namespace uair {
 std::pair<std::vector<unsigned char>, glm::ivec2> SignedDistanceField::GenerateFromFile(const std::string& textureFile) {

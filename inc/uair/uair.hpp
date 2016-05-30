@@ -38,7 +38,6 @@
 #include "windowstyles.hpp"
 
 #include "manager.hpp"
-#include "exception.hpp"
 #include "scene.hpp"
 #include "scenemanager.hpp"
 #include "timer.hpp"
