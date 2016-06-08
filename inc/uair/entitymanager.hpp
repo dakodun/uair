@@ -104,6 +104,11 @@ class EntityManager {
 					
 					
 				}
+				
+				bool operator ==(const Handle &other) const {
+					return (mIndex == other.mIndex && mCounter == other.mCounter &&
+							mName == other.mName);
+				}
 			public :
 				unsigned int mIndex = 0u; // the index of the resource in the store
 				unsigned int mCounter = 0u; // the counter value of the index used to validate the handle

@@ -42,6 +42,16 @@ void System::RegisterEntity(EntityManager::Handle handle) {
 	mRegisteredEntities.push_back(std::move(handle));
 }
 
+void System::UnregisterEntity(EntityManager::Handle handle) {
+	if (!mRegisteredEntities.empty()) {
+		for (unsigned int i = mRegisteredEntities.size() - 1; i >= 0u; ++i) {
+			if (mRegisteredEntities.at(i) == handle) {
+				mRegisteredEntities.erase(mRegisteredEntities.begin() + i);
+			}
+		}
+	}
+}
+
 EntityManager::Handle System::AddEntity(const std::string& entityName) {
 	try {
 		return mSystemManagerPtr->GetEntityManager().Add(entityName);

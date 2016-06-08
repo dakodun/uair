@@ -172,6 +172,11 @@ class Manager {
 					
 					
 				}
+				
+				bool operator ==(const Handle &other) const {
+					return (mTypeID == other.mTypeID && mIndex == other.mIndex &&
+							mCounter == other.mCounter && mName == other.mName);
+				}
 			public :
 				unsigned int mTypeID = 0u; // a unique identifier that identifies a the managed type the resource belongs to
 				unsigned int mIndex = 0u; // the index of the resource in the store

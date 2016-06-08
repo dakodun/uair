@@ -45,6 +45,9 @@ class System {
 		// register an entity handle to the system indicating it should be processed by the system
 		void RegisterEntity(EntityManager::Handle handle);
 		
+		// unregister an entity handle from the system to prevent further processing by the system
+		void UnregisterEntity(EntityManager::Handle handle);
+		
 		// component manager helpers
 		template <typename T>
 		void RegisterComponentType();
