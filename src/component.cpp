@@ -32,8 +32,22 @@ Component::Component(const std::string& componentName) : mName(componentName) {
 	
 }
 
+Component::Component(Component&& other) : Component() {
+	swap(*this, other);
+}
+
 Component::~Component() {
 
+}
+
+Component& Component::operator=(Component other) {
+	swap(*this, other);
+	
+	return *this;
+}
+
+void swap(Component& first, Component& second) {
+	std::swap(first.mName, second.mName);
 }
 
 std::string Component::GetName() const {

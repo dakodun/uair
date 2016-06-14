@@ -30,12 +30,22 @@
 #include "messagesystem.hpp"
 
 namespace uair {
-System::System(SystemManager* systemManager) : mSystemManagerPtr(systemManager) {
-	
+System::System(System&& other) : System() {
+	swap(*this, other);
 }
 
 System::~System() {
 	
+}
+
+System& System::operator=(System other) {
+	swap(*this, other);
+	
+	return *this;
+}
+
+void swap(System& first, System& second) {
+	std::swap(first.mRegisteredEntities, second.mRegisteredEntities);
 }
 
 void System::RegisterEntity(EntityManager::Handle handle) {
@@ -52,88 +62,24 @@ void System::UnregisterEntity(EntityManager::Handle handle) {
 	}
 }
 
-EntityManager::Handle System::AddEntity(const std::string& entityName) {
-	try {
-		return mSystemManagerPtr->GetEntityManager().Add(entityName);
-	} catch (std::exception& e) {
-		throw;
-	}
-}
 
-void System::RemoveEntity(const EntityManager::Handle& handle) {
-	try {
-		mSystemManagerPtr->GetEntityManager().Remove(handle);
-	} catch (std::exception& e) {
-		throw;
-	}
-}
-
-Entity& System::GetEntity(const EntityManager::Handle& handle) {
-	try {
-		return mSystemManagerPtr->GetEntityManager().Get(handle);
-	} catch (std::exception& e) {
-		throw;
-	}
-}
-
-void System::PushMessageString(const unsigned int& systemTypeID, const unsigned int& messageTypeID, const std::string& messageString) {
-	mSystemManagerPtr->GetMessageSystem().PushMessageString(systemTypeID, messageTypeID, messageString);
-}
-
-unsigned int System::GetMessageCount() {
-	return mSystemManagerPtr->GetMessageSystem().GetMessageCount();
-}
-
-unsigned int System::GetSystemType(const unsigned int& index) {
-	try {
-		return mSystemManagerPtr->GetMessageSystem().GetSystemType(index);
-	} catch (std::exception& e) {
-		throw;
-	}
-}
-
-unsigned int System::GetMessageType(const unsigned int& index) {
-	try {
-		return mSystemManagerPtr->GetMessageSystem().GetMessageType(index);
-	} catch (std::exception& e) {
-		throw;
-	}
-}
-
-int System::GetMessageState(const unsigned int& index) {
-	try {
-		return mSystemManagerPtr->GetMessageSystem().GetMessageState(index);
-	} catch (std::exception& e) {
-		throw;
-	}
-}
-
-void System::PopMessage(const unsigned int& index) {
-	mSystemManagerPtr->GetMessageSystem().PopMessage(index);
-}
-
-
-SystemManager::SystemManager(EntityManager& entityManager, Manager<Component>& componentManager, MessageSystem& messageSystem) :
-		mEntityManager(entityManager), mComponentManager(componentManager), mMessageSystem(messageSystem) {
-	
-	
+SystemManager::SystemManager(SystemManager&& other) : SystemManager() {
+	swap(*this, other);
 }
 
 SystemManager::~SystemManager() {
 	for (auto iter = mStore.begin(); iter != mStore.end(); ++iter) { // for all registered systems...
-		delete iter->second;
+		delete iter->second; // delete the resource store via the base pointer
 	}
 }
 
-EntityManager& SystemManager::GetEntityManager() {
-	return mEntityManager;
+SystemManager& SystemManager::operator=(SystemManager other) {
+	swap(*this, other);
+	
+	return *this;
 }
 
-Manager<Component>& SystemManager::GetComponentManager() {
-	return mComponentManager;
-}
-
-MessageSystem& SystemManager::GetMessageSystem() {
-	return mMessageSystem;
+void swap(SystemManager& first, SystemManager& second) {
+	std::swap(first.mStore, second.mStore);
 }
 }

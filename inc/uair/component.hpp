@@ -34,10 +34,15 @@ namespace uair {
 // base class for all components allowing them to be handled as the same resource (via base pointers)
 class Component {
 	public :
-		// derived classes should implement a constructer that optionally takes a name to identify this component
 		Component(const std::string& componentName = "");
+		Component(const Component& other) = delete;
+		Component(Component&& other);
 		
 		virtual ~Component();
+		
+		Component& operator=(Component other);
+		
+		friend void swap(Component& first, Component& second);
 		
 		// return the name (if any) assigned to this component
 		std::string GetName() const;

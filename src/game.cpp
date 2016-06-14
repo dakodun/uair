@@ -257,6 +257,7 @@ void Game::Clear() {
 	mDefaultShader.Clear(); // remove the default shader
 	mSceneManager->Clear(); // clear the scene manager
 	mResourceManager = std::move(Manager<Resource>());
+	mEntitySystem = std::move(EntitySystem());
 	
 	mContext.reset(); // remove the context
 	mWindow.reset(); // remove the window
@@ -555,67 +556,113 @@ void Game::HandleEventQueue(const WindowEvent& e) {
 	}
 }
 
-EntitySystem& Game::GetEntitySystem() {
-	return mEntitySystem;
-}
-
-EntitySystem::EntityHandle Game::AddEntity(const std::string& entityName) {
-	try {
-		return mEntitySystem.AddEntity(entityName);
-	} catch (std::exception& e) {
-		throw;
+// begin entity system helpers...
+	EntitySystem::EntityHandle Game::AddEntity(const std::string& name) {
+		try {
+			return mEntitySystem.AddEntity(name);
+		} catch (std::exception& e) {
+			throw;
+		}
 	}
-}
-
-void Game::RemoveEntity(const EntitySystem::EntityHandle& handle) {
-	try {
-		mEntitySystem.RemoveEntity(handle);
-	} catch (std::exception& e) {
-		throw;
+	
+	void Game::RemoveEntity(const EntitySystem::EntityHandle& handle) {
+		try {
+			mEntitySystem.RemoveEntity(handle);
+		} catch (std::exception& e) {
+			throw;
+		}
 	}
-}
-
-Entity& Game::GetEntity(const EntitySystem::EntityHandle& handle) {
-	try {
-		return mEntitySystem.GetEntity(handle);
-	} catch (std::exception& e) {
-		throw;
+	
+	void Game::RemoveEntities(const std::string& name) {
+		try {
+			mEntitySystem.RemoveEntities(name);
+		} catch (std::exception& e) {
+			throw;
+		}
 	}
-}
-
-void Game::PushMessageString(const unsigned int& systemTypeID, const unsigned int& messageTypeID, const std::string& messageString) {
-	mEntitySystem.PushMessageString(systemTypeID, messageTypeID, messageString);
-}
-
-unsigned int Game::GetMessageCount() {
-	return mEntitySystem.GetMessageCount();
-}
-
-unsigned int Game::GetSystemType(const unsigned int& index) {
-	try {
-		return mEntitySystem.GetSystemType(index);
-	} catch (std::exception& e) {
-		throw;
+	
+	void Game::RemoveEntities() {
+		try {
+			mEntitySystem.RemoveEntities();
+		} catch (std::exception& e) {
+			throw;
+		}
 	}
-}
-
-unsigned int Game::GetMessageType(const unsigned int& index) {
-	try {
-		return mEntitySystem.GetMessageType(index);
-	} catch (std::exception& e) {
-		throw;
+	
+	Entity& Game::GetEntity(const EntitySystem::EntityHandle& handle) {
+		try {
+			return mEntitySystem.GetEntity(handle);
+		} catch (std::exception& e) {
+			throw;
+		}
 	}
-}
-
-int Game::GetMessageState(const unsigned int& index) {
-	try {
-		return mEntitySystem.GetMessageState(index);
-	} catch (std::exception& e) {
-		throw;
+	
+	std::list< std::reference_wrapper<Entity> > Game::GetEntities(const std::string& name) {
+		try {
+			return mEntitySystem.GetEntities(name);
+		} catch (std::exception& e) {
+			throw;
+		}
 	}
-}
-
-void Game::PopMessage(const unsigned int& index) {
-	mEntitySystem.PopMessage(index);
-}
+	
+	std::list< std::reference_wrapper<Entity> > Game::GetEntities() {
+		try {
+			return mEntitySystem.GetEntities();
+		} catch (std::exception& e) {
+			throw;
+		}
+	}
+	
+	std::list<EntitySystem::EntityHandle> Game::GetEntityHandles(const std::string& name) {
+		try {
+			return mEntitySystem.GetEntityHandles(name);
+		} catch (std::exception& e) {
+			throw;
+		}
+	}
+	
+	std::list<EntitySystem::EntityHandle> Game::GetEntityHandles() {
+		try {
+			return mEntitySystem.GetEntityHandles();
+		} catch (std::exception& e) {
+			throw;
+		}
+	}
+	
+	void Game::PushMessageString(const unsigned int& systemTypeID, const unsigned int& messageTypeID, const std::string& messageString) {
+		mEntitySystem.PushMessageString(systemTypeID, messageTypeID, messageString);
+	}
+	
+	unsigned int Game::GetMessageCount() {
+		return mEntitySystem.GetMessageCount();
+	}
+	
+	unsigned int Game::GetSystemType(const unsigned int& index) {
+		try {
+			return mEntitySystem.GetSystemType(index);
+		} catch (std::exception& e) {
+			throw;
+		}
+	}
+	
+	unsigned int Game::GetMessageType(const unsigned int& index) {
+		try {
+			return mEntitySystem.GetMessageType(index);
+		} catch (std::exception& e) {
+			throw;
+		}
+	}
+	
+	int Game::GetMessageState(const unsigned int& index) {
+		try {
+			return mEntitySystem.GetMessageState(index);
+		} catch (std::exception& e) {
+			throw;
+		}
+	}
+	
+	void Game::PopMessage(const unsigned int& index) {
+		mEntitySystem.PopMessage(index);
+	}
+// ...end entity system helpers
 }

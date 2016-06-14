@@ -32,13 +32,11 @@
 #include "component.hpp"
 
 namespace uair {
-class EntityManager;
-
 // an entity represents a game object and is essentially just a listing of components
 class Entity {
 	public :
-		// assign a pointer to the manager that creates this entity and a unique id
-		Entity(EntityManager* entityManager, const unsigned int& entityID, const std::string& entityName = "");
+		// assign a unique entity id (unique within entity manager that created entity) and an entity name
+		Entity(const unsigned int& entityID, const std::string& entityName = "");
 		
 		// entities shouldn't be copied
 		Entity(const Entity& other) = delete;
@@ -46,38 +44,54 @@ class Entity {
 		// entities can be moved (required by manager)
 		Entity(Entity&& other);
 		
-		// remove all associated components
-		~Entity();
-		
 		Entity& operator=(Entity other);
 		
 		friend void swap(Entity& first, Entity& second);
 		
-		// create and associate a custom component with this entity
-		template<typename T, typename ...Ps>
-		Manager<Component>::Handle AddComponent(const Ps&... params);
-		
-		// remove all components from the entity
-		void RemoveAllComponents();
-		
-		// remove all components of a type from the entity
-		template<typename T>
-		void RemoveComponents();
-		
-		// remove all components of a type with the specified name from the entity
-		template<typename T>
-		void RemoveComponents(const std::string& name);
-		
-		// return an array of handles to all components associated with this entity
-		std::vector<Manager<Component>::Handle> GetAllComponents();
-		
-		// return an array of handles to all components of a type associated with this entity
-		template<typename T>
-		std::vector<Manager<Component>::Handle> GetComponents();
-		
-		// return an array of handles to all components of a type with the specified name associated with this entity
-		template<typename T>
-		std::vector<Manager<Component>::Handle> GetComponents(const std::string& name);
+		// begin manager helper functions...
+			template <typename T>
+			void RegisterComponent();
+			
+			template <typename T>
+			bool IsComponentRegistered();
+			
+			template <typename T, typename ...Ps>
+			Manager<Component>::Handle AddComponent(const std::string& name, const Ps&... params);
+			
+			template <typename T>
+			void RemoveComponent(const Manager<Component>::Handle& handle);
+			
+			template <typename T>
+			void RemoveComponents(const std::string& name);
+			
+			template <typename T>
+			void RemoveComponents();
+			
+			void RemoveComponent(const Manager<Component>::Handle& handle);
+			
+			void RemoveComponents(const std::string& name);
+			
+			void RemoveComponents();
+			
+			template <typename T>
+			T& GetComponent(const Manager<Component>::Handle& handle);
+			
+			template <typename T>
+			std::list< std::reference_wrapper<T> > GetComponents(const std::string& name);
+			
+			template <typename T>
+			std::list< std::reference_wrapper<T> > GetComponents();
+			
+			template <typename T>
+			std::list<Manager<Component>::Handle> GetComponentHandles(const std::string& name);
+			
+			template <typename T>
+			std::list<Manager<Component>::Handle> GetComponentHandles();
+			
+			std::list<Manager<Component>::Handle> GetComponentHandles(const std::string& name);
+			
+			std::list<Manager<Component>::Handle> GetComponentHandles();
+		// ...end manager helper functions
 		
 		// return the unique id assigned to this entity
 		unsigned int GetEntityID() const;
@@ -85,8 +99,7 @@ class Entity {
 		// return the name (if any) assigned to this entity
 		std::string GetName() const;
 	private :
-		EntityManager* mEntityManagerPtr; // a pointer to the entity manager that created this entity
-		std::vector<Manager<Component>::Handle> mComponents; // store of component handles belonging to this entity
+		Manager<Component> mComponentManager; // manager to handle creation, storage and destruction of components
 		
 		unsigned int mEntityID = 0u;
 		std::string mName = "";
@@ -115,8 +128,15 @@ class EntityManager {
 				std::string mName = ""; // a name that the handled resource can be identified by (non-unique)
 		};
 	public :
-		// assign a reference to the associated component manager allowing created entities to attach custom components
-		EntityManager(Manager<Component>& componentManager);
+		EntityManager() = default;
+		EntityManager(const EntityManager& other) = delete;
+		EntityManager(EntityManager&& other);
+		
+		~EntityManager() = default;
+		
+		EntityManager& operator=(EntityManager other);
+		
+		friend void swap(EntityManager& first, EntityManager& second);
 		
 		// add a new entity with the specified name to the store and return a custom handle to it
 		Handle Add(const std::string& name);
@@ -124,105 +144,131 @@ class EntityManager {
 		// remove an entity from the store
 		void Remove(const Handle& handle);
 		
-		// remove all entities owith the specified name from the store
+		// remove all entities with the specified name from the store
 		void Remove(const std::string& name);
 		
-		// return a reference to an entity pointed to by the supplied handle
+		// remove ALL entities from the store
+		void Remove();
+		
+		// return a reference to en entity to by the supplied handle
 		Entity& Get(const Handle& handle);
 		
 		// return a list of references matching name
 		std::list< std::reference_wrapper<Entity> > Get(const std::string& name);
 		
-		// return a reference to the component manager associated with this entity manager
-		Manager<Component>& GetComponentManager();
+		// return a list of references to ALL entities
+		std::list< std::reference_wrapper<Entity> > Get();
+		
+		// return handles to entities matching name
+		std::list<Handle> GetHandles(const std::string& name);
+		
+		// return handles to ALL entities
+		std::list<Handle> GetHandles();
 	private :
-		Manager<Component>& mComponentManager; // a reference to the component manager associated with this entity manager
 		Store<Entity> mStore; // the store used to hold entities (see manager<T> class)
 		
-		unsigned int mEntityCount = 1u; // the counter used to assign a unique id to an entity
+		unsigned int mEntityCount = 0u; // the counter used to assign a unique id to an entity
 };
 
-template<typename T, typename ...Ps>
-Manager<Component>::Handle Entity::AddComponent(const Ps&... params) {
-	Manager<Component>::Handle newComponentHandle = mEntityManagerPtr->GetComponentManager().Add<T>(params...);
-	mComponents.push_back(newComponentHandle);
-	return newComponentHandle;
-}
-
-template<typename T>
-void Entity::RemoveComponents() {
-	T temp;
-	
-	for (unsigned int i = 0u; i < mComponents.size(); ) {
-		if (mComponents.at(i).mTypeID == temp.GetTypeID()) {
-			try {
-				mEntityManagerPtr->GetComponentManager().Remove(*(mComponents.begin() + i)); // invoke removal via the component manager
-				mComponents.erase(mComponents.begin() + i);
-			} catch (std::exception& e) {
-				throw;
-			}
-			
-			continue;
+template <typename T>
+void Entity::RegisterComponent() {
+	try {
+		if (!mComponentManager.IsRegistered<T>()) {
+			mComponentManager.Register<T>();
 		}
-		
-		++i;
+	} catch (std::exception& e) {
+		throw;
 	}
 }
 
-template<typename T>
+template <typename T>
+bool Entity::IsComponentRegistered() {
+	return mComponentManager.IsRegistered<T>();
+}
+
+template <typename T, typename ...Ps>
+Manager<Component>::Handle Entity::AddComponent(const std::string& name, const Ps&... params) {
+	try {
+		if (!mComponentManager.IsRegistered<T>()) {
+			mComponentManager.Register<T>();
+		}
+		
+		return mComponentManager.Add<T, Ps...>(name, params...);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+template <typename T>
+void Entity::RemoveComponent(const Manager<Component>::Handle& handle) {
+	try {
+		mComponentManager.Remove<T>(handle);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+template <typename T>
 void Entity::RemoveComponents(const std::string& name) {
-	T temp;
-	
-	for (unsigned int i = 0u; i < mComponents.size(); ) {
-		if (mComponents.at(i).mTypeID == temp.GetTypeID()) {
-			Component& component = mEntityManagerPtr->GetComponentManager().Get<T>(mComponents.at(i));
-			
-			if (component.GetName() == name) {
-				try {
-					mEntityManagerPtr->GetComponentManager().Remove(*(mComponents.begin() + i)); // invoke removal via the component manager
-					mComponents.erase(mComponents.begin() + i);
-				} catch (std::exception& e) {
-					throw;
-				}
-				
-				continue;
-			}
-		}
-		
-		++i;
+	try {
+		mComponentManager.Remove<T>(name);
+	} catch (std::exception& e) {
+		throw;
 	}
 }
 
-template<typename T>
-std::vector<Manager<Component>::Handle> Entity::GetComponents() {
-	std::vector<Manager<Component>::Handle> components;
-	T temp;
-	
-	for (auto iter = mComponents.begin(); iter != mComponents.end(); ++iter) {
-		if (iter->mTypeID == temp.GetTypeID()) {
-			components.push_back(*iter);
-		}
+template <typename T>
+void Entity::RemoveComponents() {
+	try {
+		mComponentManager.Remove<T>();
+	} catch (std::exception& e) {
+		throw;
 	}
-	
-	return components;
 }
 
-template<typename T>
-std::vector<Manager<Component>::Handle> Entity::GetComponents(const std::string& name) {
-	std::vector<Manager<Component>::Handle> components;
-	T temp;
-	
-	for (auto iter = mComponents.begin(); iter != mComponents.end(); ++iter) {
-		if (iter->mTypeID == temp.GetTypeID()) {
-			Component& component = mEntityManagerPtr->GetComponentManager().Get<T>(*iter);
-			
-			if (component.GetName() == name) {
-				components.push_back(*iter);
-			}
-		}
+template <typename T>
+T& Entity::GetComponent(const Manager<Component>::Handle& handle) {
+	try {
+		return mComponentManager.Get<T>(handle);
+	} catch (std::exception& e) {
+		throw;
 	}
-	
-	return components;
+}
+
+template <typename T>
+std::list< std::reference_wrapper<T> > Entity::GetComponents(const std::string& name) {
+	try {
+		return mComponentManager.Get<T>(name);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+template <typename T>
+std::list< std::reference_wrapper<T> > Entity::GetComponents() {
+	try {
+		return mComponentManager.Get<T>();
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+template <typename T>
+std::list<Manager<Component>::Handle> Entity::GetComponentHandles(const std::string& name) {
+	try {
+		return mComponentManager.GetHandles<T>(name);
+	} catch (std::exception& e) {
+		throw;
+	}
+}
+
+template <typename T>
+std::list<Manager<Component>::Handle> Entity::GetComponentHandles() {
+	try {
+		return mComponentManager.GetHandles<T>();
+	} catch (std::exception& e) {
+		throw;
+	}
 }
 }
 

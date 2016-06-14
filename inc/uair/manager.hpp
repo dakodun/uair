@@ -50,6 +50,15 @@ class StoreBase {
 		
 		// virtual remove function allows us to delete entries without knowing their type (using only a name)
 		virtual void Remove(const std::string& name) = 0;
+		
+		// virtual remove function allows us to delete ALL entries without knowing their type
+		virtual void Remove() = 0;
+		
+		// virtual get function allows us to return handles to entries without knowing their type (using only a name)
+		virtual std::list< std::tuple<unsigned int, unsigned int, std::string> > GetHandles(const std::string& name) = 0;
+		
+		// virtual get function allows us to return handles to ALL entries without knowing their type
+		virtual std::list< std::tuple<unsigned int, unsigned int, std::string> > GetHandles() = 0;
 };
 
 // templated store class that maintains resources of the specified type
@@ -130,6 +139,17 @@ class Store : public StoreBase {
 			}
 		}
 		
+		void Remove() {
+			for (unsigned int i = 0u; i < mStore.size(); ++i) { // for all resources in the store...
+				if (mStore.at(i).mActive) {
+					mStore.at(i).mActive = false; // indicate the resource has been removed
+					++mStore.at(i).mCounter; // increment the counter to invalidate existing handles
+					mStore.at(i).mData.reset(nullptr); // delete the handled object
+					mFreeIndices.push(i); // add its index to the sorted queue of now free indices
+				}
+			}
+		}
+		
 		// return a reference to a handled resource given its index and counter (validity) value
 		T& Get(const unsigned int& index, const unsigned int& counter) {
 			// if the index is valid, the resource has not been removed and the counters match...
@@ -145,8 +165,49 @@ class Store : public StoreBase {
 			std::list< std::reference_wrapper<T> > result;
 			
 			for (auto iter = mStore.begin(); iter != mStore.end(); ++iter) { // for all resources in the store...
-				if (iter->mActive && iter->mName == name) { // if the name matches...
+				if (iter->mActive && iter->mName == name) { // if the resource has not been removed and the name matches...
 					result.push_back(std::ref(*(iter->mData.get()))); // add a reference to the resource to the list
+				}
+			}
+			
+			return result;
+		}
+		
+		// return a list of references to handled resources
+		std::list< std::reference_wrapper<T> > Get() {
+			std::list< std::reference_wrapper<T> > result;
+			
+			for (auto iter = mStore.begin(); iter != mStore.end(); ++iter) { // for all resources in the store...
+				if (iter->mActive) { // if the resource has not been removed...
+					result.push_back(std::ref(*(iter->mData.get()))); // add a reference to the resource to the list
+				}
+			}
+			
+			return result;
+		}
+		
+		// return a list of tuples containing the information required to build handles to resources with matching name
+		std::list< std::tuple<unsigned int, unsigned int, std::string> > GetHandles(const std::string& name) {
+			std::list< std::tuple<unsigned int, unsigned int, std::string> > result;
+			
+			unsigned int i = 0u;
+			for (auto iter = mStore.begin(); iter != mStore.end(); ++iter, ++i) { // for all resources in the store...
+				if (iter->mActive && iter->mName == name) { // if the resource has not been removed and the name matches...
+					result.emplace_back(std::make_tuple(i, iter->mCounter, iter->mName));
+				}
+			}
+			
+			return result;
+		}
+		
+		// return a list of tuples containing the information required to build handles to ALL resources
+		std::list< std::tuple<unsigned int, unsigned int, std::string> > GetHandles() {
+			std::list< std::tuple<unsigned int, unsigned int, std::string> > result;
+			
+			unsigned int i = 0u;
+			for (auto iter = mStore.begin(); iter != mStore.end(); ++iter, ++i) { // for all resources in the store...
+				if (iter->mActive) { // if the resource has not been removed...
+					result.emplace_back(std::make_tuple(i, iter->mCounter, iter->mName));
 				}
 			}
 			
@@ -223,6 +284,17 @@ class Manager {
 			mLookup.insert(std::make_pair(typeID, new Store<T>)); // add the unique id and new store to the lookup table
 		}
 		
+		template <typename T>
+		bool IsRegistered() {
+			unsigned int typeID = T::GetTypeID(); // get the type id relating to the resource type
+			auto lookupResult = mLookup.find(typeID); // search for the resource type in the lookup table
+			if (lookupResult != mLookup.end()) { // if the type id relating to the resource type is already registered...
+				return true;
+			}
+			
+			return false;
+		}
+		
 		// add a new resource of the specified type with the specified name to the store and return a custom handle to it
 		template <typename T, typename ...Ps>
 		Handle Add(const std::string& name, const Ps&... params) {
@@ -291,6 +363,25 @@ class Manager {
 			}
 		}
 		
+		// remove ALL resources of the specified type from the store
+		template <typename T>
+		void Remove() {
+			unsigned int typeID = T::GetTypeID(); // get the type id relating to the resource type
+			
+			auto lookupResult = mLookup.find(typeID); // search for the resource type in the lookup table
+			if (lookupResult == mLookup.end()) { // if the type id relating to the resource type isn't registered...
+				throw std::runtime_error("type not registered"); // an error has occurred, handle is invalid
+			}
+			
+			Store<T>* storePtr = static_cast< Store<T>* >(lookupResult->second); // get the correct type of store from the lookup and cast it from its base pointer
+			
+			try {
+				storePtr->Remove();
+			} catch (std::exception& e) {
+				throw;
+			}
+		}
+		
 		// remove a resource using only a handle (type unknown beforehand, derived from handle)
 		void Remove(const Handle& handle) {
 			auto lookupResult = mLookup.find(handle.mTypeID); // search for the resource type in the lookup table
@@ -311,6 +402,17 @@ class Manager {
 			try {
 				for (auto iter = mLookup.begin(); iter != mLookup.end(); ++iter) { // for all stored types...
 					(iter->second)->Remove(name); // remove any entry matching name
+				}
+			} catch (std::exception& e) {
+				throw;
+			}
+		}
+		
+		// remove ALL resources from ALL EVERY STORE
+		void Remove() {
+			try {
+				for (auto iter = mLookup.begin(); iter != mLookup.end(); ++iter) { // for all stored types...
+					(iter->second)->Remove();
 				}
 			} catch (std::exception& e) {
 				throw;
@@ -354,6 +456,131 @@ class Manager {
 			
 			try {
 				return storePtr->Get(name); // return a list of references to the stored resources 
+			} catch (std::exception& e) {
+				throw;
+			}
+		}
+		
+		// return a list of references to ALL resources of type
+		template <typename T>
+		std::list< std::reference_wrapper<T> > Get() {
+			unsigned int typeID = T::GetTypeID(); // get the type id relating to the resource type
+			
+			auto lookupResult = mLookup.find(typeID); // search for the resource type in the lookup table
+			if (lookupResult == mLookup.end()) { // if the type id relating to the resource type isn't registered...
+				throw std::runtime_error("type not registered"); // an error has occurred, handle is invalid
+			}
+			
+			Store<T>* storePtr = static_cast< Store<T>* >(lookupResult->second); // get the correct type of store from the lookup and cast it from its base pointer
+			
+			try {
+				return storePtr->Get(); // return a list of references to the stored resources 
+			} catch (std::exception& e) {
+				throw;
+			}
+		}
+		
+		// return handles to resources of type with matching name
+		template <typename T>
+		std::list<Handle> GetHandles(const std::string& name) {
+			unsigned int typeID = T::GetTypeID(); // get the type id relating to the resource type
+			
+			auto lookupResult = mLookup.find(typeID); // search for the resource type in the lookup table
+			if (lookupResult == mLookup.end()) { // if the type id relating to the resource type isn't registered...
+				throw std::runtime_error("type not registered"); // an error has occurred, handle is invalid
+			}
+			
+			Store<T>* storePtr = static_cast< Store<T>* >(lookupResult->second); // get the correct type of store from the lookup and cast it from its base pointer
+			
+			try {
+				std::list<Handle> handleList;
+				std::list< std::tuple<unsigned int, unsigned int, std::string> >
+						handleData = storePtr->GetHandles(name); // get handle data from the store
+				
+				// for all handle data in the list...
+				for (auto handleDataIter = handleData.begin(); handleDataIter != handleData.end(); ++handleDataIter) {
+					// construct a handle to the resource and add it to the list
+					handleList.emplace_back(typeID, std::get<0>(*handleDataIter),
+							std::get<1>(*handleDataIter), std::get<2>(*handleDataIter));
+				}
+				
+				return handleList;
+			} catch (std::exception& e) {
+				throw;
+			}
+		}
+		
+		// return handles to ALL resources of type
+		template <typename T>
+		std::list<Handle> GetHandles() {
+			unsigned int typeID = T::GetTypeID(); // get the type id relating to the resource type
+			
+			auto lookupResult = mLookup.find(typeID); // search for the resource type in the lookup table
+			if (lookupResult == mLookup.end()) { // if the type id relating to the resource type isn't registered...
+				throw std::runtime_error("type not registered"); // an error has occurred, handle is invalid
+			}
+			
+			Store<T>* storePtr = static_cast< Store<T>* >(lookupResult->second); // get the correct type of store from the lookup and cast it from its base pointer
+			
+			try {
+				std::list<Handle> handleList;
+				std::list< std::tuple<unsigned int, unsigned int, std::string> >
+						handleData = storePtr->GetHandles(); // get handle data from the store
+				
+				// for all handle data in the list...
+				for (auto handleDataIter = handleData.begin(); handleDataIter != handleData.end(); ++handleDataIter) {
+					// construct a handle to the resource and add it to the list
+					handleList.emplace_back(typeID, std::get<0>(*handleDataIter),
+							std::get<1>(*handleDataIter), std::get<2>(*handleDataIter));
+				}
+				
+				return handleList;
+			} catch (std::exception& e) {
+				throw;
+			}
+		}
+		
+		// return handles to resources with matching name FROM EVERY STORE
+		std::list<Handle> GetHandles(const std::string& name) {
+			try {
+				std::list<Handle> handleList;
+				
+				for (auto lookupIter = mLookup.begin(); lookupIter != mLookup.end(); ++lookupIter) { // for all stored types...
+					std::list< std::tuple<unsigned int, unsigned int, std::string> >
+							handleData = (lookupIter->second)->GetHandles(name); // get handle data from the store
+					
+					// for all handle data in the list...
+					for (auto handleDataIter = handleData.begin(); handleDataIter != handleData.end(); ++handleDataIter) {
+						// construct a handle to the resource and add it to the list
+						handleList.emplace_back(lookupIter->first, std::get<0>(*handleDataIter),
+								std::get<1>(*handleDataIter), std::get<2>(*handleDataIter));
+					}
+				}
+				
+				return handleList;
+			} catch (std::exception& e) {
+				throw;
+			}
+		}
+		
+		// return handles to ALL resources FROM EVERY STORE
+		std::list<Handle> GetHandles() {
+			try {
+				std::list<Handle> handleList;
+				
+				for (auto lookupIter = mLookup.begin(); lookupIter != mLookup.end(); ++lookupIter) { // for all stored types...
+					std::list< std::tuple<unsigned int, unsigned int, std::string> >
+							handleData = (lookupIter->second)->GetHandles(); // get handle data from the store
+					
+					// for all handle data in the list...
+					for (auto handleDataIter = handleData.begin(); handleDataIter != handleData.end(); ++handleDataIter) {
+						// construct a handle to the resource and add it to the list
+						handleList.emplace_back(lookupIter->first, std::get<0>(*handleDataIter),
+								std::get<1>(*handleDataIter), std::get<2>(*handleDataIter));
+					}
+				}
+				
+				return handleList;
 			} catch (std::exception& e) {
 				throw;
 			}

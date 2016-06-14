@@ -43,114 +43,124 @@ class EntitySystem {
 		typedef Manager<Component>::Handle ComponentHandle;
 		typedef EntityManager::Handle EntityHandle;
 	public :
-		EntitySystem();
+		EntitySystem() = default;
+		EntitySystem(const EntitySystem& other) = delete;
+		EntitySystem(EntitySystem&& other);
 		
-		// component manager helpers
-		template <typename T>
-		void RegisterComponentType();
+		~EntitySystem() = default;
 		
-		template <typename T>
-		T& GetComponent(const ComponentHandle& handle);
+		EntitySystem& operator=(EntitySystem other);
 		
-		// entity manager helpers
-		EntityHandle AddEntity(const std::string& entityName = "");
-		void RemoveEntity(const EntityHandle& handle);
-		Entity& GetEntity(const EntityHandle& handle);
+		friend void swap(EntitySystem& first, EntitySystem& second);
 		
-		// system manager helpers
-		template <typename T>
-		T& RegisterSystem();
+		// begin entity manager helpers...
+			EntityManager::Handle AddEntity(const std::string& name);
+			
+			void RemoveEntity(const EntityManager::Handle& handle);
+			void RemoveEntities(const std::string& name);
+			void RemoveEntities();
+			
+			Entity& GetEntity(const EntityManager::Handle& handle);
+			std::list< std::reference_wrapper<Entity> > GetEntities(const std::string& name);
+			std::list< std::reference_wrapper<Entity> > GetEntities();
+			
+			std::list<EntityManager::Handle> GetEntityHandles(const std::string& name);
+			std::list<EntityManager::Handle> GetEntityHandles();
+		// ...end entity manager helpers
 		
-		template <typename T>
-		T& GetSystem();
+		// begin system manager helpers...
+			template <typename T>
+			T& RegisterSystem();
+			
+			template <typename T>
+			void RemoveSystem();
+			
+			template <typename T>
+			T& GetSystem();
+		// ...end system manager helpers
 		
-		// message system helpers
-		template <class T>
-		void PushMessage(const unsigned int& systemTypeID, const T& messageIn);
-		void PushMessageString(const unsigned int& systemTypeID, const unsigned int& messageTypeID, const std::string& messageString);
-		
-		unsigned int GetMessageCount();
-		unsigned int GetSystemType(const unsigned int& index);
-		unsigned int GetMessageType(const unsigned int& index);
-		int GetMessageState(const unsigned int& index);
-		
-		template <class T>
-		T PeekMessage(const unsigned int& index);
-		
-		template <class T>
-		T GetMessage(const unsigned int& index);
-		
-		void PopMessage(const unsigned int& index);
+		// begin message system helpers...
+			template <class T>
+			void PushMessage(const unsigned int& systemTypeID, const T& messageIn);
+			void PushMessageString(const unsigned int& systemTypeID, const unsigned int& messageTypeID, const std::string& messageString);
+			
+			unsigned int GetMessageCount();
+			unsigned int GetSystemType(const unsigned int& index);
+			unsigned int GetMessageType(const unsigned int& index);
+			int GetMessageState(const unsigned int& index);
+			
+			template <class T>
+			T PeekMessage(const unsigned int& index);
+			
+			template <class T>
+			T GetMessage(const unsigned int& index);
+			
+			void PopMessage(const unsigned int& index);
+		// ...end message system helpers
 	private :
-		Manager<Component> mComponentManager;
 		EntityManager mEntityManager;
 		SystemManager mSystemManager;
 		
 		MessageSystem mMessageSystem;
 };
 
-template <typename T>
-void EntitySystem::RegisterComponentType() {
-	try {
-		mComponentManager.Register<T>();
-	} catch (std::exception& e) {
-		throw;
+// begin system manager helpers...
+	template <typename T>
+	T& EntitySystem::RegisterSystem() {
+		try {
+			return mSystemManager.Register<T>();
+		} catch (std::exception& e) {
+			throw;
+		}
 	}
-}
+	
+	template <typename T>
+	void EntitySystem::RemoveSystem() {
+		try {
+			mSystemManager.Remove<T>();
+		} catch (std::exception& e) {
+			throw;
+		}
+	}
+	
+	template <typename T>
+	T& EntitySystem::GetSystem() {
+		try {
+			return mSystemManager.Get<T>();
+		} catch (std::exception& e) {
+			throw;
+		}
+	}
+// ...end system manager helpers
 
-template <typename T>
-T& EntitySystem::GetComponent(const ComponentHandle& handle) {
-	try {
-		return mComponentManager.Get<T>(handle);
-	} catch (std::exception& e) {
-		throw;
+// begin message system helpers...
+	template <class T>
+	void EntitySystem::PushMessage(const unsigned int& systemTypeID, const T& messageIn) {
+		try {
+			mMessageSystem.PushMessage<T>(systemTypeID, messageIn);
+		} catch (std::exception& e) {
+			throw;
+		}
 	}
-}
 
-template <typename T>
-T& EntitySystem::RegisterSystem() {
-	try {
-		return mSystemManager.Register<T>();
-	} catch (std::exception& e) {
-		throw;
+	template <class T>
+	T EntitySystem::PeekMessage(const unsigned int& index) {
+		try {
+			return mMessageSystem.PeekMessage<T>(index);
+		} catch (std::exception& e) {
+			throw;
+		}
 	}
-}
 
-template <typename T>
-T& EntitySystem::GetSystem() {
-	try {
-		return mSystemManager.Get<T>();
-	} catch (std::exception& e) {
-		throw;
+	template <class T>
+	T EntitySystem::GetMessage(const unsigned int& index) {
+		try {
+			return mMessageSystem.GetMessage<T>(index);
+		} catch (std::exception& e) {
+			throw;
+		}
 	}
-}
-
-template <class T>
-void EntitySystem::PushMessage(const unsigned int& systemTypeID, const T& messageIn) {
-	try {
-		mMessageSystem.PushMessage<T>(systemTypeID, messageIn);
-	} catch (std::exception& e) {
-		throw;
-	}
-}
-
-template <class T>
-T EntitySystem::PeekMessage(const unsigned int& index) {
-	try {
-		return mMessageSystem.PeekMessage<T>(index);
-	} catch (std::exception& e) {
-		throw;
-	}
-}
-
-template <class T>
-T EntitySystem::GetMessage(const unsigned int& index) {
-	try {
-		return mMessageSystem.GetMessage<T>(index);
-	} catch (std::exception& e) {
-		throw;
-	}
-}
+// ...end message system helpers
 }
 
 #endif

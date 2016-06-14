@@ -38,47 +38,22 @@ class SystemManager;
 
 class System {
 	public :
-		System(SystemManager* systemManager);
+		System() = default;
+		System(const System& other) = delete;
+		System(System&& other);
 		
 		virtual ~System();
+		
+		System& operator=(System other);
+		
+		friend void swap(System& first, System& second);
 		
 		// register an entity handle to the system indicating it should be processed by the system
 		void RegisterEntity(EntityManager::Handle handle);
 		
 		// unregister an entity handle from the system to prevent further processing by the system
 		void UnregisterEntity(EntityManager::Handle handle);
-		
-		// component manager helpers
-		template <typename T>
-		void RegisterComponentType();
-		
-		template <typename T>
-		T& GetComponent(const Manager<Component>::Handle& handle);
-		
-		// entity manager helpers
-		EntityManager::Handle AddEntity(const std::string& entityName = "");
-		void RemoveEntity(const EntityManager::Handle& handle);
-		Entity& GetEntity(const EntityManager::Handle& handle);
-		
-		// message system helpers
-		template <class T>
-		void PushMessage(const unsigned int& systemTypeID, const T& messageIn);
-		void PushMessageString(const unsigned int& systemTypeID, const unsigned int& messageTypeID, const std::string& messageString);
-		
-		unsigned int GetMessageCount();
-		unsigned int GetSystemType(const unsigned int& index);
-		unsigned int GetMessageType(const unsigned int& index);
-		int GetMessageState(const unsigned int& index);
-		
-		template <class T>
-		T PeekMessage(const unsigned int& index);
-		
-		template <class T>
-		T GetMessage(const unsigned int& index);
-		
-		void PopMessage(const unsigned int& index);
 	protected :
-		SystemManager* mSystemManagerPtr; // a pointer to the system manager that this system is registered to
 		std::vector<EntityManager::Handle> mRegisteredEntities;
 };
 
@@ -86,11 +61,15 @@ class System {
 // a specialised version of the manager<T> class that handles creation, retrieval and removal of system objects
 class SystemManager {
 	public :
-		// assign a reference to the associated entity and component managers as well as the
-		// message system allowing access to them to registered systems
-		SystemManager(EntityManager& entityManager, Manager<Component>& componentManager, MessageSystem& messageSystem);
+		SystemManager() = default;
+		SystemManager(const SystemManager& other) = delete;
+		SystemManager(SystemManager&& other);
 		
 		~SystemManager();
+		
+		SystemManager& operator=(SystemManager other);
+		
+		friend void swap(SystemManager& first, SystemManager& second);
 		
 		// register a system to the system manager (creates a single instance of it) and return a reference
 		template <typename T>
@@ -103,67 +82,9 @@ class SystemManager {
 		// return a reference to a registered system
 		template <typename T>
 		T& Get();
-		
-		// return a reference to the entity manager associated with this system manager
-		EntityManager& GetEntityManager();
-		
-		// return a reference to the component manager associated with this system manager
-		Manager<Component>& GetComponentManager();
-		
-		// return a reference to the message system associated with this system manager
-		MessageSystem& GetMessageSystem();
 	private :
-		EntityManager& mEntityManager; // a reference to the entity manager associated with this system manager
-		Manager<Component>& mComponentManager; // a reference to the component manager associated with this system manager
-		MessageSystem& mMessageSystem; // a reference to the message system associated with this system manager
 		std::map<unsigned int, System*> mStore;
 };
-
-template <typename T>
-void System::RegisterComponentType() {
-	try {
-		mSystemManagerPtr->GetComponentManager().RegisterComponentType<T>();
-	} catch (std::exception& e) {
-		throw;
-	}
-}
-
-template <typename T>
-T& System::GetComponent(const Manager<Component>::Handle& handle) {
-	try {
-		return mSystemManagerPtr->GetComponentManager().Get<T>(handle);
-	} catch (std::exception& e) {
-		throw;
-	}
-}
-
-template <class T>
-void System::PushMessage(const unsigned int& systemTypeID, const T& messageIn) {
-	try {
-		mSystemManagerPtr->GetMessageSystem().PushMessage<T>(systemTypeID, messageIn);
-	} catch (std::exception& e) {
-		throw;
-	}
-}
-
-template <class T>
-T System::PeekMessage(const unsigned int& index) {
-	try {
-		return mSystemManagerPtr->GetMessageSystem().PeekMessage<T>(index);
-	} catch (std::exception& e) {
-		throw;
-	}
-}
-
-template <class T>
-T System::GetMessage(const unsigned int& index) {
-	try {
-		return mSystemManagerPtr->GetMessageSystem().GetMessage<T>(index);
-	} catch (std::exception& e) {
-		throw;
-	}
-}
-
 
 template <typename T>
 T& SystemManager::Register() {
@@ -178,7 +99,7 @@ T& SystemManager::Register() {
 		throw std::runtime_error("type already registered"); // an error has occurred, don't register system
 	}
 	
-	T* systemPtr = static_cast<T*>((mStore.insert(std::make_pair(typeID, new T(this))).first)->second); // add a new instance of the system to the store and cast it to its derived type
+	T* systemPtr = static_cast<T*>((mStore.insert(std::make_pair(typeID, new T)).first)->second); // add a new instance of the system to the store and cast it to its derived type
 	return *systemPtr; // return a reference
 }
 
