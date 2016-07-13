@@ -63,4 +63,8 @@ ResourcePtr<Shader> Renderable::GetShader() const {
 void Renderable::SetShader(ResourcePtr<Shader> shader) {
 	mShader = shader;
 }
+
+void Renderable::SetShader(Shader* shader) {
+	mShader.Set(shader);
+}
 }

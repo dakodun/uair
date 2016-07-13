@@ -56,6 +56,7 @@ class Renderable {
 		void SetAlpha(const float& newAlpha);
 		ResourcePtr<Shader> GetShader() const;
 		void SetShader(ResourcePtr<Shader> shader);
+		void SetShader(Shader* shader);
 	protected :
 		virtual std::list<RenderBatchData> Upload() = 0;
 	public :

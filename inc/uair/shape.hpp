@@ -101,6 +101,8 @@ class Shape : public Polygon, public Renderable {
 		
 		// set the animation attributes
 		void SetAnimation(const float& speed, const unsigned int& start, const unsigned int& end, const int& loops = -1);
+		void SetCurrentFrame(const unsigned int& frame);
+		unsigned int GetFrameCount();
 	protected :
 		// transform the shape into the correct format for rendering
 		std::list<RenderBatchData> Upload();

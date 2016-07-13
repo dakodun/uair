@@ -435,6 +435,19 @@ void Shape::SetAnimation(const float& speed, const unsigned int& start, const un
 	}
 }
 
+void Shape::SetCurrentFrame(const unsigned int& frame) {
+	size_t frameCount = mFrames.size(); // get the frame count
+	
+	if (frameCount > 0) { // if shape has any animation frames...
+		mAnimationTimer = 0.0f; // reset the current animation timer
+		mCurrentFrame = std::min(frameCount - 1, static_cast<size_t>(frame)); // set the end frame
+	}
+}
+
+unsigned int Shape::GetFrameCount() {
+	return mFrames.size();
+}
+
 std::list<RenderBatchData> Shape::Upload() {
 	RenderBatchData rbd; // rendering data struct
 	std::vector<unsigned int> vertCounts; // count of vertices in each contour

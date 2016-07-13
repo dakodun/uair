@@ -55,10 +55,10 @@ class StoreBase {
 		virtual void Remove() = 0;
 		
 		// virtual get function allows us to return handles to entries without knowing their type (using only a name)
-		virtual std::list< std::tuple<unsigned int, unsigned int, std::string> > GetHandles(const std::string& name) = 0;
+		virtual std::list< std::tuple<unsigned int, unsigned int, std::string> > GetHandles(const std::string& name) const = 0;
 		
 		// virtual get function allows us to return handles to ALL entries without knowing their type
-		virtual std::list< std::tuple<unsigned int, unsigned int, std::string> > GetHandles() = 0;
+		virtual std::list< std::tuple<unsigned int, unsigned int, std::string> > GetHandles() const = 0;
 };
 
 // templated store class that maintains resources of the specified type
@@ -187,7 +187,7 @@ class Store : public StoreBase {
 		}
 		
 		// return a list of tuples containing the information required to build handles to resources with matching name
-		std::list< std::tuple<unsigned int, unsigned int, std::string> > GetHandles(const std::string& name) {
+		std::list< std::tuple<unsigned int, unsigned int, std::string> > GetHandles(const std::string& name) const {
 			std::list< std::tuple<unsigned int, unsigned int, std::string> > result;
 			
 			unsigned int i = 0u;
@@ -201,7 +201,7 @@ class Store : public StoreBase {
 		}
 		
 		// return a list of tuples containing the information required to build handles to ALL resources
-		std::list< std::tuple<unsigned int, unsigned int, std::string> > GetHandles() {
+		std::list< std::tuple<unsigned int, unsigned int, std::string> > GetHandles() const {
 			std::list< std::tuple<unsigned int, unsigned int, std::string> > result;
 			
 			unsigned int i = 0u;
@@ -482,7 +482,7 @@ class Manager {
 		
 		// return handles to resources of type with matching name
 		template <typename T>
-		std::list<Handle> GetHandles(const std::string& name) {
+		std::list<Handle> GetHandles(const std::string& name) const {
 			unsigned int typeID = T::GetTypeID(); // get the type id relating to the resource type
 			
 			auto lookupResult = mLookup.find(typeID); // search for the resource type in the lookup table
@@ -512,7 +512,7 @@ class Manager {
 		
 		// return handles to ALL resources of type
 		template <typename T>
-		std::list<Handle> GetHandles() {
+		std::list<Handle> GetHandles() const {
 			unsigned int typeID = T::GetTypeID(); // get the type id relating to the resource type
 			
 			auto lookupResult = mLookup.find(typeID); // search for the resource type in the lookup table
@@ -541,7 +541,7 @@ class Manager {
 		}
 		
 		// return handles to resources with matching name FROM EVERY STORE
-		std::list<Handle> GetHandles(const std::string& name) {
+		std::list<Handle> GetHandles(const std::string& name) const {
 			try {
 				std::list<Handle> handleList;
 				
@@ -564,7 +564,7 @@ class Manager {
 		}
 		
 		// return handles to ALL resources FROM EVERY STORE
-		std::list<Handle> GetHandles() {
+		std::list<Handle> GetHandles() const {
 			try {
 				std::list<Handle> handleList;
 				

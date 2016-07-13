@@ -25,52 +25,32 @@
 **		   source distribution.
 ** **************************************************************** */
 
-#ifndef UAIRUAIR_HPP
-#define UAIRUAIR_HPP
-
-#include "init.hpp"
-
-#include "openglcontext.hpp"
-#include "openglstates.hpp"
-#include "window.hpp"
-#include "windowdisplaysettings.hpp"
-#include "windowevent.hpp"
-#include "windowstyles.hpp"
-
-#include "manager.hpp"
-#include "scene.hpp"
-#include "scenemanager.hpp"
-#include "timer.hpp"
-#include "util.hpp"
-#include "file.hpp"
-
-#include "entitysystem.hpp"
-
-#include "polygon.hpp"
-#include "transformable2d.hpp"
-#include "transformable3d.hpp"
-#include "triangulate.hpp"
-
-#include "font.hpp"
-#include "signeddistancefield.hpp"
-#include "renderbatch.hpp"
-#include "renderable.hpp"
-#include "shape.hpp"
-#include "renderstring.hpp"
-#include "texture.hpp"
-#include "renderbuffer.hpp"
-#include "fbo.hpp"
-#include "pbo.hpp"
-#include "vbo.hpp"
-#include "camera.hpp"
+#ifndef UAIRLAYOUTELEMENT_HPP
+#define UAIRLAYOUTELEMENT_HPP
 
 #include "layoutcontainer.hpp"
 #include "layoutdivision.hpp"
-#include "layoutelement.hpp"
-#include "layoutptr.hpp"
+#include "polygon.hpp"
 
-#include "sound.hpp"
-
-#include "game.hpp"
+namespace uair {
+class LayoutElement {
+	friend class LayoutContainer;
+	friend class LayoutDivision;
+	
+	public :
+		glm::vec2 GetPosition(const CoordinateSpace& coordinateSpace = CoordinateSpace::Local) const;
+		
+		void AssignToContainer(LayoutContainer* container);
+		void AssignToDivision(LayoutDivision* division, const unsigned int& row, const unsigned int & column);
+	
+	protected :
+		glm::vec2 mPosition = glm::vec2(0.0f);
+		
+		LayoutPtr<LayoutContainer> mLayoutContainer;
+		LayoutPtr<LayoutDivision> mLayoutDivision;
+		unsigned int mRow = 0u;
+		unsigned int mColumn = 0u;
+};
+}
 
 #endif
