@@ -568,6 +568,15 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND& hWnd, const UINT& message
 			
 			return 0;
 		}
+		case WM_CHAR : {
+			WindowEvent e;
+			e.mType = WindowEvent::TextInputType;
+			e.mTextInput.mInput = wParam;
+			
+			mEventQueue.push_back(e);
+			
+			return 0;
+		}
 	}
 	
 	// input related events: mouse

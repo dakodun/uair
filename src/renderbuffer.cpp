@@ -30,6 +30,7 @@
 #include <iostream>
 
 #include "openglstates.hpp"
+#include "util.hpp"
 
 namespace uair {
 RenderBuffer::RenderBuffer(RenderBuffer&& other) : RenderBuffer() {
@@ -55,8 +56,8 @@ void swap(RenderBuffer& first, RenderBuffer& second) {
 
 bool RenderBuffer::CreateRenderBuffer(const GLenum& internalformat, const unsigned int& width, const unsigned int& height) {
 	EnsureInitialised(); // ensure this render buffer has been set up properly
-	mWidth = width; // store the width
-	mHeight = height; // store the height
+	mWidth = util::NextPowerOf2(width); // store the width
+	mHeight = util::NextPowerOf2(height); // store the height
 	
 	glBindRenderbuffer(GL_RENDERBUFFER, mRenderBufferID); // bind this render buffer as the current
 	OpenGLStates::mCurrentRenderBuffer = mRenderBufferID; // set the current render buffer as this

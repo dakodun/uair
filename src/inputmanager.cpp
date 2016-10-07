@@ -312,6 +312,8 @@ void InputManager::Process() {
 			}
 		}
 	}
+	
+	mInputString = u"";
 }
 
 bool InputManager::GetKeyboardDown(const Keyboard & key) const {
@@ -354,6 +356,10 @@ unsigned int InputManager::GetKeyboardState(const Keyboard& key) const {
 	}
 	
 	return 0u; // otherwise return default of 'up'
+}
+
+std::u16string InputManager::GetInputString() const {
+	return mInputString;
 }
 
 bool InputManager::GetMouseDown(const Mouse & button) const {
@@ -513,6 +519,8 @@ void InputManager::Reset() {
 			}
 		}
 	}
+	
+	mInputString = u"";
 }
 
 void InputManager::HandleKeyboardKeys(const Keyboard & key, const unsigned int & type) {
@@ -530,6 +538,10 @@ void InputManager::HandleKeyboardKeys(const Keyboard & key, const unsigned int &
 			
 			break;
 	}
+}
+
+void InputManager::HandleTextInput(const char16_t& input) {
+	mInputString += input;
 }
 
 void InputManager::HandleMouseButtons(const Mouse & button, const unsigned int & type) {

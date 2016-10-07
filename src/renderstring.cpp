@@ -52,9 +52,13 @@ void RenderString::SetFont(Font* font) {
 	SetSize(mSize); // update the size of the font
 }
 
-void RenderString::SetText(const std::u32string& newText) {
+void RenderString::SetText(const std::u16string& newText) {
 	mString = newText; // update the string
 	mQuads.clear();
+}
+
+std::u16string RenderString::GetText() const {
+	return mString;
 }
 
 void RenderString::SetSize(const unsigned int& size) {
@@ -88,9 +92,9 @@ std::list<RenderBatchData> RenderString::Upload() {
 		int lineHeight = mFont->GetLineHeight(); // retrieve and store the new line offset
 		
 		for (unsigned int i = 0u; i < mString.size(); ++i) { // for all characters in the string...
-			char32_t codePoint = mString.at(i); // get the current character
+			char16_t codePoint = mString.at(i); // get the current character
 			
-			if (codePoint == U'\n') { // if the current character is a new line...
+			if (codePoint == u'\n') { // if the current character is a new line...
 				advanceAccum = 0; // reset the horizontal advance
 				kemingAccum = 0; // reset the kerning offset
 				lineOffset += lineHeight; // increment the vertical offset by the new line height

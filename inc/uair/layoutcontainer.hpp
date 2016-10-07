@@ -76,8 +76,8 @@ class LayoutContainer : public LayoutBase {
 		float mWidth = 0.0f;
 		float mHeight = 0.0f;
 		
-		Store<LayoutContainer> mContainers;
-		Store<LayoutDivision> mDivisions;
+		Store<LayoutBase, LayoutContainer> mContainers;
+		Store<LayoutBase, LayoutDivision> mDivisions;
 		
 		LayoutContainer* mParentContainer = nullptr;
 		LayoutDivision* mParentDivision = nullptr;

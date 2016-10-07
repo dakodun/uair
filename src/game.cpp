@@ -33,6 +33,7 @@
 #include "shape.hpp"
 #include "font.hpp"
 #include "soundbuffer.hpp"
+#include "gui.hpp"
 
 namespace uair {
 Game::Game() {
@@ -56,6 +57,7 @@ Game::Game() {
 	
 	Shape::mFrameLowerLimit = mFrameLowerLimit;
 	Font::mFTLibraryPtr = &mFTLibrary; // set the freetype library used by the font class to the newly initialised one
+	GUI::mInputManagerPtr = mInputManager;
 }
 
 Game::~Game() {
@@ -403,6 +405,10 @@ unsigned int Game::GetKeyboardState(const Keyboard& key) const {
 	return mInputManager->GetKeyboardState(key);
 }
 
+std::u16string Game::GetInputString() const {
+	return mInputManager->GetInputString();
+}
+
 bool Game::GetMouseDown(const Mouse & button) const {
 	return mInputManager->GetMouseDown(button);
 }
@@ -519,6 +525,10 @@ void Game::HandleEventQueue(const WindowEvent& e) {
 		}
 		case WindowEvent::KeyboardKeyType : {
 			mInputManager->HandleKeyboardKeys(e.mKeyboardKey.mKey, e.mKeyboardKey.mType);
+			break;
+		}
+		case WindowEvent::TextInputType : {
+			mInputManager->HandleTextInput(e.mTextInput.mInput);
 			break;
 		}
 		case WindowEvent::MouseButtonType : {

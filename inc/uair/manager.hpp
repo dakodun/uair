@@ -38,6 +38,8 @@
 
 namespace uair {
 // abstract base class that all typed stores inherit from ensuring they have the same base pointer
+// B is the base type managed by the store (can be the same as the derived type)
+template <class B>
 class StoreBase {
 	public :
 		// virtual destructor allows deletion of derived type using base pointer
@@ -54,6 +56,9 @@ class StoreBase {
 		// virtual remove function allows us to delete ALL entries without knowing their type
 		virtual void Remove() = 0;
 		
+		// virtual get function allows us to return an entry as a base pointer
+		virtual B* GetAsBase(const unsigned int& index, const unsigned int& counter) const = 0;
+		
 		// virtual get function allows us to return handles to entries without knowing their type (using only a name)
 		virtual std::list< std::tuple<unsigned int, unsigned int, std::string> > GetHandles(const std::string& name) const = 0;
 		
@@ -61,9 +66,10 @@ class StoreBase {
 		virtual std::list< std::tuple<unsigned int, unsigned int, std::string> > GetHandles() const = 0;
 };
 
-// templated store class that maintains resources of the specified type
-template <class T>
-class Store : public StoreBase {
+// templated store class that maintains resources of the specified derived type (T)
+// B is the base type managed by the store (can be the same as the derived type)
+template <class B, class T>
+class Store : public StoreBase<B> {
 	public :
 		// an entry into the store that holds the object as well as data to ensure validity
 		class StoreEntry {
@@ -186,6 +192,20 @@ class Store : public StoreBase {
 			return result;
 		}
 		
+		// return a base pointer to a resource
+		B* GetAsBase(const unsigned int& index, const unsigned int& counter) const {
+			if (!std::is_base_of<B, T>::value) { // if template type T is not base of template type B...
+				throw std::runtime_error("not of base type"); // an error has occurred, can't convert to base pointer
+			}
+			
+			// if the index is valid, the resource has not been removed and the counters match...
+			if (index < mStore.size() && mStore.at(index).mActive && mStore.at(index).mCounter == counter) {
+				return mStore.at(index).mData.get(); // return a base pointer to the object stored
+			}
+			
+			throw std::runtime_error("handle is invalid"); // an error has occurred, handle is invalid
+		}
+		
 		// return a list of tuples containing the information required to build handles to resources with matching name
 		std::list< std::tuple<unsigned int, unsigned int, std::string> > GetHandles(const std::string& name) const {
 			std::list< std::tuple<unsigned int, unsigned int, std::string> > result;
@@ -281,7 +301,7 @@ class Manager {
 				throw std::runtime_error("type already registered"); // an error has occurred, don't register resource type
 			}
 			
-			mLookup.insert(std::make_pair(typeID, new Store<T>)); // add the unique id and new store to the lookup table
+			mLookup.insert(std::make_pair(typeID, new Store<B, T>)); // add the unique id and new store to the lookup table
 		}
 		
 		template <typename T>
@@ -309,7 +329,7 @@ class Manager {
 				throw std::runtime_error("type not registered"); // an error has occurred, resource type is invalid
 			}
 			
-			Store<T>* storePtr = static_cast< Store<T>* >(lookupResult->second); // get the correct type of store from the lookup and cast it from its base pointer
+			Store<B, T>* storePtr = static_cast< Store<B, T>* >(lookupResult->second); // get the correct type of store from the lookup and cast it from its base pointer
 			std::pair<unsigned int, unsigned int> indexCounterPair; // 
 			
 			try {
@@ -335,7 +355,7 @@ class Manager {
 				throw std::runtime_error("type not registered"); // an error has occurred, handle is invalid
 			}
 			
-			Store<T>* storePtr = static_cast< Store<T>* >(lookupResult->second); // get the correct type of store from the lookup and cast it from its base pointer
+			Store<B, T>* storePtr = static_cast< Store<B, T>* >(lookupResult->second); // get the correct type of store from the lookup and cast it from its base pointer
 			
 			try {
 				storePtr->Remove(handle.mIndex, handle.mCounter); // remove the resource from the store using its index and counter (validity) value
@@ -354,7 +374,7 @@ class Manager {
 				throw std::runtime_error("type not registered"); // an error has occurred, handle is invalid
 			}
 			
-			Store<T>* storePtr = static_cast< Store<T>* >(lookupResult->second); // get the correct type of store from the lookup and cast it from its base pointer
+			Store<B, T>* storePtr = static_cast< Store<B, T>* >(lookupResult->second); // get the correct type of store from the lookup and cast it from its base pointer
 			
 			try {
 				storePtr->Remove(name); // remove all resources from the store with matching name
@@ -373,7 +393,7 @@ class Manager {
 				throw std::runtime_error("type not registered"); // an error has occurred, handle is invalid
 			}
 			
-			Store<T>* storePtr = static_cast< Store<T>* >(lookupResult->second); // get the correct type of store from the lookup and cast it from its base pointer
+			Store<B, T>* storePtr = static_cast< Store<B, T>* >(lookupResult->second); // get the correct type of store from the lookup and cast it from its base pointer
 			
 			try {
 				storePtr->Remove();
@@ -433,7 +453,7 @@ class Manager {
 				throw std::runtime_error("type not registered"); // an error has occurred, handle is invalid
 			}
 			
-			Store<T>* storePtr = static_cast< Store<T>* >(lookupResult->second); // get the correct type of store from the lookup and cast it from its base pointer
+			Store<B, T>* storePtr = static_cast< Store<B, T>* >(lookupResult->second); // get the correct type of store from the lookup and cast it from its base pointer
 			
 			try {
 				return storePtr->Get(handle.mIndex, handle.mCounter); // return a reference to the stored resource using its index and counter (validity) value
@@ -452,7 +472,7 @@ class Manager {
 				throw std::runtime_error("type not registered"); // an error has occurred, handle is invalid
 			}
 			
-			Store<T>* storePtr = static_cast< Store<T>* >(lookupResult->second); // get the correct type of store from the lookup and cast it from its base pointer
+			Store<B, T>* storePtr = static_cast< Store<B, T>* >(lookupResult->second); // get the correct type of store from the lookup and cast it from its base pointer
 			
 			try {
 				return storePtr->Get(name); // return a list of references to the stored resources 
@@ -471,10 +491,24 @@ class Manager {
 				throw std::runtime_error("type not registered"); // an error has occurred, handle is invalid
 			}
 			
-			Store<T>* storePtr = static_cast< Store<T>* >(lookupResult->second); // get the correct type of store from the lookup and cast it from its base pointer
+			Store<B, T>* storePtr = static_cast< Store<B, T>* >(lookupResult->second); // get the correct type of store from the lookup and cast it from its base pointer
 			
 			try {
 				return storePtr->Get(); // return a list of references to the stored resources 
+			} catch (std::exception& e) {
+				throw;
+			}
+		}
+		
+		// return a base pointer to a resource pointed to by the supplied handle
+		B* GetAsBase(const Handle& handle) {
+			auto lookupResult = mLookup.find(handle.mTypeID); // search for the resource type in the lookup table
+			if (lookupResult == mLookup.end()) { // if the type id relating to the resource type isn't registered...
+				throw std::runtime_error("type not registered"); // an error has occurred, handle is invalid
+			}
+			
+			try {
+				return (lookupResult->second)->GetAsBase(handle.mIndex, handle.mCounter);
 			} catch (std::exception& e) {
 				throw;
 			}
@@ -490,7 +524,7 @@ class Manager {
 				throw std::runtime_error("type not registered"); // an error has occurred, handle is invalid
 			}
 			
-			Store<T>* storePtr = static_cast< Store<T>* >(lookupResult->second); // get the correct type of store from the lookup and cast it from its base pointer
+			Store<B, T>* storePtr = static_cast< Store<B, T>* >(lookupResult->second); // get the correct type of store from the lookup and cast it from its base pointer
 			
 			try {
 				std::list<Handle> handleList;
@@ -520,7 +554,7 @@ class Manager {
 				throw std::runtime_error("type not registered"); // an error has occurred, handle is invalid
 			}
 			
-			Store<T>* storePtr = static_cast< Store<T>* >(lookupResult->second); // get the correct type of store from the lookup and cast it from its base pointer
+			Store<B, T>* storePtr = static_cast< Store<B, T>* >(lookupResult->second); // get the correct type of store from the lookup and cast it from its base pointer
 			
 			try {
 				std::list<Handle> handleList;
@@ -587,7 +621,7 @@ class Manager {
 		}
 	
 	private :
-		std::map<unsigned int, StoreBase*> mLookup; // a table mapping a resource's unique identifier to its storage
+		std::map<unsigned int, StoreBase<B>*> mLookup; // a table mapping a resource's unique identifier to its storage
 };
 }
 

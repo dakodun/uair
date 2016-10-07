@@ -45,7 +45,8 @@ class RenderString : public Transformable2D, public Renderable {
 		
 		void SetFont(ResourcePtr<Font> font); // set the font from a resource pointer
 		void SetFont(Font* font); // set the font from a raw pointer
-		void SetText(const std::u32string& newText); // change the string
+		void SetText(const std::u16string& newText); // change the string
+		std::u16string GetText() const;
 		void SetSize(const unsigned int& size); // set the size of the string
 	protected :
 		void UpdateGlobalBoundingBox();
@@ -57,7 +58,7 @@ class RenderString : public Transformable2D, public Renderable {
 		void CreateVBOVertices(); // create vertices for rendering from the vertices, transform matrix, and colours supplied
 	private :
 		ResourcePtr<Font> mFont; // the font associated with this render string
-		std::u32string mString; // the content of the render string
+		std::u16string mString; // the content of the render string
 		unsigned int mSize = 1u; // the size the string is to be rendered at
 		
 		std::list<Shape> mQuads; // a list of individual glyph quads store for efficiency

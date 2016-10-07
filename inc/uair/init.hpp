@@ -39,6 +39,8 @@
 		#define NOMINMAX
 	#endif
 	
+	#define UNICODE
+	
 	#include <windows.h>
 	#include <windowsx.h>
 	

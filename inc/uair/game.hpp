@@ -108,6 +108,7 @@ class Game {
 		bool GetKeyboardPressed(const Keyboard & key) const;
 		bool GetKeyboardReleased(const Keyboard & key) const;
 		unsigned int GetKeyboardState(const Keyboard& key) const;
+		std::u16string GetInputString() const;
 		bool GetMouseDown(const Mouse & button) const;
 		bool GetMousePressed(const Mouse & button) const;
 		bool GetMouseReleased(const Mouse & button) const;

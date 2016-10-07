@@ -71,11 +71,11 @@ class Font : public Resource {
 		void CreateCache(const std::string& cacheFilename); // create a cache file of the current font
 		bool LoadFromCache(const std::string& cacheFilename); // create the font from a cache file
 		bool LoadFromFile(const std::string& filename, const unsigned int& pointSize = 72u); // load a font file for glyph loading
-		void LoadGlyph(const char32_t& charCode); // add a glyph to the font's texture
-		void LoadGlyphs(const std::vector<char32_t>& charCodes); // add glyphs to the font's texture
+		void LoadGlyph(const char16_t& charCode); // add a glyph to the font's texture
+		void LoadGlyphs(const std::vector<char16_t>& charCodes); // add glyphs to the font's texture
 		
-		Glyph GetGlyph(const char32_t& codePoint); // return the glyph object corresponding to a character
-		int GetKerning(const char32_t& firstCodePoint, const char32_t& secondCodePoint); // return the kerning value between two characters
+		Glyph GetGlyph(const char16_t& codePoint); // return the glyph object corresponding to a character
+		int GetKerning(const char16_t& firstCodePoint, const char16_t& secondCodePoint); // return the kerning value between two characters
 		
 		unsigned int GetFontSize() const; // return the base size of the font
 		int GetLineHeight() const; // return the vertical offset for a new line
@@ -85,9 +85,9 @@ class Font : public Resource {
 		
 		static unsigned int GetTypeID();
 	private :
-		Shape CreateGlyphShape(const char32_t& charCode, Glyph& glyphObject); // create a shape of a glyph from a font file
-		void UpdateTexture(const std::vector< std::pair<char32_t, Shape> >& newShapes); // update the font's texture with new glyph shapes
-		void UpdateKerningMap(const std::vector< std::pair<char32_t, Shape> >& newShapes); // updated the kerning map with new glyphs
+		Shape CreateGlyphShape(const char16_t& charCode, Glyph& glyphObject); // create a shape of a glyph from a font file
+		void UpdateTexture(const std::vector< std::pair<char16_t, Shape> >& newShapes); // update the font's texture with new glyph shapes
+		void UpdateKerningMap(const std::vector< std::pair<char16_t, Shape> >& newShapes); // updated the kerning map with new glyphs
 		
 		Glyph Pack(Shape& shape); // pack a flyph shape into the font's texture
 		void PositionBase(Shape& baseShape, const unsigned int& padding); // position a glyph shape at the origin
@@ -99,8 +99,8 @@ class Font : public Resource {
 		unsigned int mFontSize = 1u; // the base size of the font
 		int mLineHeight = 0; // the vertical offset of a new line
 		
-		std::map<char32_t, Glyph> mGlyphs; // glyph objects containing metrics and rendering data for a character
-		std::map<std::pair<char32_t, char32_t>, int> mKernMap; // kerning values between two characters
+		std::map<char16_t, Glyph> mGlyphs; // glyph objects containing metrics and rendering data for a character
+		std::map<std::pair<char16_t, char16_t>, int> mKernMap; // kerning values between two characters
 		
 		unsigned int mTextureSize; // the width and height of the font's texture
 		FBO mFBO; // the fbo used to render to the font's texture

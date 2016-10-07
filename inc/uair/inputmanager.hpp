@@ -97,6 +97,8 @@ class InputManager {
 		bool GetKeyboardReleased(const Keyboard& key) const;
 		unsigned int GetKeyboardState(const Keyboard& key) const;
 		
+		std::u16string GetInputString() const;
+		
 		bool GetMouseDown(const Mouse& button) const;
 		bool GetMousePressed(const Mouse& button) const;
 		bool GetMouseReleased(const Mouse& button) const;
@@ -128,6 +130,8 @@ class InputManager {
 		
 		void HandleKeyboardKeys(const Keyboard& key, const unsigned int& type);
 		
+		void HandleTextInput(const char16_t& input);
+		
 		void HandleMouseButtons(const Mouse& button, const unsigned int& type);
 		
 		void AddDevice(const int& deviceID, const unsigned int& buttonCount, const unsigned int& controlCount,
@@ -147,6 +151,8 @@ class InputManager {
 		
 		std::map<int, InputDevice> mInputDevices; // a store of all input devices currently connected to the system
 		InputDevice mDefaultDevice; // the default device that is used when an invalid device is requested
+		
+		std::u16string mInputString;
 };
 
 typedef std::shared_ptr<InputManager> InputManagerPtr;

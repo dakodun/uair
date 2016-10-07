@@ -165,7 +165,7 @@ class EntityManager {
 		// return handles to ALL entities
 		std::list<Handle> GetHandles();
 	private :
-		Store<Entity> mStore; // the store used to hold entities (see manager<T> class)
+		Store<Entity, Entity> mStore; // the store used to hold entities (see manager<T> class)
 		
 		unsigned int mEntityCount = 0u; // the counter used to assign a unique id to an entity
 };

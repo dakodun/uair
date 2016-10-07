@@ -64,6 +64,7 @@
 #include "vbo.hpp"
 #include "camera.hpp"
 
+#include "gui.hpp"
 #include "layoutcontainer.hpp"
 #include "layoutdivision.hpp"
 #include "layoutelement.hpp"

@@ -46,6 +46,7 @@ class WindowEvent {
 			GainedCaptureType,
 			LostCaptureType,
 			KeyboardKeyType,
+			TextInputType,
 			MouseButtonType,
 			MouseWheelType,
 			MouseMoveType,
@@ -93,6 +94,10 @@ class WindowEvent {
 		struct KeyboardKey {
 			Keyboard mKey;
 			unsigned int mType;
+		};
+		
+		struct TextInput {
+			char16_t mInput;
 		};
 		
 		struct MouseButton {
@@ -143,6 +148,7 @@ class WindowEvent {
 			GainedCapture mGainedCapture;
 			LostCapture mLostCapture;
 			KeyboardKey mKeyboardKey;
+			TextInput mTextInput;
 			MouseButton mMouseButton;
 			MouseWheel mMouseWheel;
 			MouseMove mMouseMove;

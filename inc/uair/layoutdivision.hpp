@@ -94,8 +94,8 @@ class LayoutDivision : public LayoutBase {
 		unsigned int mColumns = 1u;
 		std::vector<Cell> mCells;
 		
-		Store<LayoutContainer> mContainers;
-		Store<LayoutDivision> mDivisions;
+		Store<LayoutBase, LayoutContainer> mContainers;
+		Store<LayoutBase, LayoutDivision> mDivisions;
 		
 		LayoutContainer* mParentContainer = nullptr;
 		LayoutDivision* mParentDivision = nullptr;

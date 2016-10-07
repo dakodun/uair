@@ -214,8 +214,8 @@ bool Font::LoadFromCache(const std::string& cacheFilename) {
 	unsigned int fontSize, width, height, depth;
 	int lineHeight;
 	std::vector<unsigned char> textureData;
-	std::vector< std::pair<char32_t, Glyph> > glyphPairs;
-	std::map<std::pair<char32_t, char32_t>, int> kerningData;
+	std::vector< std::pair<char16_t, Glyph> > glyphPairs;
+	std::map<std::pair<char16_t, char16_t>, int> kerningData;
 	std::list< std::list<Rectangle> > packingRects;
 	
 	try {
@@ -267,7 +267,7 @@ bool Font::LoadFromCache(const std::string& cacheFilename) {
 				std::istringstream iStrStream(parts.at(i));
 				int32_t charCodeIn;
 				iStrStream >> std::hex >> charCodeIn;
-				char32_t charCode = static_cast<char32_t>(charCodeIn);
+				char16_t charCode = static_cast<char16_t>(charCodeIn);
 				
 				glyph.mDimensions = glm::ivec2(util::FromString<int>(parts.at(i + 1)), util::FromString<int>(parts.at(i + 2)));
 				
@@ -291,17 +291,17 @@ bool Font::LoadFromCache(const std::string& cacheFilename) {
 			
 			if (!parts.empty() && parts.at(0) != "0") {
 				for (unsigned int i = 0u; i < parts.size(); i += 3) {
-					std::pair<char32_t, char32_t> charPair;
+					std::pair<char16_t, char16_t> charPair;
 					
 					std::istringstream iStrStreamFirst(parts.at(i));
 					int32_t charInFirst;
 					iStrStreamFirst >> std::hex >> charInFirst;
-					charPair.first = static_cast<char32_t>(charInFirst);
+					charPair.first = static_cast<char16_t>(charInFirst);
 					
 					std::istringstream iStrStreamSecond(parts.at(i + 1));
 					int32_t charInSecond;
 					iStrStreamSecond >> std::hex >> charInSecond;
-					charPair.second = static_cast<char32_t>(charInSecond);
+					charPair.second = static_cast<char16_t>(charInSecond);
 					
 					int kerning = util::FromString<int>(parts.at(i + 2));
 					
@@ -400,12 +400,12 @@ bool Font::LoadFromFile(const std::string& filename, const unsigned int& pointSi
 	return true; // return success
 }
 
-void Font::LoadGlyph(const char32_t& charCode) {
+void Font::LoadGlyph(const char16_t& charCode) {
 	LoadGlyphs({charCode});
 }
 
-void Font::LoadGlyphs(const std::vector<char32_t>& charCodes) {
-	std::vector< std::pair<char32_t, Shape> > glyphs;
+void Font::LoadGlyphs(const std::vector<char16_t>& charCodes) {
+	std::vector< std::pair<char16_t, Shape> > glyphs;
 	Glyph glyph;
 	
 	for (auto charCode = charCodes.begin(); charCode != charCodes.end(); ++charCode) { // for all character codes to be added...
@@ -425,7 +425,7 @@ void Font::LoadGlyphs(const std::vector<char32_t>& charCodes) {
 	}
 }
 
-Font::Glyph Font::GetGlyph(const char32_t& codePoint) {
+Font::Glyph Font::GetGlyph(const char16_t& codePoint) {
 	auto result = mGlyphs.find(codePoint); // search the map for the character code
 	
 	if (result != mGlyphs.end()) { // if the character code exists in the map...
@@ -435,7 +435,7 @@ Font::Glyph Font::GetGlyph(const char32_t& codePoint) {
 	throw std::runtime_error("font: code point not found");
 }
 
-int Font::GetKerning(const char32_t& firstCodePoint, const char32_t& secondCodePoint) {
+int Font::GetKerning(const char16_t& firstCodePoint, const char16_t& secondCodePoint) {
 	auto result = mKernMap.find(std::make_pair(firstCodePoint, secondCodePoint)); // search the map for the kerning pair
 	if (result != mKernMap.end()) { // if the kerning pair exists in the map...
 		return result->second; // return the kerning value
@@ -468,7 +468,7 @@ unsigned int Font::GetTypeID() {
 	return static_cast<unsigned int>(Resources::Font);
 }
 
-Shape Font::CreateGlyphShape(const char32_t& charCode, Glyph& glyphObject) {
+Shape Font::CreateGlyphShape(const char16_t& charCode, Glyph& glyphObject) {
 	if (mFTFace) {
 		FT_Load_Char(mFTFace, charCode, FT_LOAD_NO_BITMAP); // load the glyph into the face
 		FT_Outline outline = mFTFace->glyph->outline; // retrieve the outline for the glyph
@@ -578,7 +578,7 @@ Shape Font::CreateGlyphShape(const char32_t& charCode, Glyph& glyphObject) {
 	throw std::runtime_error("font: invalid face object");
 }
 
-void Font::UpdateTexture(const std::vector< std::pair<char32_t, Shape> >& newShapes) {
+void Font::UpdateTexture(const std::vector< std::pair<char16_t, Shape> >& newShapes) {
 	RenderBatch batch; // render batch used to create individual glyph textures as well as font texture
 	typedef std::pair<Rectangle, unsigned int> RectangleIndexPair; // define a rectangle and index type
 	
@@ -610,7 +610,7 @@ void Font::UpdateTexture(const std::vector< std::pair<char32_t, Shape> >& newSha
 	unsigned int doublePadding = padding * 2u; // double padding value
 	
 	while (!pQueue.empty()) { // whilst there are still glyphs to process...
-		char32_t glyph = newShapes.at(pQueue.top().second).first; // get a copy of the char code relating to the glyph
+		char16_t glyph = newShapes.at(pQueue.top().second).first; // get a copy of the char code relating to the glyph
 		Shape shp = newShapes.at(pQueue.top().second).second; // get a copy of the glyph shape
 		shp.SetColour(glm::vec3(0.0f, 0.0f, 0.0f)); // set the colour of the shape to black
 		Shape sdfShape; // a textured shape of the distance field of the glyph
@@ -723,12 +723,12 @@ void Font::UpdateTexture(const std::vector< std::pair<char32_t, Shape> >& newSha
 	OpenGLStates::BindFBO(0); // ensure fbo is no longer bound
 }
 
-void Font::UpdateKerningMap(const std::vector< std::pair<char32_t, Shape> >& newShapes) {
+void Font::UpdateKerningMap(const std::vector< std::pair<char16_t, Shape> >& newShapes) {
 	if (FT_HAS_KERNING(mFTFace)) { // if the font has kerning data...
 		for (auto newGlyph = newShapes.begin(); newGlyph != newShapes.end(); ++newGlyph) { // for all newly added glyphs...
 			for (auto oldGlyph = mGlyphs.begin(); oldGlyph != mGlyphs.end(); ++oldGlyph) { // for all existing glyphs...
-				char32_t firstChar  = newGlyph->first;
-				char32_t secondChar = oldGlyph->first;
+				char16_t firstChar  = newGlyph->first;
+				char16_t secondChar = oldGlyph->first;
 				FT_Vector kerning;
 				
 				// get kerning data for character pair
