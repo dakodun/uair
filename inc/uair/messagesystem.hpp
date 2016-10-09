@@ -35,9 +35,9 @@
 
 namespace uair {
 // base class for all messages allowing interaction with a message system
-class Message {
+class MessageS {
 	public :
-		virtual ~Message();
+		virtual ~MessageS();
 		
 		// derived message must implement this function and return a unique id (unique amongst other derived message)
 		virtual unsigned int GetTypeID() const = 0;
@@ -113,7 +113,7 @@ class MessageSystem {
 
 template <class T>
 void MessageSystem::PushMessage(const unsigned int& systemTypeID, const T& messageIn) {
-	if (!std::is_base_of<Message, T>::value) { // if the message being pushed into the queue doesn't inherit from base class...
+	if (!std::is_base_of<MessageS, T>::value) { // if the message being pushed into the queue doesn't inherit from base class...
 		throw std::runtime_error("not of base type"); // an error has occurred, don't push the message
 	}
 	

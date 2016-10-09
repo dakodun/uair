@@ -67,10 +67,10 @@ void GUI::RemoveElement(const std::string& name) {
 	}
 }
 
-void GUI::HandleEventQueue(const uair::WindowEvent& e) {
+void GUI::HandleMessageQueue(const MessageQueue::Entry& e) {
 	for (auto eleHandle = mElementHandles.begin(); eleHandle != mElementHandles.end(); ++eleHandle) {
 		auto ele = mElementManager.GetAsBase(*eleHandle);
-		ele->HandleEventQueue(e, this);
+		ele->HandleMessageQueue(e, this);
 	}
 }
 

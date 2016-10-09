@@ -34,6 +34,9 @@
 #include <set>
 #include <glm/glm.hpp>
 
+#define CEREAL_SERIALIZE_FUNCTION_NAME Serialise
+#include "cereal/archives/binary.hpp"
+
 #include "polygon.hpp"
 #include "inputenums.hpp"
 
@@ -44,24 +47,30 @@ class InputManager {
 	friend class Game;
 	
 	public :
-		struct InputDeviceCaps { // a store containing the controls that an input device possesses
-			struct ControlCaps { // the capabilities of an individual control
-				Device mDevice; // the id of the control
-				int mLowerRange; // the lower end of the input device's value range
-				int mUpperRange; // the upper end of the input device's value range
-				unsigned int mCollectionID; // the id of the link collection that the control belongs to
-			};
-			
-			std::array<ControlCaps, DEVICECOUNT> mControls; // an array that holds the capabilities for all controls present on the device
-		};
-		
 		class InputDevice { // an input device connected to the system
 			friend class InputManager;
 			
 			public :
+				struct ControlCaps { // the capabilities of an individual control
+					public :
+						void Serialise(cereal::BinaryOutputArchive& archive) const {
+							archive(mDevice, mLowerRange, mUpperRange, mCollectionID);
+						}
+						
+						void Serialise(cereal::BinaryInputArchive& archive) {
+							archive(mDevice, mLowerRange, mUpperRange, mCollectionID);
+						}
+					
+					public :
+						Device mDevice; // the id of the control
+						int mLowerRange; // the lower end of the input device's value range
+						int mUpperRange; // the upper end of the input device's value range
+						unsigned int mCollectionID; // the id of the link collection that the control belongs to
+				};
+			public :
 				InputDevice();
 				InputDevice(const unsigned int& buttonCount, const unsigned int& controlCount,
-						const InputDeviceCaps& caps);
+						const std::vector<ControlCaps>& caps);
 				
 				unsigned int GetButtonCount() const; // get the number of buttons reported by the input device
 				bool GetButtonDown(const unsigned int& button) const; // returns true if the button is held down
@@ -80,7 +89,7 @@ class InputManager {
 			private :
 				unsigned int mButtonCount; // the reported number of buttons present on the input device
 				unsigned int mControlCount; // the reported number of controls present on the input device
-				std::map<Device, InputDeviceCaps::ControlCaps> mControlCaps; // the capabilities of controls present on the device
+				std::map<Device, ControlCaps> mControlCaps; // the capabilities of controls present on the device
 				
 				std::map<unsigned int, unsigned int> mButtonStates; // the current state of all buttons
 				std::map<Device, int> mControlStates; // the current value of all controls
@@ -135,7 +144,7 @@ class InputManager {
 		void HandleMouseButtons(const Mouse& button, const unsigned int& type);
 		
 		void AddDevice(const int& deviceID, const unsigned int& buttonCount, const unsigned int& controlCount,
-				const InputDeviceCaps& caps); // adds an input device to the store when it is connected to the system
+				const std::vector<InputDevice::ControlCaps>& caps); // adds an input device to the store when it is connected to the system
 		void RemoveDevice(const int& deviceID); // removes an input device from the store when it is disconnected from the system
 		void HandleDeviceButtons(const unsigned int& button, const unsigned int& type, const int& deviceID); // handles the updating of the states of input device controls
 		void HandleDeviceControls(const Device& control, const int& value, const int& deviceID); // handles the updating of the states of input device controls

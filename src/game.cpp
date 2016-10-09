@@ -34,6 +34,7 @@
 #include "font.hpp"
 #include "soundbuffer.hpp"
 #include "gui.hpp"
+#include "windowmessages.hpp"
 
 namespace uair {
 Game::Game() {
@@ -70,9 +71,12 @@ void Game::Run() {
 	while (mWindow) { // whilst we have a valid window...
 		mWindow->Process(); // process the window
 		
-		while (!mWindow->mEventQueue.empty()) { // whilst there are events waiting in the queue...
-			HandleEventQueue(mWindow->mEventQueue.front());
-			mWindow->mEventQueue.pop_front();
+		mMessageQueue += mWindow->mMessageQueue; // add the window's message queue to the end of this
+		mWindow->mMessageQueue.ClearQueue(); // clear the window's message queue for next loop
+		while (!mMessageQueue.IsEmpty()) { // while there are messages to process...
+			MessageQueue::Entry e = mMessageQueue.GetMessage(); // retrieve the message entry from the queue
+			HandleMessageQueue(e); // handle the message
+			mMessageQueue.PopMessage(); // remove the message from the front of the queue
 		}
 		
 		for (unsigned int i = 0u; i < mRenderPasses; ++i) {
@@ -509,60 +513,69 @@ void Game::RemoveResource(const std::string& name) {
 	}
 }
 
-void Game::HandleEventQueue(const WindowEvent& e) {
-	switch (e.mType) {
-		case WindowEvent::CloseType : {
-			mOpen = false;
+void Game::HandleMessageQueue(const MessageQueue::Entry& e) {
+	using namespace WindowMessage;
+	switch (e.GetTypeID()) {
+		case CloseMessage::GetTypeID() : {
+			mOpen = false; // indicate that the application should close
 			break;
 		}
-		case WindowEvent::LostFocusType : {
+		case LostFocusMessage::GetTypeID() : {
+			mInputManager->Reset(); // reset any input states (such as keys that are down)
+			break;
+		}
+		case LostCaptureMessage::GetTypeID() : {
 			mInputManager->Reset();
 			break;
 		}
-		case WindowEvent::LostCaptureType : {
-			mInputManager->Reset();
+		case KeyboardKeyMessage::GetTypeID() : {
+			KeyboardKeyMessage msg = e.Deserialise<KeyboardKeyMessage>();
+			mInputManager->HandleKeyboardKeys(msg.mKey, msg.mType);
 			break;
 		}
-		case WindowEvent::KeyboardKeyType : {
-			mInputManager->HandleKeyboardKeys(e.mKeyboardKey.mKey, e.mKeyboardKey.mType);
+		case TextInputMessage::GetTypeID() : {
+			TextInputMessage msg = e.Deserialise<TextInputMessage>();
+			mInputManager->HandleTextInput(msg.mInput);
 			break;
 		}
-		case WindowEvent::TextInputType : {
-			mInputManager->HandleTextInput(e.mTextInput.mInput);
+		case MouseButtonMessage::GetTypeID() : {
+			MouseButtonMessage msg = e.Deserialise<MouseButtonMessage>();
+			mInputManager->HandleMouseButtons(msg.mButton, msg.mType);
 			break;
 		}
-		case WindowEvent::MouseButtonType : {
-			mInputManager->HandleMouseButtons(e.mMouseButton.mButton, e.mMouseButton.mType);
+		case MouseWheelMessage::GetTypeID() : {
+			MouseWheelMessage msg = e.Deserialise<MouseWheelMessage>();
+			mInputManager->mMouseWheel += msg.mAmount;
 			break;
 		}
-		case WindowEvent::MouseWheelType : {
-			mInputManager->mMouseWheel += e.mMouseWheel.mAmount;
-			break;
-		}
-		case WindowEvent::DeviceChangedType : { // an input device has been connect or disconnected
-			if (e.mDeviceChanged.mStatus) { // if the device was connected...
-				mInputManager->AddDevice(e.mDeviceChanged.mID, e.mDeviceChanged.mButtonCount, e.mDeviceChanged.mControlCount, e.mDeviceChanged.mCaps);
+		case DeviceChangedMessage::GetTypeID() : { // an input device has been connect or disconnected
+			DeviceChangedMessage msg = e.Deserialise<DeviceChangedMessage>();
+			
+			if (msg.mStatus) { // if the device was connected...
+				mInputManager->AddDevice(msg.mID, msg.mButtonCount, msg.mControlCount, msg.mCaps);
 			}
 			else {
-				mInputManager->RemoveDevice(e.mDeviceChanged.mID);
+				mInputManager->RemoveDevice(msg.mID);
 			}
 			
 			break;
 		}
-		case WindowEvent::DeviceButtonType : { // a button on an input device has been pressed or released
-			mInputManager->HandleDeviceButtons(e.mDeviceButton.mButton, e.mDeviceButton.mType, e.mDeviceButton.mID);
+		case DeviceButtonMessage::GetTypeID() : { // a button on an input device has been pressed or released
+			DeviceButtonMessage msg = e.Deserialise<DeviceButtonMessage>();
+			mInputManager->HandleDeviceButtons(msg.mButton, msg.mType, msg.mID);
 			break;
 		}
-		case WindowEvent::DeviceControlType : { // the value of a control on an input device has changed
-			mInputManager->HandleDeviceControls(e.mDeviceControl.mControl, e.mDeviceControl.mValue, e.mDeviceControl.mID);
+		case DeviceControlMessage::GetTypeID() : { // the value of a control on an input device has changed
+			DeviceControlMessage msg = e.Deserialise<DeviceControlMessage>();
+			mInputManager->HandleDeviceControls(msg.mControl, msg.mValue, msg.mID);
 			break;
 		}
 		default :
 			break;
 	}
 	
-	if (mSceneManager->mCurrScene) {
-		mSceneManager->mCurrScene->HandleEventQueue(e);
+	if (mSceneManager->mCurrScene) { // if a current scene exists...
+		mSceneManager->mCurrScene->HandleMessageQueue(e); // forward the message to the scene
 	}
 }
 

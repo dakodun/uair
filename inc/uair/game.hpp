@@ -39,6 +39,7 @@
 #include "timer.hpp"
 #include "window.hpp"
 #include "openglcontext.hpp"
+#include "messagequeue.hpp"
 #include "resource.hpp"
 #include "manager.hpp"
 #include "entitysystem.hpp"
@@ -194,7 +195,7 @@ class Game {
 			void PopMessage(const unsigned int& index);
 		// ...end entity system helpers
 	private :
-		void HandleEventQueue(const WindowEvent& e);
+		void HandleMessageQueue(const MessageQueue::Entry& e);
 		
 		void AddWindow();
 		void AddWindow(const std::string & windowTitle, const WindowDisplaySettings & settings,
@@ -216,6 +217,8 @@ class Game {
 		WindowPtr mWindow;
 		OpenGLContextPtr mContext;
 		bool mOpen = true;
+		
+		MessageQueue mMessageQueue;
 		
 		SceneManagerPtr mSceneManager;
 		InputManagerPtr mInputManager;

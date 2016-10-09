@@ -39,19 +39,19 @@ InputManager::InputDevice::InputDevice() : mButtonCount(0u), mControlCount(0u) {
 }
 
 InputManager::InputDevice::InputDevice(const unsigned int& buttonCount, const unsigned int& controlCount,
-		const InputDeviceCaps& caps) : mButtonCount(buttonCount), mControlCount(controlCount) {
+		const std::vector<ControlCaps>& caps) : mButtonCount(buttonCount), mControlCount(controlCount) {
 	
 	for (unsigned int i = 0u; i < buttonCount; ++i) { // for all buttons...
 		mButtonStates.emplace(i, 0); // add a state value to the store
 	}
 	
-	for (unsigned int i = 0u; i < controlCount; ++i) { // for all controls...
-		mControlCaps.emplace(caps.mControls.at(i).mDevice, caps.mControls.at(i)); // store the capabilities of the control
-		mControlStates.emplace(caps.mControls.at(i).mDevice, 0); // add a value to the store
+	for (auto control = caps.begin(); control != caps.end(); ++control) {
+		mControlCaps.emplace(control->mDevice, *control); // store the capabilities of the control
+		mControlStates.emplace(control->mDevice, 0); // add a value to the store
 		
 		std::vector<Device> tempLinkCollection; // create a new link collection
-		auto linkCollection = mLinkCollections.emplace(caps.mControls.at(i).mCollectionID, std::move(tempLinkCollection)); // add it to the store or retrieve existing entry
-		linkCollection.first->second.emplace_back(caps.mControls.at(i).mDevice); // add the control to the link collection
+		auto linkCollection = mLinkCollections.emplace(control->mCollectionID, std::move(tempLinkCollection)); // add it to the store or retrieve existing entry
+		linkCollection.first->second.emplace_back(control->mDevice); // add the control to the link collection
 	}
 }
 
@@ -568,7 +568,7 @@ void InputManager::HandleMouseButtons(const Mouse & button, const unsigned int &
 }
 
 void InputManager::AddDevice(const int& deviceID, const unsigned int& buttonCount, const unsigned int& controlCount,
-		const InputDeviceCaps& caps) {
+		const std::vector<InputDevice::ControlCaps>& caps) {
 	
 	InputDevice inputDevice(buttonCount, controlCount, caps); // create a new input device
 	mInputDevices.emplace(deviceID, std::move(inputDevice)); // add the new input device to the store

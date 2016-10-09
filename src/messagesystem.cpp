@@ -28,7 +28,7 @@
 #include "messagesystem.hpp"
 
 namespace uair {
-Message::~Message() {
+MessageS::~MessageS() {
 	
 }
 

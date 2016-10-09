@@ -31,6 +31,7 @@
 
 #include "openglcontext.hpp"
 #include "inputenums.hpp"
+#include "windowmessages.hpp"
 
 namespace uair {
 unsigned int WindowWin32::mWindowCount = 0u;
@@ -89,7 +90,7 @@ void swap(WindowWin32& first, WindowWin32& second) {
 	std::swap(first.mWindowHandle, second.mWindowHandle);
 	std::swap(first.mDeviceContext, second.mDeviceContext);
 	
-	std::swap(first.mEventQueue, second.mEventQueue);
+	std::swap(first.mMessageQueue, second.mMessageQueue);
 	
 	std::swap(first.mOpen, second.mOpen);
 	std::swap(first.mWinTitle, second.mWinTitle);
@@ -126,11 +127,9 @@ void WindowWin32::Process() {
 		if ((globalMouse.x != mGlobalMouse.x || globalMouse.y != mGlobalMouse.y) ||
 				(localMouse.x != mLocalMouse.x || localMouse.y != mLocalMouse.y)) {
 			
-			WindowEvent e;
-			e.mType = WindowEvent::MouseMoveType;
-			e.mMouseMove.mGlobalX = globalMouse.x; e.mMouseMove.mGlobalY = globalMouse.y;
-			e.mMouseMove.mLocalX = localMouse.x; e.mMouseMove.mLocalY = localMouse.y;
-			mEventQueue.push_back(e);
+			// create a message with the new mouse coordinates and dispatch it to the queue
+			WindowMessage::MouseMoveMessage msg(localMouse.x, localMouse.y, globalMouse.x, globalMouse.y);
+			mMessageQueue.PushMessage<WindowMessage::MouseMoveMessage>(msg);
 			
 			mGlobalMouse.x = globalMouse.x; mGlobalMouse.y = globalMouse.y;
 			mLocalMouse.x = localMouse.x; mLocalMouse.y = localMouse.y;
@@ -237,11 +236,9 @@ std::pair<glm::ivec2, glm::ivec2> WindowWin32::SetMouseCoords(const glm::ivec2& 
 		SetCursorPos(globalMouse.x, globalMouse.y);
 		
 		{
-			WindowEvent e;
-			e.mType = WindowEvent::MouseMoveType;
-			e.mMouseMove.mGlobalX = globalMouse.x; e.mMouseMove.mGlobalY = globalMouse.y;
-			e.mMouseMove.mLocalX = localMouse.x; e.mMouseMove.mLocalY = localMouse.y;
-			mEventQueue.push_back(e);
+			// create a message with the new mouse coordinates and dispatch it to the queue
+			WindowMessage::MouseMoveMessage msg(localMouse.x, localMouse.y, globalMouse.x, globalMouse.y);
+			mMessageQueue.PushMessage<WindowMessage::MouseMoveMessage>(msg);
 			
 			mGlobalMouse.x = globalMouse.x; mGlobalMouse.y = globalMouse.y;
 			mLocalMouse.x = localMouse.x; mLocalMouse.y = localMouse.y;
@@ -387,11 +384,9 @@ void WindowWin32::SetUpWindow() {
 		ScreenToClient(mWindowHandle, &localMouse);
 		
 		{
-			WindowEvent e;
-			e.mType = WindowEvent::MouseMoveType;
-			e.mMouseMove.mGlobalX = globalMouse.x; e.mMouseMove.mGlobalY = globalMouse.y;
-			e.mMouseMove.mLocalX = localMouse.x; e.mMouseMove.mLocalY = localMouse.y;
-			mEventQueue.push_back(e);
+			// create a message with the new mouse coordinates and dispatch it to the queue
+			WindowMessage::MouseMoveMessage msg(localMouse.x, localMouse.y, globalMouse.x, globalMouse.y);
+			mMessageQueue.PushMessage<WindowMessage::MouseMoveMessage>(msg);
 			
 			mGlobalMouse.x = globalMouse.x; mGlobalMouse.y = globalMouse.y;
 			mLocalMouse.x = localMouse.x; mLocalMouse.y = localMouse.y;
@@ -437,104 +432,93 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND& hWnd, const UINT& message
 			return 0;
 		}
 		case WM_CLOSE : {
-			WindowEvent e;
-			e.mType = WindowEvent::CloseType;
-			mEventQueue.push_back(e);
+			WindowMessage::CloseMessage msg;
+			mMessageQueue.PushMessage<WindowMessage::CloseMessage>(msg);
 			
 			return 0;
 		}
 		case WM_SIZE : {
-			WindowEvent e;
-			e.mType = WindowEvent::SizeType;
+			short width = LOWORD(lParam); // store the new window width
+			short height = HIWORD(lParam); // store the new window height
 			
-			e.mSize.mType = wParam;
-			e.mSize.mWidth = LOWORD(lParam);
-			e.mSize.mHeight = HIWORD(lParam);
-			mEventQueue.push_back(e);
+			// create a message with the new window dimensions and dispatch it to the queue
+			WindowMessage::SizeMessage msg(wParam, width, HIWORD(lParam));
+			mMessageQueue.PushMessage<WindowMessage::SizeMessage>(msg);
 			
-			mWinDS.mWidth = e.mSize.mWidth; mWinDS.mHeight = e.mSize.mHeight;
-			mWinSize.x = e.mSize.mWidth; mWinSize.y = e.mSize.mHeight;
+			mWinDS.mWidth = width; mWinDS.mHeight = height; // update the current display settings
+			mWinSize.x = width; mWinSize.y = height; // update the stored window dimensions
 			
 			{
+				// create a rectangle with the new window dimensions
 				RECT winRect;
-				winRect.left = static_cast<long>(0); winRect.right = static_cast<long>(e.mSize.mWidth);
-				winRect.top = static_cast<long>(0); winRect.bottom = static_cast<long>(e.mSize.mHeight);
+				winRect.left = static_cast<long>(0); winRect.right = static_cast<long>(width);
+				winRect.top = static_cast<long>(0); winRect.bottom = static_cast<long>(height);
 				
+				// adjust the rectangle to account for borders (to get the actual size of the window)
 				AdjustWindowRectEx(&winRect, GetWindowLong(mWindowHandle, GWL_STYLE), false,
 						GetWindowLong(mWindowHandle, GWL_EXSTYLE));
 				
+				// update the stored actual window size
 				mActualSize.x = winRect.right - winRect.left;
 				mActualSize.y = winRect.bottom - winRect.top;
 			}
 			
-			if (wglGetCurrentContext() != 0) {
-				GLint width = static_cast<GLint>(e.mSize.mWidth);
-				GLint height = static_cast<GLint>(e.mSize.mHeight);
-				if (height == 0) {
-					height = 1;
+			if (wglGetCurrentContext() != 0) { // if we have a linked opengl context...
+				// get the new dimensions as GLints
+				GLint widthInt = static_cast<GLint>(width);
+				GLint heightInt = static_cast<GLint>(width);
+				if (heightInt == 0) {
+					heightInt = 1;
 				}
 				
-				glViewport(0, 0, width, height);
+				glViewport(0, 0, widthInt, heightInt); // update the opengl viewport
 			}
 			
 			return 0;
 		}
 		case WM_MOVE : {
-			WindowEvent e;
-			e.mType = WindowEvent::MoveType;
+			short x = LOWORD(lParam); // store the new window x position
+			short y = HIWORD(lParam); // store the new window y position
 			
-			e.mMove.mX = LOWORD(lParam);
-			e.mMove.mY = HIWORD(lParam);
-			mEventQueue.push_back(e);
+			// create a message with the new window coordinates and dispatch it to the queue
+			WindowMessage::MoveMessage msg(x, y);
+			mMessageQueue.PushMessage<WindowMessage::MoveMessage>(msg);
 			
-			mWinPos = glm::ivec2(e.mMove.mX, e.mMove.mY);
+			mWinPos = glm::ivec2(x, y); // update the stored window position
 			
 			return 0;
 		}
 		case WM_SETFOCUS : {
 			// wglMakeCurrent(mDeviceContext, mRenderContext);
 			
-			WindowEvent e;
-			e.mType = WindowEvent::GainedFocusType;
-			mEventQueue.push_back(e);
+			WindowMessage::GainedFocusMessage msg;
+			mMessageQueue.PushMessage<WindowMessage::GainedFocusMessage>(msg);
 			
-			mHasFocus = true;
+			mHasFocus = true; // indicate the window now has focus
 			
 			return 0;
 		}
 		case WM_KILLFOCUS : {
-			WindowEvent e;
-			e.mType = WindowEvent::LostFocusType;
-			mEventQueue.push_back(e);
+			WindowMessage::LostFocusMessage msg;
+			mMessageQueue.PushMessage<WindowMessage::LostFocusMessage>(msg);
 			
-			ReleaseCapture();
-			mCaptureCount = 0;
+			ReleaseCapture(); // ensure the mouse is not being captured by the window (now in the background)
+			mCaptureCount = 0; // reset the count of how many events have captured the mouse
 			
-			mHasFocus = false;
+			mHasFocus = false; // indicate the window no longer has focus
 			
 			return 0;
 		}
 		case WM_DISPLAYCHANGE : {
-			WindowEvent e;
-			e.mType = WindowEvent::DisplayChangeType;
-			e.mDisplayChange.mHeight = HIWORD(lParam);
-			e.mDisplayChange.mWidth = LOWORD(lParam);
-			
-			mEventQueue.push_back(e);
+			// create a message with the new resolution and dispatch it to the queue
+			WindowMessage::DisplayChangeMessage msg(LOWORD(lParam), HIWORD(lParam));
+			mMessageQueue.PushMessage<WindowMessage::DisplayChangeMessage>(msg);
 			
 			return 0;
 		}
 		case WM_CAPTURECHANGED : {
-			WindowEvent e;
-			
-			if (reinterpret_cast<HWND>(lParam) == mWindowHandle) {
-				e.mType = WindowEvent::GainedCaptureType;
-			}
-			else {
-				e.mType = WindowEvent::LostCaptureType;
-			}
-			
-			mEventQueue.push_back(e);
+			WindowMessage::LostCaptureMessage msg;
+			mMessageQueue.PushMessage<WindowMessage::LostCaptureMessage>(msg);
 			
 			return 0;
 		}
@@ -544,14 +528,11 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND& hWnd, const UINT& message
 	switch (message) {
 		case WM_KEYDOWN :
 		case WM_SYSKEYDOWN : {
-			Keyboard key = ToKeyboard(wParam, lParam);
+			Keyboard key = ToKeyboard(wParam, lParam); // convert the windows keycode to a key enum
 			
-			WindowEvent e;
-			e.mType = WindowEvent::KeyboardKeyType;
-			e.mKeyboardKey.mKey = key;
-			e.mKeyboardKey.mType = 0;
-			
-			mEventQueue.push_back(e);
+			// create a message with the key and state (down) and dispatch it to the queue
+			WindowMessage::KeyboardKeyMessage msg(key, 0u);
+			mMessageQueue.PushMessage<WindowMessage::KeyboardKeyMessage>(msg);
 			
 			return 0;
 		}
@@ -559,21 +540,16 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND& hWnd, const UINT& message
 		case WM_SYSKEYUP : {
 			Keyboard key = ToKeyboard(wParam, lParam);
 			
-			WindowEvent e;
-			e.mType = WindowEvent::KeyboardKeyType;
-			e.mKeyboardKey.mKey = key;
-			e.mKeyboardKey.mType = 1;
-			
-			mEventQueue.push_back(e);
+			// create a message with the key and state (up) and dispatch it to the queue
+			WindowMessage::KeyboardKeyMessage msg(key, 1u);
+			mMessageQueue.PushMessage<WindowMessage::KeyboardKeyMessage>(msg);
 			
 			return 0;
 		}
 		case WM_CHAR : {
-			WindowEvent e;
-			e.mType = WindowEvent::TextInputType;
-			e.mTextInput.mInput = wParam;
-			
-			mEventQueue.push_back(e);
+			// create a message with the input character (as char16_t) and dispatch it to the queue
+			WindowMessage::TextInputMessage msg(wParam);
+			mMessageQueue.PushMessage<WindowMessage::TextInputMessage>(msg);
 			
 			return 0;
 		}
@@ -582,40 +558,31 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND& hWnd, const UINT& message
 	// input related events: mouse
 	switch (message) {
 		case WM_LBUTTONDOWN : { // left muse button down
-			WindowEvent e;
-			e.mType = WindowEvent::MouseButtonType;
-			e.mMouseButton.mButton = Mouse::Left;
-			e.mMouseButton.mType = 0;
+			// create a message with the button and state (down) and dispatch it to the queue
+			WindowMessage::MouseButtonMessage msg(Mouse::Left, 0u);
+			mMessageQueue.PushMessage<WindowMessage::MouseButtonMessage>(msg);
 			
-			mEventQueue.push_back(e);
-			
-			SetCapture(mWindowHandle);
-			++mCaptureCount;
+			SetCapture(mWindowHandle); // capture the mouse input whilst the button is held down
+			++mCaptureCount; // increment the capture count (to handle multiple buttons down)
 			
 			return 0;
 		}
 		case WM_LBUTTONUP : {
-			WindowEvent e;
-			e.mType = WindowEvent::MouseButtonType;
-			e.mMouseButton.mButton = Mouse::Left;
-			e.mMouseButton.mType = 1;
+			// create a message with the button and state (up) and dispatch it to the queue
+			WindowMessage::MouseButtonMessage msg(Mouse::Left, 1u);
+			mMessageQueue.PushMessage<WindowMessage::MouseButtonMessage>(msg);
 			
-			mEventQueue.push_back(e);
-			
-			--mCaptureCount;
-			if (mCaptureCount == 0u) {
-				ReleaseCapture();
+			--mCaptureCount; // decrement the capture count (indicate this button is no longer down)
+			if (mCaptureCount == 0u) { // if capture count is 0 (no other buttons are down)...
+				ReleaseCapture(); // stop capturing the mouse
 			}
 			
 			return 0;
 		}
 		case WM_LBUTTONDBLCLK : {
-			WindowEvent e;
-			e.mType = WindowEvent::MouseButtonType;
-			e.mMouseButton.mButton = Mouse::Left;
-			e.mMouseButton.mType = 2;
-			
-			mEventQueue.push_back(e);
+			// create a message with the button and state (double click) and dispatch it to the queue
+			WindowMessage::MouseButtonMessage msg(Mouse::Left, 2u);
+			mMessageQueue.PushMessage<WindowMessage::MouseButtonMessage>(msg);
 			
 			SetCapture(mWindowHandle);
 			++mCaptureCount;
@@ -623,12 +590,8 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND& hWnd, const UINT& message
 			return 0;
 		}
 		case WM_MBUTTONDOWN : {
-			WindowEvent e;
-			e.mType = WindowEvent::MouseButtonType;
-			e.mMouseButton.mButton = Mouse::Middle;
-			e.mMouseButton.mType = 0;
-			
-			mEventQueue.push_back(e);
+			WindowMessage::MouseButtonMessage msg(Mouse::Middle, 0u);
+			mMessageQueue.PushMessage<WindowMessage::MouseButtonMessage>(msg);
 			
 			SetCapture(mWindowHandle);
 			++mCaptureCount;
@@ -636,12 +599,8 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND& hWnd, const UINT& message
 			return 0;
 		}
 		case WM_MBUTTONUP : {
-			WindowEvent e;
-			e.mType = WindowEvent::MouseButtonType;
-			e.mMouseButton.mButton = Mouse::Middle;
-			e.mMouseButton.mType = 1;
-			
-			mEventQueue.push_back(e);
+			WindowMessage::MouseButtonMessage msg(Mouse::Middle, 1u);
+			mMessageQueue.PushMessage<WindowMessage::MouseButtonMessage>(msg);
 			
 			--mCaptureCount;
 			if (mCaptureCount == 0u) {
@@ -651,12 +610,8 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND& hWnd, const UINT& message
 			return 0;
 		}
 		case WM_MBUTTONDBLCLK : {
-			WindowEvent e;
-			e.mType = WindowEvent::MouseButtonType;
-			e.mMouseButton.mButton = Mouse::Middle;
-			e.mMouseButton.mType = 2;
-			
-			mEventQueue.push_back(e);
+			WindowMessage::MouseButtonMessage msg(Mouse::Middle, 2u);
+			mMessageQueue.PushMessage<WindowMessage::MouseButtonMessage>(msg);
 			
 			SetCapture(mWindowHandle);
 			++mCaptureCount;
@@ -664,12 +619,8 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND& hWnd, const UINT& message
 			return 0;
 		}
 		case WM_RBUTTONDOWN : {
-			WindowEvent e;
-			e.mType = WindowEvent::MouseButtonType;
-			e.mMouseButton.mButton = Mouse::Right;
-			e.mMouseButton.mType = 0;
-			
-			mEventQueue.push_back(e);
+			WindowMessage::MouseButtonMessage msg(Mouse::Right, 0u);
+			mMessageQueue.PushMessage<WindowMessage::MouseButtonMessage>(msg);
 			
 			SetCapture(mWindowHandle);
 			++mCaptureCount;
@@ -677,12 +628,8 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND& hWnd, const UINT& message
 			return 0;
 		}
 		case WM_RBUTTONUP : {
-			WindowEvent e;
-			e.mType = WindowEvent::MouseButtonType;
-			e.mMouseButton.mButton = Mouse::Right;
-			e.mMouseButton.mType = 1;
-			
-			mEventQueue.push_back(e);
+			WindowMessage::MouseButtonMessage msg(Mouse::Right, 1u);
+			mMessageQueue.PushMessage<WindowMessage::MouseButtonMessage>(msg);
 			
 			--mCaptureCount;
 			if (mCaptureCount == 0u) {
@@ -692,12 +639,8 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND& hWnd, const UINT& message
 			return 0;
 		}
 		case WM_RBUTTONDBLCLK : {
-			WindowEvent e;
-			e.mType = WindowEvent::MouseButtonType;
-			e.mMouseButton.mButton = Mouse::Right;
-			e.mMouseButton.mType = 2;
-			
-			mEventQueue.push_back(e);
+			WindowMessage::MouseButtonMessage msg(Mouse::Right, 2u);
+			mMessageQueue.PushMessage<WindowMessage::MouseButtonMessage>(msg);
 			
 			SetCapture(mWindowHandle);
 			++mCaptureCount;
@@ -705,19 +648,14 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND& hWnd, const UINT& message
 			return 0;
 		}
 		case WM_XBUTTONDOWN : {
-			WindowEvent e;
-			e.mType = WindowEvent::MouseButtonType;
-			
-			if (HIWORD(wParam) == 1) {
-				e.mMouseButton.mButton = Mouse::M4;
+			if (HIWORD(wParam) == 1) { // if the button is mouse 4...
+				WindowMessage::MouseButtonMessage msg(Mouse::M4, 0u);
+				mMessageQueue.PushMessage<WindowMessage::MouseButtonMessage>(msg);
 			}
-			else {
-				e.mMouseButton.mButton = Mouse::M5;
+			else { // otherwise it is mouse 5...
+				WindowMessage::MouseButtonMessage msg(Mouse::M5, 0u);
+				mMessageQueue.PushMessage<WindowMessage::MouseButtonMessage>(msg);
 			}
-			
-			e.mMouseButton.mType = 0;
-			
-			mEventQueue.push_back(e);
 			
 			SetCapture(mWindowHandle);
 			++mCaptureCount;
@@ -725,19 +663,14 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND& hWnd, const UINT& message
 			return 0;
 		}
 		case WM_XBUTTONUP : {
-			WindowEvent e;
-			e.mType = WindowEvent::MouseButtonType;
-			
 			if (HIWORD(wParam) == 1) {
-				e.mMouseButton.mButton = Mouse::M4;
+				WindowMessage::MouseButtonMessage msg(Mouse::M4, 1u);
+				mMessageQueue.PushMessage<WindowMessage::MouseButtonMessage>(msg);
 			}
 			else {
-				e.mMouseButton.mButton = Mouse::M5;
+				WindowMessage::MouseButtonMessage msg(Mouse::M5, 1u);
+				mMessageQueue.PushMessage<WindowMessage::MouseButtonMessage>(msg);
 			}
-			
-			e.mMouseButton.mType = 1;
-			
-			mEventQueue.push_back(e);
 			
 			--mCaptureCount;
 			if (mCaptureCount == 0u) {
@@ -747,19 +680,14 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND& hWnd, const UINT& message
 			return 0;
 		}
 		case WM_XBUTTONDBLCLK : {
-			WindowEvent e;
-			e.mType = WindowEvent::MouseButtonType;
-			
 			if (HIWORD(wParam) == 1) {
-				e.mMouseButton.mButton = Mouse::M4;
+				WindowMessage::MouseButtonMessage msg(Mouse::M4, 2u);
+				mMessageQueue.PushMessage<WindowMessage::MouseButtonMessage>(msg);
 			}
 			else {
-				e.mMouseButton.mButton = Mouse::M5;
+				WindowMessage::MouseButtonMessage msg(Mouse::M5, 2u);
+				mMessageQueue.PushMessage<WindowMessage::MouseButtonMessage>(msg);
 			}
-			
-			e.mMouseButton.mType = 2;
-			
-			mEventQueue.push_back(e);
 			
 			SetCapture(mWindowHandle);
 			++mCaptureCount;
@@ -767,11 +695,9 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND& hWnd, const UINT& message
 			return 0;
 		}
 		case WM_MOUSEWHEEL : {
-			WindowEvent e;
-			e.mType = WindowEvent::MouseWheelType;
-			e.mMouseWheel.mAmount = GET_WHEEL_DELTA_WPARAM(wParam);
-			
-			mEventQueue.push_back(e);
+			// create a message with theamount the wheel was scrolled and dispatch it to the queue
+			WindowMessage::MouseWheelMessage msg(GET_WHEEL_DELTA_WPARAM(wParam));
+			mMessageQueue.PushMessage<WindowMessage::MouseWheelMessage>(msg);
 			
 			return 0;
 		}
@@ -857,20 +783,16 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND& hWnd, const UINT& message
 						
 						for (unsigned int i = 0u; i < inputDevice->second.mButtonCount; ++i) {
 							if (inputDevice->second.mButtonStates.at(i) != tempButtonStates.at(i)) {
-								// dispatch an event indicating a button state has changed
-								WindowEvent e;
-								e.mType = WindowEvent::DeviceButtonType;
-								e.mDeviceButton.mButton = i;
-								e.mDeviceButton.mID = inputDevice->second.mID;
-								
-								if (tempButtonStates.at(i)) {
-									e.mDeviceButton.mType = 0;
+								if (tempButtonStates.at(i)) { // if the button is down...
+									// create a message with the device id, button id and state (down) and dispatch it to the queue
+									WindowMessage::DeviceButtonMessage msg(inputDevice->second.mID, i, 0u);
+									mMessageQueue.PushMessage<WindowMessage::DeviceButtonMessage>(msg);
 								}
-								else {
-									e.mDeviceButton.mType = 1;
+								else { // otherwise the button is up...
+									// create a message with the device id, button id and state (up) and dispatch it to the queue
+									WindowMessage::DeviceButtonMessage msg(inputDevice->second.mID, i, 1u);
+									mMessageQueue.PushMessage<WindowMessage::DeviceButtonMessage>(msg);
 								}
-								
-								mEventQueue.push_back(e);
 							}
 						}
 						
@@ -896,13 +818,9 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND& hWnd, const UINT& message
 							if (oldValue != inputDevice->second.mControlStates.end() && oldValue->second != intValue) { // if the value exists and differs from the previous...
 								oldValue->second = intValue; // update the previous...
 								
-								// dispatch an event indicating a control value has changed
-								WindowEvent e;
-								e.mType = WindowEvent::DeviceControlType;
-								e.mDeviceControl.mControl = control;
-								e.mDeviceControl.mID = inputDevice->second.mID;
-								e.mDeviceControl.mValue = intValue;
-								mEventQueue.push_back(e);
+								// create a message with the device id, control id and value and dispatch it to the queue
+								WindowMessage::DeviceControlMessage msg(inputDevice->second.mID, control, intValue);
+								mMessageQueue.PushMessage<WindowMessage::DeviceControlMessage>(msg);
 							}
 						}
 					}
@@ -920,13 +838,11 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND& hWnd, const UINT& message
 			else { // otherwise if a device was removed from the system...
 				auto result = mInputDevices.find((HANDLE)lParam); // find the device's handle in the device store
 				if (result != mInputDevices.end()) { // if the device exists in the store...
-					WindowEvent e; // create a window event
-					e.mType = WindowEvent::DeviceChangedType; // set the event type
-					e.mDeviceChanged.mID = result->second.mID; // set the id to the device's id in the store
-					e.mDeviceChanged.mStatus = false; // set the connection status to false (disconnected)
+					// create a message with the device id and connection state (disconnected) and dispatch it to the queue
+					WindowMessage::DeviceChangedMessage msg(result->second.mID, false);
+					mMessageQueue.PushMessage<WindowMessage::DeviceChangedMessage>(msg);
 					
 					mInputDevices.erase(result); // remove the device from the store
-					mEventQueue.push_back(e); // add the window event to the event queue
 				}
 			}
 			
@@ -1187,11 +1103,6 @@ bool WindowWin32::RegisterInputDevice(HANDLE deviceHandle) {
 	PRID_DEVICE_INFO deviceInfo = (PRID_DEVICE_INFO)ridBuffer.get(); // cast the rawinput data to a pointer to a device info structure
 	
 	if (deviceInfo->dwType == RIM_TYPEHID) { // if the device connected wasn't a mouse or keyboard...
-		WindowEvent e; // create a window event
-		e.mType = WindowEvent::DeviceChangedType; // set the event type
-		e.mDeviceChanged.mID = mInputDeviceIDCounter; // set the id to the device's id in the store
-		e.mDeviceChanged.mStatus = true; // set the connection status to true (connected)
-		
 		UINT ppdBufferSize;
 		GetRawInputDeviceInfo(deviceHandle, RIDI_PREPARSEDDATA, NULL, &ppdBufferSize);
 		std::unique_ptr<BYTE[]> ppdBuffer(new BYTE[ppdBufferSize]);
@@ -1238,7 +1149,7 @@ bool WindowWin32::RegisterInputDevice(HANDLE deviceHandle) {
 				}
 				
 				// create a control capability structure
-				InputManager::InputDeviceCaps::ControlCaps deviceControlCaps;
+				InputManager::InputDevice::ControlCaps deviceControlCaps;
 				deviceControlCaps.mDevice = control;
 				deviceControlCaps.mLowerRange = intLowerRange;
 				deviceControlCaps.mUpperRange = intUpperRange;
@@ -1252,15 +1163,14 @@ bool WindowWin32::RegisterInputDevice(HANDLE deviceHandle) {
 			}
 		}
 		
-		e.mDeviceChanged.mButtonCount = inputDevice.mButtonCount; // set the reported number of buttons present
-		e.mDeviceChanged.mControlCount = inputDevice.mControlCount; // set the reported number of controls present
-		for (unsigned int i = 0u; i < inputDevice.mControlCount && i < DEVICECOUNT; ++i) { // for all controls present...
-			e.mDeviceChanged.mCaps.mControls.at(i) = inputDevice.mControls.at(i); // set the control capabilities
-		}
+		// create a message with the details of the connected device (and connection state (connected))
+		WindowMessage::DeviceChangedMessage msg(mInputDeviceIDCounter, true, inputDevice.mButtonCount,
+				inputDevice.mControlCount, inputDevice.mControls);
+		
 		
 		inputDevice.mID = mInputDeviceIDCounter++; // set the new device's id and then increment the id counter
 		mInputDevices.emplace(deviceHandle, std::move(inputDevice)); // add the new device to the store
-		mEventQueue.push_back(e); // add the window event to the event queue
+		mMessageQueue.PushMessage<WindowMessage::DeviceChangedMessage>(msg); // dispatch the connection message to the queue
 	}
 	
 	return true;

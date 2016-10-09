@@ -30,12 +30,13 @@
 
 #include "init.hpp"
 
+#include "messagequeue.hpp"
 #include "openglcontext.hpp"
 #include "openglstates.hpp"
 #include "window.hpp"
 #include "windowdisplaysettings.hpp"
-#include "windowevent.hpp"
 #include "windowstyles.hpp"
+#include "windowmessages.hpp"
 
 #include "manager.hpp"
 #include "scene.hpp"

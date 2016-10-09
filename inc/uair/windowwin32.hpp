@@ -42,14 +42,17 @@
 #include <map>
 #include <vector>
 #include <memory>
+#include <set>
 
 #include <glm/glm.hpp>
 
 #include "init.hpp"
 #include "windowdisplaysettings.hpp"
-#include "windowevent.hpp"
 #include "windowstyles.hpp"
 #include "openglcontextwin32.hpp"
+#include "messagequeue.hpp"
+#include "polygon.hpp"
+#include "inputmanager.hpp"
 
 namespace uair {
 class OpenGLContext;
@@ -94,7 +97,7 @@ class WindowWin32 {
 			int mID = 0; // the id assigned to the input device
 			unsigned int mButtonCount = 0u; // the number of buttons reported by the input device
 			unsigned int mControlCount = 0u; // the number of controls reported by the input device
-			std::vector<InputManager::InputDeviceCaps::ControlCaps> mControls; // the capabilities of controls present on the device
+			std::vector<InputManager::InputDevice::ControlCaps> mControls; // the capabilities of controls present on the device
 			
 			std::vector<bool> mButtonStates; // the current state of all buttons
 			std::map<Device, int> mControlStates; // the current values of all controls
@@ -118,7 +121,7 @@ class WindowWin32 {
 		HWND mWindowHandle = 0;
 		HDC mDeviceContext = 0;
 		
-		std::deque<WindowEvent> mEventQueue;
+		MessageQueue mMessageQueue; // the window object maintains its own message queue
 		
 		bool mOpen = false;
 		std::string mWinTitle;

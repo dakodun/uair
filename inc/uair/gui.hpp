@@ -32,7 +32,7 @@
 
 #include "manager.hpp"
 #include "inputmanager.hpp"
-#include "windowevent.hpp"
+#include "messagequeue.hpp"
 
 namespace uair {
 class RenderBatch;
@@ -40,7 +40,7 @@ class RenderBatch;
 class GUI;
 class GUIElement {
 	public :
-		virtual void HandleEventQueue(const uair::WindowEvent& e, GUI* caller = nullptr) {
+		virtual void HandleMessageQueue(const MessageQueue::Entry& e, GUI* caller = nullptr) {
 			
 		}
 		
@@ -94,7 +94,7 @@ class GUI {
 			std::list< std::reference_wrapper<T> > GetElement(const std::string& name);
 		// ...end
 		
-		void HandleEventQueue(const uair::WindowEvent& e);
+		void HandleMessageQueue(const MessageQueue::Entry& e);
 		void Input();
 		void Process();
 		void PostProcess(const unsigned int& processed);

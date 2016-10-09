@@ -25,45 +25,46 @@
 **		   source distribution.
 ** **************************************************************** */
 
-#ifndef UAIRSCENE_HPP
-#define UAIRSCENE_HPP
-
-#include <string>
-#include <memory>
-
 #include "messagequeue.hpp"
 
 namespace uair {
-class Scene {
-	public :
-		Scene(std::string name) : mName(name) {
-			
-		}
-		
-		virtual ~Scene() = default;
-		
-		virtual void HandleMessageQueue(const MessageQueue::Entry& e) = 0;
-		virtual void Input() = 0;
-		virtual void Process() = 0;
-		virtual void PostProcess(const unsigned int& processed) = 0;
-		virtual void Render(const unsigned int& pass) = 0;
-		
-		virtual void OnEnter() = 0;
-		virtual void OnLeave() = 0;
-		virtual bool OnQuit() = 0;
-		
-		virtual std::string GetTag() = 0;
-		
-		std::string GetName() {
-			return mName;
-		}
-		
-		bool mPersist = false;
-	protected :
-		std::string mName = "";
-};
-
-typedef std::shared_ptr<Scene> ScenePtr;
+Message::~Message() {
+	
 }
 
-#endif
+
+MessageQueue& MessageQueue::operator+=(MessageQueue other) {
+	while (!other.mQueue.empty()) { // while the copy of the other queue still has entries...
+		mQueue.push(other.mQueue.front()); // add the entry to the end of this queue
+		other.mQueue.pop(); // remove the entry from the copy of the other queue
+	}
+	
+	return *this;
+}
+
+void MessageQueue::PushMessageString(const unsigned int& messageTypeID, const std::string& messageString) {
+	// add an entry to the queue using the message's unique type id and the serialised string
+	mQueue.emplace(messageTypeID, messageString);
+}
+
+MessageQueue::Entry MessageQueue::GetMessage() const {
+	return mQueue.front(); // return the entry at the front of the queue
+}
+
+void MessageQueue::PopMessage() {
+	mQueue.pop(); // remove the message from the front of the queue
+}
+
+void MessageQueue::ClearQueue() {
+	std::queue<Entry> newQueue; // create a new empty queue
+	mQueue = std::move(newQueue); // overwrite the existing queue
+}
+
+bool MessageQueue::IsEmpty() const {
+	return mQueue.empty();
+}
+
+unsigned int MessageQueue::GetMessageCount() const {
+	return mQueue.size();
+}
+}

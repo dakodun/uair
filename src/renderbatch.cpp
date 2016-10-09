@@ -48,77 +48,79 @@ void RenderBatch::Add(Renderable& renderable, const unsigned int& pass) {
 }
 
 void RenderBatch::Upload() {
-	std::vector<VBOVertex> vertices; // final container for all vertex data
-	std::vector<VBOIndex> indices; // final container for all index data
-	std::vector<Segment> segments; // container holding segment data
-	
-	std::size_t vertexCount = 0u; // the total current vertex count for the vbo
-	GLuint offset = 0u;
-	unsigned int min = std::numeric_limits<unsigned int>::max();
-	unsigned int max = 0u;
-	
-	std::sort(mRenderData.begin(), mRenderData.end(), RenderDataSort); // sort the data first by pass, then by shader id and finally by texture id
-	
-	unsigned int currentPass = mRenderData.at(0).mPass;
-	ResourcePtr<Shader> currentShader = mRenderData.at(0).mShader;
-	GLuint currentTextureID = mRenderData.at(0).mTextureID;
-	GLuint currentRenderMode = mRenderData.at(0).mRenderMode;
-	unsigned int currentMin = std::numeric_limits<unsigned int>::max();
-	unsigned int currentMax = 0u;
-	std::size_t currentCount = 0u;
-	
-	for (unsigned int i = 0u; i < mRenderData.size(); ++i) { // for all render data...
-		if (!mRenderData.at(i).mShader) { // if render data has an invalid shader...
-			continue; // skip data
-		}
+	if (!mRenderData.empty()) { // if upload data exists...
+		std::vector<VBOVertex> vertices; // final container for all vertex data
+		std::vector<VBOIndex> indices; // final container for all index data
+		std::vector<Segment> segments; // container holding segment data
 		
-		for (unsigned int j = 0u; j < mRenderData.at(i).mIndexData.size(); ++j) { // for all indices in the current render data...
-			mRenderData.at(i).mIndexData.at(j) += vertexCount; // add the total vertex count to each of the indices
-			
-			min = std::min(min, mRenderData.at(i).mIndexData.at(j)); // store the smallest index
-			max = std::max(max, mRenderData.at(i).mIndexData.at(j)); // store the largest index
-		}
+		std::size_t vertexCount = 0u; // the total current vertex count for the vbo
+		GLuint offset = 0u;
+		unsigned int min = std::numeric_limits<unsigned int>::max();
+		unsigned int max = 0u;
 		
-		vertexCount += mRenderData.at(i).mVertexData.size(); // add the current batch's vertex count to the total
+		std::sort(mRenderData.begin(), mRenderData.end(), RenderDataSort); // sort the data first by pass, then by shader id and finally by texture id
 		
-		if (mRenderData.at(i).mPass != currentPass || mRenderData.at(i).mShader->GetProgramID() != currentShader->GetProgramID() ||
-				mRenderData.at(i).mTextureID != currentTextureID || mRenderData.at(i).mRenderMode != currentRenderMode) {
+		unsigned int currentPass = mRenderData.at(0).mPass;
+		ResourcePtr<Shader> currentShader = mRenderData.at(0).mShader;
+		GLuint currentTextureID = mRenderData.at(0).mTextureID;
+		GLuint currentRenderMode = mRenderData.at(0).mRenderMode;
+		unsigned int currentMin = std::numeric_limits<unsigned int>::max();
+		unsigned int currentMax = 0u;
+		std::size_t currentCount = 0u;
+		
+		for (unsigned int i = 0u; i < mRenderData.size(); ++i) { // for all render data...
+			if (!mRenderData.at(i).mShader) { // if render data has an invalid shader...
+				continue; // skip data
+			}
 			
-			currentMin = std::min(currentMin, currentMax); // ensure the minimum is smaller than the maximum
-			segments.emplace_back(currentPass, 0u, currentShader, currentTextureID, currentRenderMode, currentCount, offset, currentMin, currentMax);
-			offset += currentCount;
+			for (unsigned int j = 0u; j < mRenderData.at(i).mIndexData.size(); ++j) { // for all indices in the current render data...
+				mRenderData.at(i).mIndexData.at(j) += vertexCount; // add the total vertex count to each of the indices
+				
+				min = std::min(min, mRenderData.at(i).mIndexData.at(j)); // store the smallest index
+				max = std::max(max, mRenderData.at(i).mIndexData.at(j)); // store the largest index
+			}
 			
-			// reset current statuses to match current render data...
-			currentPass = mRenderData.at(i).mPass;
-			currentShader = mRenderData.at(i).mShader;
-			currentTextureID = mRenderData.at(i).mTextureID;
-			currentRenderMode = mRenderData.at(i).mRenderMode;
-			currentMin = std::numeric_limits<unsigned int>::max();
-			currentMax = 0u;
-			currentCount = 0u;
+			vertexCount += mRenderData.at(i).mVertexData.size(); // add the current batch's vertex count to the total
+			
+			if (mRenderData.at(i).mPass != currentPass || mRenderData.at(i).mShader->GetProgramID() != currentShader->GetProgramID() ||
+					mRenderData.at(i).mTextureID != currentTextureID || mRenderData.at(i).mRenderMode != currentRenderMode) {
+				
+				currentMin = std::min(currentMin, currentMax); // ensure the minimum is smaller than the maximum
+				segments.emplace_back(currentPass, 0u, currentShader, currentTextureID, currentRenderMode, currentCount, offset, currentMin, currentMax);
+				offset += currentCount;
+				
+				// reset current statuses to match current render data...
+				currentPass = mRenderData.at(i).mPass;
+				currentShader = mRenderData.at(i).mShader;
+				currentTextureID = mRenderData.at(i).mTextureID;
+				currentRenderMode = mRenderData.at(i).mRenderMode;
+				currentMin = std::numeric_limits<unsigned int>::max();
+				currentMax = 0u;
+				currentCount = 0u;
+				// ...end
+			}
+			
+			currentCount += mRenderData.at(i).mIndexData.size(); // 
+			
+			// update the current minimum and maximum index for the current batch...
+			currentMin = std::min(currentMin, min);
+			currentMax = std::max(currentMax, max);
+			min = std::numeric_limits<unsigned int>::max();
+			max = 0;
+			// ...end
+			
+			// add the current render data to the vertex and index arrays...
+			vertices.insert(vertices.end(), mRenderData.at(i).mVertexData.begin(), mRenderData.at(i).mVertexData.end());
+			indices.insert(indices.end(), mRenderData.at(i).mIndexData.begin(), mRenderData.at(i).mIndexData.end());
 			// ...end
 		}
 		
-		currentCount += mRenderData.at(i).mIndexData.size(); // 
+		currentMin = std::min(currentMin, currentMax); // ensure the minimum is smaller than the maximum
+		segments.emplace_back(currentPass, 0u, currentShader, currentTextureID, currentRenderMode, currentCount, offset, currentMin, currentMax);
 		
-		// update the current minimum and maximum index for the current batch...
-		currentMin = std::min(currentMin, min);
-		currentMax = std::max(currentMax, max);
-		min = std::numeric_limits<unsigned int>::max();
-		max = 0;
-		// ...end
-		
-		// add the current render data to the vertex and index arrays...
-		vertices.insert(vertices.end(), mRenderData.at(i).mVertexData.begin(), mRenderData.at(i).mVertexData.end());
-		indices.insert(indices.end(), mRenderData.at(i).mIndexData.begin(), mRenderData.at(i).mIndexData.end());
-		// ...end
+		mVBO.AddData(vertices, indices, segments); // add the vertices, indices and segment data to the vbo
+		mRenderData.clear(); // clear batch data containers
 	}
-	
-	currentMin = std::min(currentMin, currentMax); // ensure the minimum is smaller than the maximum
-	segments.emplace_back(currentPass, 0u, currentShader, currentTextureID, currentRenderMode, currentCount, offset, currentMin, currentMax);
-	
-	mVBO.AddData(vertices, indices, segments); // add the vertices, indices and segment data to the vbo
-	mRenderData.clear(); // clear batch data containers
 }
 
 void RenderBatch::Draw(const unsigned int& pass) {
