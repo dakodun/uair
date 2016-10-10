@@ -59,6 +59,7 @@ Game::Game() {
 	Shape::mFrameLowerLimit = mFrameLowerLimit;
 	Font::mFTLibraryPtr = &mFTLibrary; // set the freetype library used by the font class to the newly initialised one
 	GUI::mInputManagerPtr = mInputManager;
+	GUI::mMessageQueuePtr = &mMessageQueue;
 }
 
 Game::~Game() {

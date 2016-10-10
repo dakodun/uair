@@ -66,6 +66,7 @@
 #include "camera.hpp"
 
 #include "gui.hpp"
+#include "guibutton.hpp"
 #include "layoutcontainer.hpp"
 #include "layoutdivision.hpp"
 #include "layoutelement.hpp"

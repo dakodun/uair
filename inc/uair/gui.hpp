@@ -105,6 +105,7 @@ class GUI {
 	
 	public :
 		static std::weak_ptr<InputManager> mInputManagerPtr;
+		static MessageQueue* mMessageQueuePtr;
 		
 		bool mUpdated = false;
 	private :

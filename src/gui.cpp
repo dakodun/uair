@@ -31,6 +31,7 @@
 
 namespace uair {
 std::weak_ptr<InputManager> GUI::mInputManagerPtr = std::weak_ptr<InputManager>();
+MessageQueue* GUI::mMessageQueuePtr = nullptr;
 
 GUI::GUI() : mElementHandles(CompareHandles) {
 	

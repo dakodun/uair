@@ -55,13 +55,14 @@ class RenderString : public Transformable2D, public Renderable {
 		
 		std::list<RenderBatchData> Upload();
 	private :
-		void CreateVBOVertices(); // create vertices for rendering from the vertices, transform matrix, and colours supplied
+		void CreateQuads();
 	private :
 		ResourcePtr<Font> mFont; // the font associated with this render string
 		std::u16string mString; // the content of the render string
 		unsigned int mSize = 1u; // the size the string is to be rendered at
 		
 		std::list<Shape> mQuads; // a list of individual glyph quads store for efficiency
+		glm::vec2 mTextScale = glm::vec2(1.0f, 1.0f); // scale factor to size quads to match desired text size
 };
 }
 

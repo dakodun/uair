@@ -34,6 +34,7 @@
 #define CEREAL_SERIALIZE_FUNCTION_NAME Serialise
 #include "cereal/archives/binary.hpp"
 #include "cereal/types/vector.hpp"
+#include "cereal/types/string.hpp"
 
 #include "init.hpp" // on windows, macro will rename GetMessage to GetMessageW so just go with it
 

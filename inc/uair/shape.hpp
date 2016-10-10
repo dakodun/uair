@@ -133,7 +133,7 @@ class Shape : public Polygon, public Renderable {
 		std::vector<AnimationFrame> mFrames; // animation frame data
 		unsigned int mCurrentFrame = 0u; // index of the current animation frame (if any)
 		bool mIsAnimated = false; // is shape animated
-		int mAnimationDirection = 1; // direction of animation (forward (1) or reverse (1))
+		int mAnimationDirection = 1; // direction of animation (forward (1) or reverse (-1))
 		float mAnimationLimit = 0.0f; // limit of animation (essentially it's speed)
 		float mAnimationTimer = 0.0f; // timer before switching to next frame
 		int mAnimationLoopCount = 0; // how many times to loop the animation (-1 implies infinitely)
