@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html>
+	<head>
+			<link rel="stylesheet" type="text/css" href="../style.css">
+	</head>
+	
+	<body>
+		<div id="main">
+			<!-- Page Header -->
+			<div id="header">
+				<div id="headerTitle">Uair Engine</div>
+				<div id="headerSubtitle">Alpha</div>
+			</div>
+			
+			<!-- Page Navigation -->
+			<div id="navigation">
+				<div id="navigationBar">
+					<div class="navigationBarItem"><a href="../index.html">Home</a></div>
+					<div class="navigationBarSeperator"><img src="../img/seperator.png"></img></div>
+					<div class="navigationBarItem"><a href="_classlist.html" id="navigationBarItemCurrent">Class List</a></div>
+					<div class="navigationBarSeperator"><img src="../img/seperator.png"></img></div>
+					<div class="navigationBarItem"><a href="_filelist.html">File List</a></div>
+					<div class="navigationBarSeperator"><img src="../img/seperator.png"></img></div>
+				</div>
+				<div id="navigationTitle">
+					class EntitySystem
+					<br>
+			</div>
+			
+			<!-- Page Content -->
+			<div id="content">
+				<div class="spacer16"></div>
+				<div class="contentHeading">Overview</div>
+				<div class="spacer8"></div>
+				<div class="contentBlock">
+					Detailed
+				</div>
+				
+				<div class="spacer16"></div>
+				
+				<span class="contentSubHeading">Member Functions</span>
+				<div class="contentItemContainer">
+					<div class="contentItemA">Public:</div>
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+							</span>
+							<a href="#anchEntitySystem">
+								EntitySystem()
+							</a>
+							<span class="contentItemBReg">
+								 = default
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+							</span>
+							<a href="#anchEntitySystem2">
+								EntitySystem(const EntitySystem&amp; other)
+							</a>
+							<span class="contentItemBReg">
+								 = delete
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+							</span>
+							<a href="#anchEntitySystem3">
+								EntitySystem(EntitySystem&amp;&amp; other)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+							</span>
+							<a href="#anch~EntitySystem">
+								~EntitySystem()
+							</a>
+							<span class="contentItemBReg">
+								 = default
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								EntitySystem&amp;
+							</span>
+							<a href="#anchoperator=">
+								operator=(EntitySystem other)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								friend void
+							</span>
+							<a href="#anchswap">
+								swap(EntitySystem&amp; first, EntitySystem&amp; second)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								EntityManager::Handle
+							</span>
+							<a href="#anchAddEntity">
+								AddEntity(const std::string&amp; name)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchRemoveEntity">
+								RemoveEntity(const EntityManager::Handle&amp; handle)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchRemoveEntities">
+								RemoveEntities(const std::string&amp; name)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchRemoveEntities2">
+								RemoveEntities()
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								Entity&amp;
+							</span>
+							<a href="#anchGetEntity">
+								GetEntity(const EntityManager::Handle&amp; handle)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								std::list&lt; std::reference_wrapper&lt;Entity&gt; &gt;
+							</span>
+							<a href="#anchGetEntities">
+								GetEntities(const std::string&amp; name)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								std::list&lt; std::reference_wrapper&lt;Entity&gt; &gt;
+							</span>
+							<a href="#anchGetEntities2">
+								GetEntities()
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								std::list&lt;EntityManager::Handle&gt;
+							</span>
+							<a href="#anchGetEntityHandles">
+								GetEntityHandles(const std::string&amp; name)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								std::list&lt;EntityManager::Handle&gt;
+							</span>
+							<a href="#anchGetEntityHandles2">
+								GetEntityHandles()
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								template &lt;typename T&gt;
+								<br>
+								T&amp;
+							</span>
+							<a href="#anchRegisterSystem">
+								RegisterSystem()
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								template &lt;typename T&gt;
+								<br>
+								void
+							</span>
+							<a href="#anchRemoveSystem">
+								RemoveSystem()
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								template &lt;typename T&gt;
+								<br>
+								T&amp;
+							</span>
+							<a href="#anchGetSystem">
+								GetSystem()
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+				</div>
+				
+				<div class="spacer8"></div>
+				
+				<span class="contentSubHeading">Data Members</span>
+				<div class="contentItemContainer">
+					<div class="contentItemA">Private:</div>
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								EntityManager
+							</span>
+							<a href="#anchmEntityManager">
+								mEntityManager
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								SystemManager
+							</span>
+							<a href="#anchmSystemManager">
+								mSystemManager
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+				</div>
+				
+				<div class="spacer8"></div>
+				
+				<span class="contentSubHeading">Other</span>
+				<div class="contentItemContainer">
+					<div class="contentItemA">Public:</div>
+						<div class="contentItemB">
+							<a href="Link.html">
+								typedef Manager&lt;Component&gt;::Handle ComponentHandle
+							</a>
+						</div>
+						<div class="contentItemC">
+							Description
+						</div>
+						
+						<div class="contentItemB">
+							<a href="Link.html">
+								typedef EntityManager::Handle EntityHandle
+							</a>
+						</div>
+						<div class="contentItemC">
+							Description
+						</div>
+				</div>
+				
+				<div class="spacer32"></div>
+				
+				<div class="contentHeading">Member Functions and Data Members</div>
+				
+				<div class="spacer12"></div>
+				
+				<span class="contentSubHeading" id="anchEntitySystem">
+					EntitySystem()
+					 = default
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchEntitySystem2">
+					EntitySystem(const EntitySystem&amp; other)
+					 = delete
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const EntitySystem&amp; other: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchEntitySystem3">
+					EntitySystem(EntitySystem&amp;&amp; other)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						EntitySystem&amp;&amp; other: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anch~EntitySystem">
+					~EntitySystem()
+					 = default
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchoperator=">
+					EntitySystem&amp;
+					operator=(EntitySystem other)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						EntitySystem other: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchswap">
+					friend void
+					swap(EntitySystem&amp; first, EntitySystem&amp; second)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						EntitySystem&amp; first: 
+					</div>
+					<div class="contentItemC">
+						EntitySystem&amp; second: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchAddEntity">
+					EntityManager::Handle
+					AddEntity(const std::string&amp; name)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const std::string&amp; name: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchRemoveEntity">
+					void
+					RemoveEntity(const EntityManager::Handle&amp; handle)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const EntityManager::Handle&amp; handle: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchRemoveEntities">
+					void
+					RemoveEntities(const std::string&amp; name)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const std::string&amp; name: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchRemoveEntities2">
+					void
+					RemoveEntities()
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetEntity">
+					Entity&amp;
+					GetEntity(const EntityManager::Handle&amp; handle)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const EntityManager::Handle&amp; handle: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetEntities">
+					std::list&lt; std::reference_wrapper&lt;Entity&gt; &gt;
+					GetEntities(const std::string&amp; name)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const std::string&amp; name: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetEntities2">
+					std::list&lt; std::reference_wrapper&lt;Entity&gt; &gt;
+					GetEntities()
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetEntityHandles">
+					std::list&lt;EntityManager::Handle&gt;
+					GetEntityHandles(const std::string&amp; name)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const std::string&amp; name: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetEntityHandles2">
+					std::list&lt;EntityManager::Handle&gt;
+					GetEntityHandles()
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchRegisterSystem">
+					template &lt;typename T&gt;
+					<br>
+					T&amp;
+					RegisterSystem()
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchRemoveSystem">
+					template &lt;typename T&gt;
+					<br>
+					void
+					RemoveSystem()
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetSystem">
+					template &lt;typename T&gt;
+					<br>
+					T&amp;
+					GetSystem()
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmEntityManager">
+					EntityManager
+					mEntityManager
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmSystemManager">
+					SystemManager
+					mSystemManager
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer32"></div>
+				
+				<div class="contentHeading">Source Files</div>
+				
+				<div class="spacer8"></div>
+				
+				<div class="contentBlock">
+					<a href="source/inc/uair/entitysystem.hpp">inc/uair/entitysystem.hpp</a>
+				</div>
+				
+				<div class="spacer4"></div>
+				
+				<div class="contentBlock">
+					<a href="source/src/entitysystem.cpp">src/entitysystem.cpp</a>
+				</div>
+				
+				<div class="spacer32"></div>
+			</div>
+			
+			<!-- Page Footer -->
+			<div id="footer">
+				Documentation last updated on the 6th of February, 2014.
+			</div>
+		</div>
+	</body>
+</html>
+

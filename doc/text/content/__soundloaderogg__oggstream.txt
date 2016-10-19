@@ -1,0 +1,48 @@
+__	Class List
+	SoundLoaderOgg::OggStream
+--
+	inc/uair/soundloaderogg.hpp
+--
+	struct OggStream
+--
+	Brief
+--
+	Detailed
+__
+
+-	public
+	int mVorbis
+=	Brief
+==	Detailed
+>	Default
+
+-	public
+	unsigned int mPacketsProcessed
+=	Brief
+==	Detailed
+>	Default
+
+-	public
+	ogg_stream_state mState
+=	Brief
+==	Detailed
+
+-	public
+	vorbis_info mInfo
+=	Brief
+==	Detailed
+
+-	public
+	vorbis_comment mComment
+=	Brief
+==	Detailed
+
+-	public
+	vorbis_block mBlock
+=	Brief
+==	Detailed
+
+-	public
+	vorbis_dsp_state mDSPState
+=	Brief
+==	Detailed

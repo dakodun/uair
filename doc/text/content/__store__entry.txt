@@ -1,0 +1,43 @@
+__	Class List
+	Store<B, T>::StoreEntry
+--
+	inc/uair/manager.hpp
+--
+	class StoreEntry
+--
+	Brief
+--
+	Detailed
+__
+
++	public
+	template <typename ...Ps>
+	StoreEntry(const std::string& name, const Ps&... params)
+=	Brief
+==	Detailed
+>	(const std::string& name: 
+>	const Ps&... params: 
+
+
+-	public
+	std::string mName
+=	Brief
+==	Detailed
+>	Default
+
+-	public
+	bool mActive
+=	Brief
+==	Detailed
+>	Default
+
+-	public
+	unsigned int mCounter
+=	Brief
+==	Detailed
+>	Default
+
+-	public
+	std::unique_ptr<T> mData
+=	Brief
+==	Detailed

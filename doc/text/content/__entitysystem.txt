@@ -1,0 +1,146 @@
+__	Class List
+	EntitySystem
+--
+	inc/uair/entitysystem.hpp
+	src/entitysystem.cpp
+--
+	class EntitySystem
+--
+	Brief
+--
+	Detailed
+__
+
++	public
+	EntitySystem() = default
+=	Brief
+==	Detailed
+
++	public
+	EntitySystem(const EntitySystem& other) = delete
+=	Brief
+==	Detailed
+>	const EntitySystem& other: 
+
++	public
+	EntitySystem(EntitySystem&& other)
+=	Brief
+==	Detailed
+>	EntitySystem&& other: 
+
++	public
+	~EntitySystem() = default
+=	Brief
+==	Detailed
+
++	public
+	EntitySystem& operator=(EntitySystem other)
+=	Brief
+==	Detailed
+>	EntitySystem other: 
+
++	public
+	friend void swap(EntitySystem& first, EntitySystem& second)
+=	Brief
+==	Detailed
+>	EntitySystem& first: 
+>	EntitySystem& second: 
+
++	public
+	EntityManager::Handle AddEntity(const std::string& name)
+=	Brief
+==	Detailed
+>	const std::string& name: 
+<	Return
+
++	public
+	void RemoveEntity(const EntityManager::Handle& handle)
+=	Brief
+==	Detailed
+>	const EntityManager::Handle& handle: 
+
++	public
+	void RemoveEntities(const std::string& name)
+=	Brief
+==	Detailed
+>	const std::string& name: 
+
++	public
+	void RemoveEntities()
+=	Brief
+==	Detailed
+
++	public
+	Entity& GetEntity(const EntityManager::Handle& handle)
+=	Brief
+==	Detailed
+>	const EntityManager::Handle& handle: 
+<	Return
+
++	public
+	std::list< std::reference_wrapper<Entity> > GetEntities(const std::string& name)
+=	Brief
+==	Detailed
+>	const std::string& name: 
+<	Return
+
++	public
+	std::list< std::reference_wrapper<Entity> > GetEntities()
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	std::list<EntityManager::Handle> GetEntityHandles(const std::string& name)
+=	Brief
+==	Detailed
+>	const std::string& name: 
+<	Return
+
++	public
+	std::list<EntityManager::Handle> GetEntityHandles()
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	template <typename T>
+	T& RegisterSystem()
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	template <typename T>
+	void RemoveSystem()
+=	Brief
+==	Detailed
+
++	public
+	template <typename T>
+	T& GetSystem()
+=	Brief
+==	Detailed
+<	Return
+
+
+-	private
+	EntityManager mEntityManager
+=	Brief
+==	Detailed
+
+-	private
+	SystemManager mSystemManager
+=	Brief
+==	Detailed
+
+
+~	public
+	typedef Manager<Component>::Handle ComponentHandle
+=	Description
+<	Link
+
+~	public
+	typedef EntityManager::Handle EntityHandle
+=	Description
+<	Link

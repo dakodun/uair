@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html>
+	<head>
+			<link rel="stylesheet" type="text/css" href="../style.css">
+	</head>
+	
+	<body>
+		<div id="main">
+			<!-- Page Header -->
+			<div id="header">
+				<div id="headerTitle">Uair Engine</div>
+				<div id="headerSubtitle">Alpha</div>
+			</div>
+			
+			<!-- Page Navigation -->
+			<div id="navigation">
+				<div id="navigationBar">
+					<div class="navigationBarItem"><a href="../index.html">Home</a></div>
+					<div class="navigationBarSeperator"><img src="../img/seperator.png"></img></div>
+					<div class="navigationBarItem"><a href="_classlist.html" id="navigationBarItemCurrent">Class List</a></div>
+					<div class="navigationBarSeperator"><img src="../img/seperator.png"></img></div>
+					<div class="navigationBarItem"><a href="_filelist.html">File List</a></div>
+					<div class="navigationBarSeperator"><img src="../img/seperator.png"></img></div>
+				</div>
+				<div id="navigationTitle">
+					class Shape : public Polygon, public Renderable
+					<br>
+			</div>
+			
+			<!-- Page Content -->
+			<div id="content">
+				<div class="spacer16"></div>
+				<div class="contentHeading">Overview</div>
+				<div class="spacer8"></div>
+				<div class="contentBlock">
+					Detailed
+				</div>
+				
+				<div class="spacer16"></div>
+				
+				<span class="contentSubHeading">Member Functions</span>
+				<div class="contentItemContainer">
+					<div class="contentItemA">Public:</div>
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+							</span>
+							<a href="#anchShape">
+								Shape()
+							</a>
+							<span class="contentItemBReg">
+								 = default
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								explicit
+							</span>
+							<a href="#anchShape2">
+								Shape(const std::vector&lt;Contour&gt;&amp; contours, const CoordinateSpace&amp; coordinateSpace = CoordinateSpace::Local)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								explicit
+							</span>
+							<a href="#anchShape3">
+								Shape(const ClipperLib::Paths&amp; clipperPaths)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchAddContour">
+								AddContour(const Contour&amp; contour, const CoordinateSpace&amp; coordinateSpace = CoordinateSpace::Local)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchAddContours">
+								AddContours(const std::vector&lt;Contour&gt;&amp; contours, const CoordinateSpace&amp; coordinateSpace = CoordinateSpace::Local)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchOffset">
+								Offset(float distance, const ClipperLib::JoinType&amp; miterType = ClipperLib::jtRound, const double&amp; miterLimit = 2.0d)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchPositionContoursAtOrigin">
+								PositionContoursAtOrigin()
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchFromClipperPaths">
+								FromClipperPaths(const ClipperLib::Paths&amp; clipperPaths)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								Shape
+							</span>
+							<a href="#anchGetTransformed">
+								GetTransformed()
+							</a>
+							<span class="contentItemBReg">
+								 const
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								std::string
+							</span>
+							<a href="#anchGetTag">
+								GetTag()
+							</a>
+							<span class="contentItemBReg">
+								 const
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchProcess">
+								Process()
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchSetWindingRule">
+								SetWindingRule(const WindingRule&amp; windingRule)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchAddColour">
+								AddColour(const std::vector&lt;glm::vec4&gt;&amp; colour)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchAddFrame">
+								AddFrame(ResourcePtr&lt;Texture&gt; texture, const unsigned int&amp; layer)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchAddFrameCoords">
+								AddFrameCoords(ResourcePtr&lt;Texture&gt; texture, const unsigned int&amp; layer, std::vector&lt;glm::vec2&gt; textureCoords)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchAddFrameRect">
+								AddFrameRect(ResourcePtr&lt;Texture&gt; texture, const unsigned int&amp; layer, const std::vector&lt;glm::vec2&gt;&amp; textureRect)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchAddFrameStrip">
+								AddFrameStrip(ResourcePtr&lt;Texture&gt; texture, const unsigned int&amp; layer, const unsigned int&amp; numFrames, const unsigned int&amp; numPerRow, const unsigned int&amp; numPerCol, const glm::ivec2&amp; offset = glm::ivec2(0, 0))
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchAddFrame2">
+								AddFrame(Texture* texture, const unsigned int&amp; layer)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchAddFrameCoords2">
+								AddFrameCoords(Texture* texture, const unsigned int&amp; layer, std::vector&lt;glm::vec2&gt; textureCoords)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchAddFrameRect2">
+								AddFrameRect(Texture* texture, const unsigned int&amp; layer, const std::vector&lt;glm::vec2&gt;&amp; textureRect)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchAddFrameStrip2">
+								AddFrameStrip(Texture* texture, const unsigned int&amp; layer, const unsigned int&amp; numFrames, const unsigned int&amp; numPerRow, const unsigned int&amp; numPerCol, const glm::ivec2&amp; offset = glm::ivec2(0, 0))
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchSetAnimation">
+								SetAnimation(const float&amp; speed, const unsigned int&amp; start, const unsigned int&amp; end, const int&amp; loops = -1)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchSetCurrentFrame">
+								SetCurrentFrame(const unsigned int&amp; frame)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								unsigned int
+							</span>
+							<a href="#anchGetFrameCount">
+								GetFrameCount()
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+					<div class="contentItemA">Protected:</div>
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								std::list&lt;RenderBatchData&gt;
+							</span>
+							<a href="#anchUpload">
+								Upload()
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+					<div class="contentItemA">Private:</div>
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchCalculateTexCoords">
+								CalculateTexCoords(const std::vector&lt;glm::vec2&gt;&amp; points, const std::vector&lt;glm::vec2&gt;&amp; texRect, std::vector&lt;glm::vec2&gt;&amp; texCoordsLocation)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchCreateVBOVertices">
+								CreateVBOVertices(RenderBatchData&amp; batchData, const std::vector&lt;glm::vec2&gt;&amp; vertices, std::vector&lt;glm::vec2&gt; texCoords, std::vector&lt;glm::vec4&gt; colours)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchCalculateExtraColour">
+								CalculateExtraColour()
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchCalculateExtraTexCoords">
+								CalculateExtraTexCoords(AnimationFrame&amp; frame)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+				</div>
+				
+				<div class="spacer8"></div>
+				
+				<span class="contentSubHeading">Data Members</span>
+				<div class="contentItemContainer">
+					<div class="contentItemA">Public:</div>
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								static float
+							</span>
+							<a href="#anchmFrameLowerLimit">
+								mFrameLowerLimit
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+					<div class="contentItemA">Private:</div>
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								WindingRule
+							</span>
+							<a href="#anchmWindingRule">
+								mWindingRule
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								std::vector&lt; std::vector&lt;VBOIndex&gt; &gt;
+							</span>
+							<a href="#anchmIndices">
+								mIndices
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								std::vector&lt;Triangulate::Vertex&gt;
+							</span>
+							<a href="#anchmVertices">
+								mVertices
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								std::vector&lt;glm::vec4&gt;
+							</span>
+							<a href="#anchmColourArray">
+								mColourArray
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								std::vector&lt;glm::vec4&gt;
+							</span>
+							<a href="#anchmColourArrayExtra">
+								mColourArrayExtra
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								std::vector&lt;AnimationFrame&gt;
+							</span>
+							<a href="#anchmFrames">
+								mFrames
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								unsigned int
+							</span>
+							<a href="#anchmCurrentFrame">
+								mCurrentFrame
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								bool
+							</span>
+							<a href="#anchmIsAnimated">
+								mIsAnimated
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								int
+							</span>
+							<a href="#anchmAnimationDirection">
+								mAnimationDirection
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								float
+							</span>
+							<a href="#anchmAnimationLimit">
+								mAnimationLimit
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								float
+							</span>
+							<a href="#anchmAnimationTimer">
+								mAnimationTimer
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								int
+							</span>
+							<a href="#anchmAnimationLoopCount">
+								mAnimationLoopCount
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								unsigned int
+							</span>
+							<a href="#anchmAnimationStartFrame">
+								mAnimationStartFrame
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								unsigned int
+							</span>
+							<a href="#anchmAnimationEndFrame">
+								mAnimationEndFrame
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+				</div>
+				
+				<div class="spacer32"></div>
+				
+				<div class="contentHeading">Member Functions and Data Members</div>
+				
+				<div class="spacer12"></div>
+				
+				<span class="contentSubHeading" id="anchShape">
+					Shape()
+					 = default
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchShape2">
+					explicit
+					Shape(const std::vector&lt;Contour&gt;&amp; contours, const CoordinateSpace&amp; coordinateSpace = CoordinateSpace::Local)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const std::vector&lt;Contour&gt;&amp; contours: 
+					</div>
+					<div class="contentItemC">
+						const CoordinateSpace&amp; coordinateSpace: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchShape3">
+					explicit
+					Shape(const ClipperLib::Paths&amp; clipperPaths)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const ClipperLib::Paths&amp; clipperPaths: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchAddContour">
+					void
+					AddContour(const Contour&amp; contour, const CoordinateSpace&amp; coordinateSpace = CoordinateSpace::Local)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const Contour&amp; contour: 
+					</div>
+					<div class="contentItemC">
+						const CoordinateSpace&amp; coordinateSpace: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchAddContours">
+					void
+					AddContours(const std::vector&lt;Contour&gt;&amp; contours, const CoordinateSpace&amp; coordinateSpace = CoordinateSpace::Local)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchOffset">
+					void
+					Offset(float distance, const ClipperLib::JoinType&amp; miterType = ClipperLib::jtRound, const double&amp; miterLimit = 2.0d)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						float distance: 
+					</div>
+					<div class="contentItemC">
+						const ClipperLib::JoinType&amp; miterType: 
+					</div>
+					<div class="contentItemC">
+						const double&amp; miterLimit: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchPositionContoursAtOrigin">
+					void
+					PositionContoursAtOrigin()
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchFromClipperPaths">
+					void
+					FromClipperPaths(const ClipperLib::Paths&amp; clipperPaths)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const ClipperLib::Paths&amp; clipperPaths: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetTransformed">
+					Shape
+					GetTransformed()
+					 const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetTag">
+					std::string
+					GetTag()
+					 const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchProcess">
+					void
+					Process()
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchSetWindingRule">
+					void
+					SetWindingRule(const WindingRule&amp; windingRule)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const WindingRule&amp; windingRule: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchAddColour">
+					void
+					AddColour(const std::vector&lt;glm::vec4&gt;&amp; colour)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const std::vector&lt;glm::vec4&gt;&amp; colour: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchAddFrame">
+					void
+					AddFrame(ResourcePtr&lt;Texture&gt; texture, const unsigned int&amp; layer)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						ResourcePtr&lt;Texture&gt; texture: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; layer: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchAddFrameCoords">
+					void
+					AddFrameCoords(ResourcePtr&lt;Texture&gt; texture, const unsigned int&amp; layer, std::vector&lt;glm::vec2&gt; textureCoords)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						ResourcePtr&lt;Texture&gt; texture: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; layer: 
+					</div>
+					<div class="contentItemC">
+						std::vector&lt;glm::vec2&gt; textureCoords: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchAddFrameRect">
+					void
+					AddFrameRect(ResourcePtr&lt;Texture&gt; texture, const unsigned int&amp; layer, const std::vector&lt;glm::vec2&gt;&amp; textureRect)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						ResourcePtr&lt;Texture&gt; texture: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; layer: 
+					</div>
+					<div class="contentItemC">
+						const std::vector&lt;glm::vec2&gt;&amp; textureRect: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchAddFrameStrip">
+					void
+					AddFrameStrip(ResourcePtr&lt;Texture&gt; texture, const unsigned int&amp; layer, const unsigned int&amp; numFrames, const unsigned int&amp; numPerRow, const unsigned int&amp; numPerCol, const glm::ivec2&amp; offset = glm::ivec2(0, 0))
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						ResourcePtr&lt;Texture&gt; texture: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; layer: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; numFrames: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; numPerRow: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; numPerCol: 
+					</div>
+					<div class="contentItemC">
+						const glm::ivec2&amp; offset: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchAddFrame2">
+					void
+					AddFrame(Texture* texture, const unsigned int&amp; layer)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						Texture* texture: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; layer: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchAddFrameCoords2">
+					void
+					AddFrameCoords(Texture* texture, const unsigned int&amp; layer, std::vector&lt;glm::vec2&gt; textureCoords)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						Texture* texture: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; layer: 
+					</div>
+					<div class="contentItemC">
+						std::vector&lt;glm::vec2&gt; textureCoords: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchAddFrameRect2">
+					void
+					AddFrameRect(Texture* texture, const unsigned int&amp; layer, const std::vector&lt;glm::vec2&gt;&amp; textureRect)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						Texture* texture: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; layer: 
+					</div>
+					<div class="contentItemC">
+						const std::vector&lt;glm::vec2&gt;&amp; textureRect: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchAddFrameStrip2">
+					void
+					AddFrameStrip(Texture* texture, const unsigned int&amp; layer, const unsigned int&amp; numFrames, const unsigned int&amp; numPerRow, const unsigned int&amp; numPerCol, const glm::ivec2&amp; offset = glm::ivec2(0, 0))
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						Texture* texture: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; layer: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; numFrames: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; numPerRow: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; numPerCol: 
+					</div>
+					<div class="contentItemC">
+						const glm::ivec2&amp; offset: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchSetAnimation">
+					void
+					SetAnimation(const float&amp; speed, const unsigned int&amp; start, const unsigned int&amp; end, const int&amp; loops = -1)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const float&amp; speed: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; start: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; end: 
+					</div>
+					<div class="contentItemC">
+						const int&amp; loops: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchSetCurrentFrame">
+					void
+					SetCurrentFrame(const unsigned int&amp; frame)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const unsigned int&amp; frame: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetFrameCount">
+					unsigned int
+					GetFrameCount()
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchUpload">
+					std::list&lt;RenderBatchData&gt;
+					Upload()
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchCalculateTexCoords">
+					void
+					CalculateTexCoords(const std::vector&lt;glm::vec2&gt;&amp; points, const std::vector&lt;glm::vec2&gt;&amp; texRect, std::vector&lt;glm::vec2&gt;&amp; texCoordsLocation)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const std::vector&lt;glm::vec2&gt;&amp; points: 
+					</div>
+					<div class="contentItemC">
+						const std::vector&lt;glm::vec2&gt;&amp; texRect: 
+					</div>
+					<div class="contentItemC">
+						std::vector&lt;glm::vec2&gt;&amp; texCoordsLocation: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchCreateVBOVertices">
+					void
+					CreateVBOVertices(RenderBatchData&amp; batchData, const std::vector&lt;glm::vec2&gt;&amp; vertices, std::vector&lt;glm::vec2&gt; texCoords, std::vector&lt;glm::vec4&gt; colours)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						RenderBatchData&amp; batchData: 
+					</div>
+					<div class="contentItemC">
+						const std::vector&lt;glm::vec2&gt;&amp; vertices: 
+					</div>
+					<div class="contentItemC">
+						std::vector&lt;glm::vec2&gt; texCoords: 
+					</div>
+					<div class="contentItemC">
+						std::vector&lt;glm::vec4&gt; colours: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchCalculateExtraColour">
+					void
+					CalculateExtraColour()
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchCalculateExtraTexCoords">
+					void
+					CalculateExtraTexCoords(AnimationFrame&amp; frame)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						AnimationFrame&amp; frame: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmFrameLowerLimit">
+					static float
+					mFrameLowerLimit
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmWindingRule">
+					WindingRule
+					mWindingRule
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Default Value:</div>
+					<div class="contentItemC">
+						Default
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmIndices">
+					std::vector&lt; std::vector&lt;VBOIndex&gt; &gt;
+					mIndices
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Default Value:</div>
+					<div class="contentItemC">
+						Default
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmVertices">
+					std::vector&lt;Triangulate::Vertex&gt;
+					mVertices
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmColourArray">
+					std::vector&lt;glm::vec4&gt;
+					mColourArray
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmColourArrayExtra">
+					std::vector&lt;glm::vec4&gt;
+					mColourArrayExtra
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmFrames">
+					std::vector&lt;AnimationFrame&gt;
+					mFrames
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmCurrentFrame">
+					unsigned int
+					mCurrentFrame
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Default Value:</div>
+					<div class="contentItemC">
+						Default
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmIsAnimated">
+					bool
+					mIsAnimated
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Default Value:</div>
+					<div class="contentItemC">
+						Default
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmAnimationDirection">
+					int
+					mAnimationDirection
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Default Value:</div>
+					<div class="contentItemC">
+						Default
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmAnimationLimit">
+					float
+					mAnimationLimit
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Default Value:</div>
+					<div class="contentItemC">
+						Default
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmAnimationTimer">
+					float
+					mAnimationTimer
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Default Value:</div>
+					<div class="contentItemC">
+						Default
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmAnimationLoopCount">
+					int
+					mAnimationLoopCount
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Default Value:</div>
+					<div class="contentItemC">
+						Default
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmAnimationStartFrame">
+					unsigned int
+					mAnimationStartFrame
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Default Value:</div>
+					<div class="contentItemC">
+						Default
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmAnimationEndFrame">
+					unsigned int
+					mAnimationEndFrame
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Default Value:</div>
+					<div class="contentItemC">
+						Default
+					</div>
+				</div>
+				
+				<div class="spacer32"></div>
+				
+				<div class="contentHeading">Source Files</div>
+				
+				<div class="spacer8"></div>
+				
+				<div class="contentBlock">
+					<a href="source/inc/uair/shape.hpp">inc/uair/shape.hpp</a>
+				</div>
+				
+				<div class="spacer4"></div>
+				
+				<div class="contentBlock">
+					<a href="source/src/shape.cpp">src/shape.cpp</a>
+				</div>
+				
+				<div class="spacer32"></div>
+			</div>
+			
+			<!-- Page Footer -->
+			<div id="footer">
+				Documentation last updated on the 6th of February, 2014.
+			</div>
+		</div>
+	</body>
+</html>
+

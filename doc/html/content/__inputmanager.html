@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html>
+	<head>
+			<link rel="stylesheet" type="text/css" href="../style.css">
+	</head>
+	
+	<body>
+		<div id="main">
+			<!-- Page Header -->
+			<div id="header">
+				<div id="headerTitle">Uair Engine</div>
+				<div id="headerSubtitle">Alpha</div>
+			</div>
+			
+			<!-- Page Navigation -->
+			<div id="navigation">
+				<div id="navigationBar">
+					<div class="navigationBarItem"><a href="../index.html">Home</a></div>
+					<div class="navigationBarSeperator"><img src="../img/seperator.png"></img></div>
+					<div class="navigationBarItem"><a href="_classlist.html" id="navigationBarItemCurrent">Class List</a></div>
+					<div class="navigationBarSeperator"><img src="../img/seperator.png"></img></div>
+					<div class="navigationBarItem"><a href="_filelist.html">File List</a></div>
+					<div class="navigationBarSeperator"><img src="../img/seperator.png"></img></div>
+				</div>
+				<div id="navigationTitle">
+					class InputManager
+					<br>
+			</div>
+			
+			<!-- Page Content -->
+			<div id="content">
+				<div class="spacer16"></div>
+				<div class="contentHeading">Overview</div>
+				<div class="spacer8"></div>
+				<div class="contentBlock">
+					Detailed
+				</div>
+				
+				<div class="spacer16"></div>
+				
+				<span class="contentSubHeading">Member Functions</span>
+				<div class="contentItemContainer">
+					<div class="contentItemA">Public:</div>
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+							</span>
+							<a href="#anchInputManager">
+								InputManager()
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchProcess">
+								Process()
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								bool
+							</span>
+							<a href="#anchGetKeyboardDown">
+								GetKeyboardDown(const Keyboard&amp; key)
+							</a>
+							<span class="contentItemBReg">
+								 const
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								bool
+							</span>
+							<a href="#anchGetKeyboardPressed">
+								GetKeyboardPressed(const Keyboard&amp; key)
+							</a>
+							<span class="contentItemBReg">
+								 const
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								bool
+							</span>
+							<a href="#anchGetKeyboardReleased">
+								GetKeyboardReleased(const Keyboard&amp; key)
+							</a>
+							<span class="contentItemBReg">
+								 const
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								unsigned int
+							</span>
+							<a href="#anchGetKeyboardState">
+								GetKeyboardState(const Keyboard&amp; key)
+							</a>
+							<span class="contentItemBReg">
+								 const
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								std::u16string
+							</span>
+							<a href="#anchGetInputString">
+								GetInputString()
+							</a>
+							<span class="contentItemBReg">
+								 const
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								bool
+							</span>
+							<a href="#anchGetMouseDown">
+								GetMouseDown(const Mouse&amp; button)
+							</a>
+							<span class="contentItemBReg">
+								 const
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								bool
+							</span>
+							<a href="#anchGetMousePressed">
+								GetMousePressed(const Mouse&amp; button)
+							</a>
+							<span class="contentItemBReg">
+								 const
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								bool
+							</span>
+							<a href="#anchGetMouseReleased">
+								GetMouseReleased(const Mouse&amp; button)
+							</a>
+							<span class="contentItemBReg">
+								 const
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								unsigned int
+							</span>
+							<a href="#anchGetMouseState">
+								GetMouseState(const Mouse&amp; button)
+							</a>
+							<span class="contentItemBReg">
+								 const
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								int
+							</span>
+							<a href="#anchGetMouseWheel">
+								GetMouseWheel()
+							</a>
+							<span class="contentItemBReg">
+								 const
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchSetMouseCoords">
+								SetMouseCoords(const glm::ivec2&amp; newCoords, const CoordinateSpace&amp; coordinateSpace = CoordinateSpace::Local)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								glm::ivec2
+							</span>
+							<a href="#anchGetMouseCoords">
+								GetMouseCoords(const CoordinateSpace&amp; coordinateSpace = CoordinateSpace::Local)
+							</a>
+							<span class="contentItemBReg">
+								 const
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								bool
+							</span>
+							<a href="#anchDeviceExists">
+								DeviceExists(const int&amp; deviceID)
+							</a>
+							<span class="contentItemBReg">
+								 const
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								const InputDevice&amp;
+							</span>
+							<a href="#anchGetDevice">
+								GetDevice(const int&amp; deviceID)
+							</a>
+							<span class="contentItemBReg">
+								 const
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								unsigned int
+							</span>
+							<a href="#anchGetDeviceButtonCount">
+								GetDeviceButtonCount(const int&amp; deviceID)
+							</a>
+							<span class="contentItemBReg">
+								 const
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								bool
+							</span>
+							<a href="#anchGetDeviceButtonDown">
+								GetDeviceButtonDown(const int&amp; deviceID, const unsigned int&amp; button)
+							</a>
+							<span class="contentItemBReg">
+								 const
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								bool
+							</span>
+							<a href="#anchGetDeviceButtonPressed">
+								GetDeviceButtonPressed(const int&amp; deviceID, const unsigned int&amp; button)
+							</a>
+							<span class="contentItemBReg">
+								 const
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								bool
+							</span>
+							<a href="#anchGetDeviceButtonReleased">
+								GetDeviceButtonReleased(const int&amp; deviceID, const unsigned int&amp; button)
+							</a>
+							<span class="contentItemBReg">
+								 const
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								unsigned int
+							</span>
+							<a href="#anchGetDeviceButtonState">
+								GetDeviceButtonState(const int&amp; deviceID, const unsigned int&amp; button)
+							</a>
+							<span class="contentItemBReg">
+								 const
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								unsigned int
+							</span>
+							<a href="#anchGetDeviceControlCount">
+								GetDeviceControlCount(const int&amp; deviceID)
+							</a>
+							<span class="contentItemBReg">
+								 const
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								bool
+							</span>
+							<a href="#anchDeviceHasControl">
+								DeviceHasControl(const int&amp; deviceID, const Device&amp; control)
+							</a>
+							<span class="contentItemBReg">
+								 const
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								int
+							</span>
+							<a href="#anchGetDeviceControl">
+								GetDeviceControl(const int&amp; deviceID, const Device&amp; control)
+							</a>
+							<span class="contentItemBReg">
+								 const
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								int
+							</span>
+							<a href="#anchGetDeviceControlScaled">
+								GetDeviceControlScaled(const int&amp; deviceID, const Device&amp; control, std::pair&lt;int, int&gt; range = std::make_pair(0, 255))
+							</a>
+							<span class="contentItemBReg">
+								 const
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								std::pair&lt;int, int&gt;
+							</span>
+							<a href="#anchGetDeviceControlRange">
+								GetDeviceControlRange(const int&amp; deviceID, const Device&amp; control)
+							</a>
+							<span class="contentItemBReg">
+								 const
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								std::vector&lt;Device&gt;
+							</span>
+							<a href="#anchGetDeviceLinkedDevices">
+								GetDeviceLinkedDevices(const int&amp; deviceID, const unsigned int&amp; collectionID)
+							</a>
+							<span class="contentItemBReg">
+								 const
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								unsigned int
+							</span>
+							<a href="#anchGetDeviceLinkID">
+								GetDeviceLinkID(const int&amp; deviceID, const Device&amp; control)
+							</a>
+							<span class="contentItemBReg">
+								 const
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+					<div class="contentItemA">Private:</div>
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchReset">
+								Reset()
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchHandleKeyboardKeys">
+								HandleKeyboardKeys(const Keyboard&amp; key, const unsigned int&amp; type)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchHandleTextInput">
+								HandleTextInput(const char16_t&amp; input)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchHandleMouseButtons">
+								HandleMouseButtons(const Mouse&amp; button, const unsigned int&amp; type)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchAddDevice">
+								AddDevice(const int&amp; deviceID, const unsigned int&amp; buttonCount, const unsigned int&amp; controlCount, const std::vector&lt;InputDevice::ControlCaps&gt;&amp; caps)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchRemoveDevice">
+								RemoveDevice(const int&amp; deviceID)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchHandleDeviceButtons">
+								HandleDeviceButtons(const unsigned int&amp; button, const unsigned int&amp; type, const int&amp; deviceID)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchHandleDeviceControls">
+								HandleDeviceControls(const Device&amp; control, const int&amp; value, const int&amp; deviceID)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+				</div>
+				
+				<div class="spacer8"></div>
+				
+				<span class="contentSubHeading">Data Members</span>
+				<div class="contentItemContainer">
+					<div class="contentItemA">Public:</div>
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								static std::weak_ptr&lt;Window&gt;
+							</span>
+							<a href="#anchmWindowPtr">
+								mWindowPtr
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+					<div class="contentItemA">Private:</div>
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								std::map&lt;Keyboard, unsigned int&gt;
+							</span>
+							<a href="#anchmKeyboardStates">
+								mKeyboardStates
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								std::map&lt;Mouse, unsigned int&gt;
+							</span>
+							<a href="#anchmMouseStates">
+								mMouseStates
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								int
+							</span>
+							<a href="#anchmMouseWheel">
+								mMouseWheel
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								std::map&lt;int, InputDevice&gt;
+							</span>
+							<a href="#anchmInputDevices">
+								mInputDevices
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								InputDevice
+							</span>
+							<a href="#anchmDefaultDevice">
+								mDefaultDevice
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								std::u16string
+							</span>
+							<a href="#anchmInputString">
+								mInputString
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+				</div>
+				
+				<div class="spacer8"></div>
+				
+				<span class="contentSubHeading">Other</span>
+				<div class="contentItemContainer">
+					<div class="contentItemA">Public:</div>
+						<div class="contentItemB">
+							<a href="Link.html">
+								class InputDevice
+							</a>
+						</div>
+						<div class="contentItemC">
+							Description
+						</div>
+				</div>
+				
+				<div class="spacer32"></div>
+				
+				<div class="contentHeading">Member Functions and Data Members</div>
+				
+				<div class="spacer12"></div>
+				
+				<span class="contentSubHeading" id="anchInputManager">
+					InputManager()
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchProcess">
+					void
+					Process()
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetKeyboardDown">
+					bool
+					GetKeyboardDown(const Keyboard&amp; key)
+					 const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const Keyboard&amp; key: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetKeyboardPressed">
+					bool
+					GetKeyboardPressed(const Keyboard&amp; key)
+					 const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const Keyboard&amp; key: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetKeyboardReleased">
+					bool
+					GetKeyboardReleased(const Keyboard&amp; key)
+					 const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const Keyboard&amp; key: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetKeyboardState">
+					unsigned int
+					GetKeyboardState(const Keyboard&amp; key)
+					 const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const Keyboard&amp; key: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetInputString">
+					std::u16string
+					GetInputString()
+					 const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetMouseDown">
+					bool
+					GetMouseDown(const Mouse&amp; button)
+					 const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const Mouse&amp; button: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetMousePressed">
+					bool
+					GetMousePressed(const Mouse&amp; button)
+					 const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const Mouse&amp; button: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetMouseReleased">
+					bool
+					GetMouseReleased(const Mouse&amp; button)
+					 const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const Mouse&amp; button: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetMouseState">
+					unsigned int
+					GetMouseState(const Mouse&amp; button)
+					 const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const Mouse&amp; button: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetMouseWheel">
+					int
+					GetMouseWheel()
+					 const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchSetMouseCoords">
+					void
+					SetMouseCoords(const glm::ivec2&amp; newCoords, const CoordinateSpace&amp; coordinateSpace = CoordinateSpace::Local)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const glm::ivec2&amp; newCoords: 
+					</div>
+					<div class="contentItemC">
+						const CoordinateSpace&amp; coordinateSpace: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetMouseCoords">
+					glm::ivec2
+					GetMouseCoords(const CoordinateSpace&amp; coordinateSpace = CoordinateSpace::Local)
+					 const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const CoordinateSpace&amp; coordinateSpace: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchDeviceExists">
+					bool
+					DeviceExists(const int&amp; deviceID)
+					 const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const int&amp; deviceID: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetDevice">
+					const InputDevice&amp;
+					GetDevice(const int&amp; deviceID)
+					 const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const int&amp; deviceID: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetDeviceButtonCount">
+					unsigned int
+					GetDeviceButtonCount(const int&amp; deviceID)
+					 const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const int&amp; deviceID: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetDeviceButtonDown">
+					bool
+					GetDeviceButtonDown(const int&amp; deviceID, const unsigned int&amp; button)
+					 const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const int&amp; deviceID: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; button: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetDeviceButtonPressed">
+					bool
+					GetDeviceButtonPressed(const int&amp; deviceID, const unsigned int&amp; button)
+					 const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const int&amp; deviceID: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; button: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetDeviceButtonReleased">
+					bool
+					GetDeviceButtonReleased(const int&amp; deviceID, const unsigned int&amp; button)
+					 const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const int&amp; deviceID: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; button: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetDeviceButtonState">
+					unsigned int
+					GetDeviceButtonState(const int&amp; deviceID, const unsigned int&amp; button)
+					 const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const int&amp; deviceID: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; button: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetDeviceControlCount">
+					unsigned int
+					GetDeviceControlCount(const int&amp; deviceID)
+					 const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const int&amp; deviceID: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchDeviceHasControl">
+					bool
+					DeviceHasControl(const int&amp; deviceID, const Device&amp; control)
+					 const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const int&amp; deviceID: 
+					</div>
+					<div class="contentItemC">
+						const Device&amp; control: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetDeviceControl">
+					int
+					GetDeviceControl(const int&amp; deviceID, const Device&amp; control)
+					 const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const int&amp; deviceID: 
+					</div>
+					<div class="contentItemC">
+						const Device&amp; control: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetDeviceControlScaled">
+					int
+					GetDeviceControlScaled(const int&amp; deviceID, const Device&amp; control, std::pair&lt;int, int&gt; range = std::make_pair(0, 255))
+					 const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const int&amp; deviceID: 
+					</div>
+					<div class="contentItemC">
+						const Device&amp; control: 
+					</div>
+					<div class="contentItemC">
+						std::pair&lt;int, int&gt; range: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetDeviceControlRange">
+					std::pair&lt;int, int&gt;
+					GetDeviceControlRange(const int&amp; deviceID, const Device&amp; control)
+					 const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const int&amp; deviceID: 
+					</div>
+					<div class="contentItemC">
+						const Device&amp; control: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetDeviceLinkedDevices">
+					std::vector&lt;Device&gt;
+					GetDeviceLinkedDevices(const int&amp; deviceID, const unsigned int&amp; collectionID)
+					 const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const int&amp; deviceID: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; collectionID: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetDeviceLinkID">
+					unsigned int
+					GetDeviceLinkID(const int&amp; deviceID, const Device&amp; control)
+					 const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const int&amp; deviceID: 
+					</div>
+					<div class="contentItemC">
+						const Device&amp; control: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchReset">
+					void
+					Reset()
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchHandleKeyboardKeys">
+					void
+					HandleKeyboardKeys(const Keyboard&amp; key, const unsigned int&amp; type)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const Keyboard&amp; key: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; type: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchHandleTextInput">
+					void
+					HandleTextInput(const char16_t&amp; input)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const char16_t&amp; input: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchHandleMouseButtons">
+					void
+					HandleMouseButtons(const Mouse&amp; button, const unsigned int&amp; type)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const Mouse&amp; button: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; type: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchAddDevice">
+					void
+					AddDevice(const int&amp; deviceID, const unsigned int&amp; buttonCount, const unsigned int&amp; controlCount, const std::vector&lt;InputDevice::ControlCaps&gt;&amp; caps)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const int&amp; deviceID: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; buttonCount: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; controlCount: 
+					</div>
+					<div class="contentItemC">
+						const std::vector&lt;InputDevice::ControlCaps&gt;&amp; caps: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchRemoveDevice">
+					void
+					RemoveDevice(const int&amp; deviceID)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const int&amp; deviceID: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchHandleDeviceButtons">
+					void
+					HandleDeviceButtons(const unsigned int&amp; button, const unsigned int&amp; type, const int&amp; deviceID)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const unsigned int&amp; button: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; type: 
+					</div>
+					<div class="contentItemC">
+						const int&amp; deviceID: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchHandleDeviceControls">
+					void
+					HandleDeviceControls(const Device&amp; control, const int&amp; value, const int&amp; deviceID)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const Device&amp; control: 
+					</div>
+					<div class="contentItemC">
+						const int&amp; value: 
+					</div>
+					<div class="contentItemC">
+						const int&amp; deviceID: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmWindowPtr">
+					static std::weak_ptr&lt;Window&gt;
+					mWindowPtr
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Default Value:</div>
+					<div class="contentItemC">
+						Default
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmKeyboardStates">
+					std::map&lt;Keyboard, unsigned int&gt;
+					mKeyboardStates
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmMouseStates">
+					std::map&lt;Mouse, unsigned int&gt;
+					mMouseStates
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmMouseWheel">
+					int
+					mMouseWheel
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmInputDevices">
+					std::map&lt;int, InputDevice&gt;
+					mInputDevices
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmDefaultDevice">
+					InputDevice
+					mDefaultDevice
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmInputString">
+					std::u16string
+					mInputString
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer32"></div>
+				
+				<div class="contentHeading">Source Files</div>
+				
+				<div class="spacer8"></div>
+				
+				<div class="contentBlock">
+					<a href="source/inc/uair/inputmanager.hpp">inc/uair/inputmanager.hpp</a>
+				</div>
+				
+				<div class="spacer4"></div>
+				
+				<div class="contentBlock">
+					<a href="source/src/inputmanager.cpp">src/inputmanager.cpp</a>
+				</div>
+				
+				<div class="spacer32"></div>
+			</div>
+			
+			<!-- Page Footer -->
+			<div id="footer">
+				Documentation last updated on the 6th of February, 2014.
+			</div>
+		</div>
+	</body>
+</html>
+

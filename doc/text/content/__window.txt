@@ -1,0 +1,30 @@
+__	Class List
+	Window
+--
+	inc/uair/window.hpp
+	src/window.cpp
+--
+	class Window : public WindowOS
+--
+	Brief
+--
+	Detailed
+__
+
++	public
+	Window()
+=	Brief
+==	Detailed
+
++	public
+	Window(const std::string & windowTitle, const WindowDisplaySettings & settings, const unsigned long & windowStyle = WindowStyles::Visible)
+=	Brief
+==	Detailed
+>	const std::string & windowTitle: 
+>	const WindowDisplaySettings & settings: 
+>	const unsigned long & windowStyle: 
+
++	public
+	~Window()
+=	Brief
+==	Detailed

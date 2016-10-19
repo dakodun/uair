@@ -1,0 +1,109 @@
+__	Class List
+	Store
+--
+	inc/uair/manager.hpp
+--
+	template <class B, class T>
+	class Store : public StoreBase<B>
+--
+	Brief
+--
+	Detailed
+__
+
++	public
+	Store()
+=	Brief
+==	Detailed
+
++	public
+	template <typename ...Ps>
+	std::pair<unsigned int, unsigned int> Add(const std::string& name, const Ps&... params)
+=	Brief
+==	Detailed
+>	const std::string& name: 
+>	const Ps&... params: 
+<	Return
+
++	public
+	void Remove(const unsigned int& index, const unsigned int& counter)
+=	Brief
+==	Detailed
+>	const unsigned int& index: 
+>	const unsigned int& counter: 
+
++	public
+	void Remove(const std::string& name)
+=	Brief
+==	Detailed
+>	const std::string& name: 
+
++	public
+	void Remove()
+=	Brief
+==	Detailed
+
++	public
+	T& Get(const unsigned int& index, const unsigned int& counter)
+=	Brief
+==	Detailed
+>	const unsigned int& index: 
+>	const unsigned int& counter: 
+<	Return
+
++	public
+	std::list< std::reference_wrapper<T> > Get(const std::string& name)
+=	Brief
+==	Detailed
+>	const std::string& name: 
+<	Return
+
++	public
+	std::list< std::reference_wrapper<T> > Get()
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	B* GetAsBase(const unsigned int& index, const unsigned int& counter) const
+=	Brief
+==	Detailed
+>	const unsigned int& index: 
+>	const unsigned int& counter: 
+<	Return
+
++	public
+	std::list< std::tuple<unsigned int, unsigned int, std::string> > GetHandles(const std::string& name) const
+=	Brief
+==	Detailed
+>	const std::string& name: 
+<	Return
+
++	public
+	std::list< std::tuple<unsigned int, unsigned int, std::string> > GetHandles() const
+=	Brief
+==	Detailed
+<	Return
+
+
+-	private
+	unsigned int mReserveCap
+=	Brief
+==	Detailed
+>	Default
+
+-	private
+	std::vector<StoreEntry> mStore
+=	Brief
+==	Detailed
+
+-	private
+	std::priority_queue<unsigned int> mFreeIndices
+=	Brief
+==	Detailed
+
+
+~	public
+	class StoreEntry
+=	Description
+<	Link

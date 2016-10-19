@@ -1,0 +1,11 @@
+__	Class List
+	WindowPtr
+--
+	inc/uair/window.hpp
+--
+	typedef std::shared_ptr<Window> WindowPtr
+--
+	Brief
+--
+	Detailed
+__

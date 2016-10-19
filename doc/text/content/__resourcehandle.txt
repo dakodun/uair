@@ -1,0 +1,11 @@
+__	Class List
+	ResourceHandle
+--
+	inc/uair/resource.hpp
+--
+	typedef Manager<Resource>::Handle ResourceHandle
+--
+	Brief
+--
+	Detailed
+__

@@ -1,0 +1,11 @@
+__	Class List
+	SceneManager::SceneMap
+--
+	inc/uair/scenemanager.hpp
+--
+	typedef std::unordered_multimap<std::string, ScenePtr> SceneMap
+--
+	Brief
+--
+	Detailed
+__

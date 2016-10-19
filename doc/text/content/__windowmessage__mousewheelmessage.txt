@@ -1,0 +1,47 @@
+__	Class List
+	WindowMessage::MouseWheelMessage
+--
+	inc/uair/windowmessages.hpp
+	src/windowmessages.cpp
+--
+	class MouseWheelMessage : public Message
+--
+	Brief
+--
+	Detailed
+__
+
++	public
+	MouseWheelMessage() = default
+=	Brief
+==	Detailed
+
++	public
+	MouseWheelMessage(const int& amount)
+=	Brief
+==	Detailed
+>	const int& amount: 
+
++	public
+	void Serialise(cereal::BinaryOutputArchive& archive) const
+=	Brief
+==	Detailed
+>	cereal::BinaryOutputArchive& archive: 
+
++	public
+	void Serialise(cereal::BinaryInputArchive& archive)
+=	Brief
+==	Detailed
+>	cereal::BinaryInputArchive& archive: 
+
++	public
+	static constexpr unsigned int GetTypeID()
+=	Brief
+==	Detailed
+<	Return
+
+
+-	public
+	int mAmount
+=	Brief
+==	Detailed

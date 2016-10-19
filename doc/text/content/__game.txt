@@ -1,0 +1,611 @@
+__	Class List
+	Game
+--
+	inc/uair/game.hpp
+	src/game.cpp
+--
+	class Game
+--
+	Brief
+--
+	Detailed
+__
+
++	public
+	Game()
+=	Brief
+==	Detailed
+
++	public
+	~Game()
+=	Brief
+==	Detailed
+
++	public
+	void Run()
+=	Brief
+==	Detailed
+
++	public
+	void Input()
+=	Brief
+==	Detailed
+
++	public
+	void Process()
+=	Brief
+==	Detailed
+
++	public
+	void PostProcess(const unsigned int & processed)
+=	Brief
+==	Detailed
+>	const unsigned int & processed: 
+
++	public
+	void Render(const unsigned int & pass)
+=	Brief
+==	Detailed
+>	const unsigned int & pass: 
+
++	public
+	void Init()
+=	Brief
+==	Detailed
+
++	public
+	void Init(const std::string & windowTitle, const WindowDisplaySettings & settings, const unsigned long & windowStyle = WindowStyles::Visible)
+=	Brief
+==	Detailed
+>	const std::string & windowTitle: 
+>	const WindowDisplaySettings & settings: 
+>	const unsigned long & windowStyle: 
+
++	public	
+	WindowPtr GetWindow()
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	OpenGLContextPtr GetContext()
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	void Quit()
+=	Brief
+==	Detailed
+
++	public
+	void Clear()
+=	Brief
+==	Detailed
+
++	public
+	void CreateDefaultShader()
+=	Brief
+==	Detailed
+
++	public
+	SceneManagerPtr GetSceneManager()
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	bool RequestSceneChange(Scene* newScene, const bool & restore = true)
+=	Brief
+==	Detailed
+>	Scene* newScene: 
+>	const bool & restore: 
+<	Return
+
++	public
+	bool CurrentSceneExists()
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	bool NextSceneExists()
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	ScenePtr GetCurrentScene()
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	ScenePtr GetNextScene()
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	template<typename T>
+	std::shared_ptr<T> GetCurrentSceneCast()
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	template<typename T>
+	std::shared_ptr<T> GetNextSceneCast()
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	template<typename T>
+	std::shared_ptr<T> CastScene(ScenePtr scenePtr)
+=	Brief
+==	Detailed
+>	ScenePtr scenePtr: 
+<	Return
+
++	public
+	InputManagerPtr GetInputManager()
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	bool GetKeyboardDown(const Keyboard & key) const
+=	Brief
+==	Detailed
+>	const Keyboard & key: 
+<	Return
+
++	public
+	bool GetKeyboardPressed(const Keyboard & key) const
+=	Brief
+==	Detailed
+>	const Keyboard & key: 
+<	Return
+
++	public
+	bool GetKeyboardReleased(const Keyboard & key) const
+=	Brief
+==	Detailed
+>	const Keyboard & key: 
+<	Return
+
++	public
+	unsigned int GetKeyboardState(const Keyboard& key) const
+=	Brief
+==	Detailed
+>	const Keyboard& key: 
+<	Return
+
++	public
+	std::u16string GetInputString() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	bool GetMouseDown(const Mouse & button) const
+=	Brief
+==	Detailed
+>	const Mouse & button: 
+<	Return
+
++	public
+	bool GetMousePressed(const Mouse & button) const
+=	Brief
+==	Detailed
+>	const Mouse & button: 
+<	Return
+
++	public
+	bool GetMouseReleased(const Mouse & button) const
+=	Brief
+==	Detailed
+>	const Mouse & button: 
+<	Return
+
++	public
+	unsigned int GetMouseState(const Mouse& button) const
+=	Brief
+==	Detailed
+>	const Mouse& button: 
+<	Return
+
++	public
+	int GetMouseWheel() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	void SetMouseCoords(const glm::ivec2& newCoords, const CoordinateSpace& coordinateSpace = CoordinateSpace::Local)
+=	Brief
+==	Detailed
+>	const glm::ivec2& newCoords: 
+>	const CoordinateSpace& coordinateSpace: 
+
++	public
+	glm::ivec2 GetMouseCoords(const CoordinateSpace& coordinateSpace = CoordinateSpace::Local) const
+=	Brief
+==	Detailed
+>	const CoordinateSpace& coordinateSpace: 
+<	Return
+
++	public
+	bool DeviceExists(const int& deviceID) const
+=	Brief
+==	Detailed
+>	const int& deviceID: 
+<	Return
+
++	public
+	const InputManager::InputDevice& GetDevice(const int& deviceID) const
+=	Brief
+==	Detailed
+>	const int& deviceID: 
+<	Return
+
++	public
+	unsigned int GetDeviceButtonCount(const int& deviceID) const
+=	Brief
+==	Detailed
+>	const int& deviceID: 
+<	Return
+
++	public
+	bool GetDeviceButtonDown(const int& deviceID, const unsigned int& button) const
+=	Brief
+==	Detailed
+>	const int& deviceID: 
+>	const unsigned int& button: 
+<	Return
+
++	public
+	bool GetDeviceButtonPressed(const int& deviceID, const unsigned int& button) const
+=	Brief
+==	Detailed
+>	const int& deviceID: 
+>	const unsigned int& button: 
+<	Return
+
++	public
+	bool GetDeviceButtonReleased(const int& deviceID, const unsigned int& button) const
+=	Brief
+==	Detailed
+>	const int& deviceID: 
+>	const unsigned int& button: 
+<	Return
+
++	public
+	unsigned int GetDeviceButtonState(const int& deviceID, const unsigned int& button) const
+=	Brief
+==	Detailed
+>	const int& deviceID: 
+>	const unsigned int& button: 
+<	Return
+
++	public
+	unsigned int GetDeviceControlCount(const int& deviceID) const
+=	Brief
+==	Detailed
+>	const int& deviceID: 
+<	Return
+
++	public
+	bool DeviceHasControl(const int& deviceID, const Device& control) const
+=	Brief
+==	Detailed
+>	const int& deviceID: 
+>	const Device& control: 
+<	Return
+
++	public
+	int GetDeviceControl(const int& deviceID, const Device& control) const
+=	Brief
+==	Detailed
+>	const int& deviceID: 
+>	const Device& control: 
+<	Return
+
++	public
+	int GetDeviceControlScaled(const int& deviceID, const Device& control, std::pair<int, int> range = std::make_pair(0, 255)) const
+=	Brief
+==	Detailed
+>	const int& deviceID: 
+>	const Device& control: 
+>	std::pair<int, int> range: 
+<	Return
+
++	public
+	std::pair<int, int> GetDeviceControlRange(const int& deviceID, const Device& control) const
+=	Brief
+==	Detailed
+>	const int& deviceID: 
+>	const Device& control: 
+<	Return
+
++	public
+	std::vector<Device> GetDeviceLinkedDevices(const int& deviceID, const unsigned int& collectionID) const
+=	Brief
+==	Detailed
+>	const int& deviceID: 
+>	const unsigned int& collectionID: 
+<	Return
+
++	public
+	unsigned int GetDeviceLinkID(const int& deviceID, const Device& control) const
+=	Brief
+==	Detailed
+>	const int& deviceID: 
+>	const Device& control: 
+<	Return
+
++	public
+	template <typename T>
+	void RegisterResourceType()
+=	Brief
+==	Detailed
+
++	public
+	template <typename T, typename ...Ps>
+	ResourceHandle AddResource(const std::string& name, const Ps&... params)
+=	Brief
+==	Detailed
+>	const std::string& name: 
+>	const Ps&... params: 
+<	Return
+
++	public
+	template <typename T>
+	void RemoveResource(const ResourceHandle& handle)
+=	Brief
+==	Detailed
+>	const ResourceHandle& handle: 
+
++	public
+	template <typename T>
+	void RemoveResource(const std::string& name)
+=	Brief
+==	Detailed
+>	const std::string& name: 
+
++	public
+	void RemoveResource(const ResourceHandle& handle)
+=	Brief
+==	Detailed
+>	const ResourceHandle& handle: 
+
++	public
+	void RemoveResource(const std::string& name)
+=	Brief
+==	Detailed
+>	const std::string& name: 
+
++	public
+	template <typename T>
+	T& GetResource(const ResourceHandle& handle)
+=	Brief
+==	Detailed
+>	const ResourceHandle& handle: 
+<	Return
+
++	public
+	template <typename T>
+	std::list< std::reference_wrapper<T> > GetResource(const std::string& name)
+=	Brief
+==	Detailed
+>	const std::string& name: 
+<	Return
+
++	public
+	EntityManager::Handle AddEntity(const std::string& name)
+=	Brief
+==	Detailed
+>	const std::string& name: 
+<	Return
+
++	public
+	void RemoveEntity(const EntityManager::Handle& handle)
+=	Brief
+==	Detailed
+>	const EntityManager::Handle& handle: 
+
++	public
+	void RemoveEntities(const std::string& name)
+=	Brief
+==	Detailed
+>	const std::string& name: 
+
++	public
+	void RemoveEntities()
+=	Brief
+==	Detailed
+
++	public
+	Entity& GetEntity(const EntityManager::Handle& handle)
+=	Brief
+==	Detailed
+>	const EntityManager::Handle& handle: 
+<	Return
+
++	public
+	std::list< std::reference_wrapper<Entity> > GetEntities(const std::string& name)
+=	Brief
+==	Detailed
+>	const std::string& name: 
+<	Return
+
++	public
+	std::list< std::reference_wrapper<Entity> > GetEntities()
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	std::list<EntityManager::Handle> GetEntityHandles(const std::string& name)
+=	Brief
+==	Detailed
+>	const std::string& name: 
+<	Return
+
++	public
+	std::list<EntityManager::Handle> GetEntityHandles()
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	template <typename T>
+	T& RegisterSystem()
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	template <typename T>
+	void RemoveSystem()
+=	Brief
+==	Detailed
+
++	public
+	template <typename T>
+	T& GetSystem()
+=	Brief
+==	Detailed
+<	Return
+
+
++	private
+	void HandleMessageQueue(const MessageQueue::Entry& e)
+=	Brief
+==	Detailed
+>	const MessageQueue::Entry& e: 
+
++	private
+	void AddWindow()
+=	Brief
+==	Detailed
+
++	private
+	void AddWindow(const std::string & windowTitle, const WindowDisplaySettings & settings, const unsigned long & windowStyle = WindowStyles::Visible)
+=	Brief
+==	Detailed
+>	const std::string & windowTitle: 
+>	const WindowDisplaySettings & settings: 
+>	const unsigned long & windowStyle: 
+
++	private
+	void AddContext()
+=	Brief
+==	Detailed
+
++	private
+	void AddContext(WindowPtr windowPtr)
+=	Brief
+==	Detailed
+>	WindowPtr windowPtr: 
+
++	private
+	void MakeCurrent(WindowPtr windowPtr, OpenGLContextPtr contextPtr)
+=	Brief
+==	Detailed
+>	WindowPtr windowPtr: 
+>	OpenGLContextPtr contextPtr: 
+
+
+-	public
+	float mFrameLowerLimit
+=	Brief
+==	Detailed
+>	Default
+
+-	public
+	float mFrameUpperLimit
+=	Brief
+==	Detailed
+>	Default
+
+-	public
+	unsigned int mRenderPasses
+=	Brief
+==	Detailed
+>	Default
+
+
+-	private
+	float mTotalFrameTime
+=	Brief
+==	Detailed
+>	Default
+
+-	private
+	float mAccumulator 
+=	Brief
+==	Detailed
+>	Default
+
+-	private
+	Timer mTimer
+=	Brief
+==	Detailed
+
+-	private
+	WindowPtr mWindow
+=	Brief
+==	Detailed
+
+-	private
+	OpenGLContextPtr mContext
+=	Brief
+==	Detailed
+
+-	private
+	bool mOpen
+=	Brief
+==	Detailed
+>	Default
+
+-	private
+	MessageQueue mMessageQueue
+=	Brief
+==	Detailed
+
+-	private
+	SceneManagerPtr mSceneManager
+=	Brief
+==	Detailed
+
+-	private
+	InputManagerPtr mInputManager
+=	Brief
+==	Detailed
+
+-	private
+	Manager<Resource> mResourceManager
+=	Brief
+==	Detailed
+
+-	private
+	bool mDefaultShaderExists
+=	Brief
+==	Detailed
+
+-	private
+	Shader mDefaultShader
+=	Brief
+==	Detailed
+
+-	private
+	EntitySystem mEntitySystem
+=	Brief
+==	Detailed
+
+-	private
+	FT_Library mFTLibrary
+=	Brief
+==	Detailed

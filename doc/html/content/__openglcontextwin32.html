@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html>
+	<head>
+			<link rel="stylesheet" type="text/css" href="../style.css">
+	</head>
+	
+	<body>
+		<div id="main">
+			<!-- Page Header -->
+			<div id="header">
+				<div id="headerTitle">Uair Engine</div>
+				<div id="headerSubtitle">Alpha</div>
+			</div>
+			
+			<!-- Page Navigation -->
+			<div id="navigation">
+				<div id="navigationBar">
+					<div class="navigationBarItem"><a href="../index.html">Home</a></div>
+					<div class="navigationBarSeperator"><img src="../img/seperator.png"></img></div>
+					<div class="navigationBarItem"><a href="_classlist.html" id="navigationBarItemCurrent">Class List</a></div>
+					<div class="navigationBarSeperator"><img src="../img/seperator.png"></img></div>
+					<div class="navigationBarItem"><a href="_filelist.html">File List</a></div>
+					<div class="navigationBarSeperator"><img src="../img/seperator.png"></img></div>
+				</div>
+				<div id="navigationTitle">
+					class OpenGLContextWin32
+					<br>
+			</div>
+			
+			<!-- Page Content -->
+			<div id="content">
+				<div class="spacer16"></div>
+				<div class="contentHeading">Overview</div>
+				<div class="spacer8"></div>
+				<div class="contentBlock">
+					Detailed
+				</div>
+				
+				<div class="spacer16"></div>
+				
+				<span class="contentSubHeading">Member Functions</span>
+				<div class="contentItemContainer">
+					<div class="contentItemA">Public:</div>
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+							</span>
+							<a href="#anchOpenGLContextWin32">
+								OpenGLContextWin32()
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+							</span>
+							<a href="#anchOpenGLContextWin322">
+								OpenGLContextWin32(Window&amp; window)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+							</span>
+							<a href="#anchOpenGLContextWin323">
+								OpenGLContextWin32(const OpenGLContextWin32&amp; other)
+							</a>
+							<span class="contentItemBReg">
+								 = delete
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+							</span>
+							<a href="#anchOpenGLContextWin324">
+								OpenGLContextWin32(OpenGLContextWin32&amp;&amp; other)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								virtual
+							</span>
+							<a href="#anch~OpenGLContextWin32">
+								~OpenGLContextWin32()
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								OpenGLContextWin32&amp;
+							</span>
+							<a href="#anchoperator=">
+								operator=(OpenGLContextWin32 other)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								friend void
+							</span>
+							<a href="#anchswap">
+								swap(OpenGLContextWin32&amp; first, OpenGLContextWin32&amp; second)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchMakeCurrent">
+								MakeCurrent(Window&amp; window)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+					<div class="contentItemA">Private:</div>
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchSetUpContext">
+								SetUpContext()
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchSetUpContext2">
+								SetUpContext(Window&amp; window)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchInitGlew">
+								InitGlew(HDC&amp; deviceContext, HGLRC&amp; renderContext, GLEWContext&amp; glewContext, WGLEWContext&amp; glewContextWin32)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+				</div>
+				
+				<div class="spacer8"></div>
+				
+				<span class="contentSubHeading">Data Members</span>
+				<div class="contentItemContainer">
+					<div class="contentItemA">Private:</div>
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								HGLRC
+							</span>
+							<a href="#anchmRenderContext">
+								mRenderContext
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								GLEWContext
+							</span>
+							<a href="#anchmGlewContext">
+								mGlewContext
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								WGLEWContext
+							</span>
+							<a href="#anchmGlewContextWin32">
+								mGlewContextWin32
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+				</div>
+				
+				<div class="spacer32"></div>
+				
+				<div class="contentHeading">Member Functions and Data Members</div>
+				
+				<div class="spacer12"></div>
+				
+				<span class="contentSubHeading" id="anchOpenGLContextWin32">
+					OpenGLContextWin32()
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchOpenGLContextWin322">
+					OpenGLContextWin32(Window&amp; window)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						Window&amp; window: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchOpenGLContextWin323">
+					OpenGLContextWin32(const OpenGLContextWin32&amp; other)
+					 = delete
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const OpenGLContextWin32&amp; other: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchOpenGLContextWin324">
+					OpenGLContextWin32(OpenGLContextWin32&amp;&amp; other)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						OpenGLContextWin32&amp;&amp; other: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anch~OpenGLContextWin32">
+					virtual
+					~OpenGLContextWin32()
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchoperator=">
+					OpenGLContextWin32&amp;
+					operator=(OpenGLContextWin32 other)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						OpenGLContextWin32 other: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchswap">
+					friend void
+					swap(OpenGLContextWin32&amp; first, OpenGLContextWin32&amp; second)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						OpenGLContextWin32&amp; first: 
+					</div>
+					<div class="contentItemC">
+						OpenGLContextWin32&amp; second: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchMakeCurrent">
+					void
+					MakeCurrent(Window&amp; window)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						Window&amp; window: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchSetUpContext">
+					void
+					SetUpContext()
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchSetUpContext2">
+					void
+					SetUpContext(Window&amp; window)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						Window&amp; window: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchInitGlew">
+					void
+					InitGlew(HDC&amp; deviceContext, HGLRC&amp; renderContext, GLEWContext&amp; glewContext, WGLEWContext&amp; glewContextWin32)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						HDC&amp; deviceContext: 
+					</div>
+					<div class="contentItemC">
+						HGLRC&amp; renderContext: 
+					</div>
+					<div class="contentItemC">
+						GLEWContext&amp; glewContext: 
+					</div>
+					<div class="contentItemC">
+						WGLEWContext&amp; glewContextWin32: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmRenderContext">
+					HGLRC
+					mRenderContext
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Default Value:</div>
+					<div class="contentItemC">
+						Default
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmGlewContext">
+					GLEWContext
+					mGlewContext
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmGlewContextWin32">
+					WGLEWContext
+					mGlewContextWin32
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer32"></div>
+				
+				<div class="contentHeading">Source Files</div>
+				
+				<div class="spacer8"></div>
+				
+				<div class="contentBlock">
+					<a href="source/inc/uair/openglcontextwin32.hpp">inc/uair/openglcontextwin32.hpp</a>
+				</div>
+				
+				<div class="spacer4"></div>
+				
+				<div class="contentBlock">
+					<a href="source/src/openglcontextwin32.cpp">src/openglcontextwin32.cpp</a>
+				</div>
+				
+				<div class="spacer32"></div>
+			</div>
+			
+			<!-- Page Footer -->
+			<div id="footer">
+				Documentation last updated on the 6th of February, 2014.
+			</div>
+		</div>
+	</body>
+</html>
+

@@ -1,0 +1,64 @@
+__	Class List
+	LayoutDivision::Cell
+--
+	inc/uair/layoutdivision.hpp
+--
+	struct Cell
+--
+	Brief
+--
+	Detailed
+__
+
++	public
+	Cell(const glm::vec2& position, const float& width, const float& height, LayoutDivision* parentDivision = nullptr)
+=	Brief
+==	Detailed
+>	const glm::vec2& position: 
+>	const float& width: 
+>	const float& height: 
+>	LayoutDivision* parentDivision: 
+
++	public
+	glm::vec2 GetPosition(const CoordinateSpace& coordinateSpace = CoordinateSpace::Local) const
+=	Brief
+==	Detailed
+>	const CoordinateSpace& coordinateSpace: 
+<	Return
+
++	public
+	float GetWidth() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	float GetHeight() const
+=	Brief
+==	Detailed
+<	Return
+
+
+-	private
+	glm::vec2 mPosition
+=	Brief
+==	Detailed
+>	Default
+
+-	private
+	float mWidth
+=	Brief
+==	Detailed
+>	Default
+
+-	private
+	float mHeight
+=	Brief
+==	Detailed
+>	Default
+
+-	private
+	LayoutDivision* mParentDivision
+=	Brief
+==	Detailed
+>	Default

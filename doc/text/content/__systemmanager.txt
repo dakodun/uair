@@ -1,0 +1,74 @@
+__	Class List
+	SystemManager
+--
+	inc/uair/systemmanager.hpp
+	src/systemmanager.cpp
+--
+	class SystemManager
+--
+	Brief
+--
+	Detailed
+__
+
++	public
+	SystemManager() = default
+=	Brief
+==	Detailed
+
++	public
+	SystemManager(const SystemManager& other) = delete
+=	Brief
+==	Detailed
+>	const SystemManager& other: 
+
++	public
+	SystemManager(SystemManager&& other)
+=	Brief
+==	Detailed
+>	SystemManager&& other: 
+
++	public
+	~SystemManager()
+=	Brief
+==	Detailed
+
++	public
+	SystemManager& operator=(SystemManager other)
+=	Brief
+==	Detailed
+>	SystemManager other: 
+<	Return
+
++	public
+	friend void swap(SystemManager& first, SystemManager& second)
+=	Brief
+==	Detailed
+>	SystemManager& first: 
+>	SystemManager& second: 
+
++	public
+	template <typename T>
+	T& Register()
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	template <typename T>
+	void Remove()
+=	Brief
+==	Detailed
+
++	public
+	template <typename T>
+	T& Get()
+=	Brief
+==	Detailed
+<	Return
+
+
+-	private
+	std::map<unsigned int, System*> mStore
+=	Brief
+==	Detailed

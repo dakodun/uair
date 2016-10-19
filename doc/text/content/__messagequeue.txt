@@ -1,0 +1,73 @@
+__	Class List
+	MessageQueue
+--
+	inc/uair/messagequeue.hpp
+	src/messagequeue.cpp
+--
+	class MessageQueue
+--
+	Brief
+--
+	Detailed
+__
+
++	public
+	MessageQueue& operator+=(MessageQueue other)
+=	Brief
+==	Detailed
+>	MessageQueue other: 
+<	Return
+
++	public
+	template <class T>
+	void PushMessage(const T& messageIn)
+=	Brief
+==	Detailed
+>	const T& messageIn: 
+
++	public
+	void PushMessageString(const unsigned int& messageTypeID, const std::string& messageString)
+=	Brief
+==	Detailed
+>	const unsigned int& messageTypeID: 
+>	:const std::string& messageString 
+
++	public
+	Entry GetMessage() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	void PopMessage()
+=	Brief
+==	Detailed
+
++	public
+	void ClearQueue()
+=	Brief
+==	Detailed
+
++	public
+	bool IsEmpty() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	unsigned int GetMessageCount() const
+=	Brief
+==	Detailed
+<	Return
+
+
+-	private
+	std::queue<Entry> mQueue
+=	Brief
+==	Detailed
+
+
+~	public
+	class Entry
+=	Description
+<	Link

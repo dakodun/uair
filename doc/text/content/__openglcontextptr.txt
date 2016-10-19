@@ -1,0 +1,11 @@
+__	Class List
+	OpenGLContextPtr
+--
+	inc/uair/openglcontext.hpp
+--
+	typedef std::shared_ptr<OpenGLContext> OpenGLContextPtr
+--
+	Brief
+--
+	Detailed
+__

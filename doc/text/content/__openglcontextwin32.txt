@@ -1,0 +1,98 @@
+__	Class List
+	OpenGLContextWin32
+--
+	inc/uair/openglcontextwin32.hpp
+	src/openglcontextwin32.cpp
+--
+	class OpenGLContextWin32
+--
+	Brief
+--
+	Detailed
+__
+
++	public
+	OpenGLContextWin32()
+=	Brief
+==	Detailed
+
++	public
+	OpenGLContextWin32(Window& window)
+=	Brief
+==	Detailed
+>	Window& window: 
+
++	public
+	OpenGLContextWin32(const OpenGLContextWin32& other) = delete
+=	Brief
+==	Detailed
+>	const OpenGLContextWin32& other: 
+
++	public
+	OpenGLContextWin32(OpenGLContextWin32&& other)
+=	Brief
+==	Detailed
+>	OpenGLContextWin32&& other: 
+
++	public
+	virtual ~OpenGLContextWin32()
+=	Brief
+==	Detailed
+
++	public
+	OpenGLContextWin32& operator=(OpenGLContextWin32 other)
+=	Brief
+==	Detailed
+>	OpenGLContextWin32 other: 
+<	Return
+
++	public
+	friend void swap(OpenGLContextWin32& first, OpenGLContextWin32& second)
+=	Brief
+==	Detailed
+>	OpenGLContextWin32& first: 
+>	OpenGLContextWin32& second: 
+
++	public
+	void MakeCurrent(Window& window)
+=	Brief
+==	Detailed
+>	Window& window: 
+
+
++	private
+	void SetUpContext()
+=	Brief
+==	Detailed
+
++	private
+	void SetUpContext(Window& window)
+=	Brief
+==	Detailed
+>	Window& window: 
+
++	private
+	void InitGlew(HDC& deviceContext, HGLRC& renderContext, GLEWContext& glewContext, WGLEWContext& glewContextWin32)
+=	Brief
+==	Detailed
+>	HDC& deviceContext: 
+>	HGLRC& renderContext: 
+>	GLEWContext& glewContext: 
+>	WGLEWContext& glewContextWin32: 
+
+
+-	private
+	HGLRC mRenderContext
+=	Brief
+==	Detailed
+>	Default
+
+-	private
+	GLEWContext mGlewContext
+=	Brief
+==	Detailed
+
+-	private
+	WGLEWContext mGlewContextWin32
+=	Brief
+==	Detailed

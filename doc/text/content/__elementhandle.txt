@@ -1,0 +1,11 @@
+__	Class List
+	ElementHandle
+--
+	inc/uair/gui.hpp
+--
+	typedef Manager<GUIElement>::Handle ElementHandle
+--
+	Brief
+--
+	Detailed
+__

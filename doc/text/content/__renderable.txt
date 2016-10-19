@@ -1,0 +1,127 @@
+__	Class List
+	Renderable
+--
+	inc/uair/renderable.hpp
+	src/renderable.cpp
+--
+	class Renderable
+--
+	Brief
+--
+	Detailed
+__
+
++	public
+	virtual ~Renderable() = default
+=	Brief
+==	Detailed
+
++	public
+	virtual std::string GetTag() const = 0
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	std::string GetName() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	float GetDepth() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	void SetDepth(const float& newDepth)
+=	Brief
+==	Detailed
+>	const float& newDepth: 
+
++	public
+	glm::vec3 GetColour() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	void SetColour(const glm::vec3& newColour)
+=	Brief
+==	Detailed
+>	const glm::vec3& newColour: 
+
++	public
+	float GetAlpha() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	void SetAlpha(const float& newAlpha)
+=	Brief
+==	Detailed
+>	const float& newAlpha: 
+
++	public
+	ResourcePtr<Shader> GetShader() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	void SetShader(ResourcePtr<Shader> shader)
+=	Brief
+==	Detailed
+>	ResourcePtr<Shader> shader: 
+
++	public
+	void SetShader(Shader* shader)
+=	Brief
+==	Detailed
+>	Shader* shader: 
+
+
++	protected
+	virtual std::list<RenderBatchData> Upload() = 0
+=	Brief
+==	Detailed
+<	Return
+
+
+-	public
+	GLenum mRenderMode
+=	Brief
+==	Detailed
+>	Default
+
+
+-	protected
+	std::string mName
+=	Brief
+==	Detailed
+>	Default
+
+-	protected
+	float mDepth
+=	Brief
+==	Detailed
+>	Default
+
+-	protected
+	glm::vec3 mColour
+=	Brief
+==	Detailed
+>	Default
+
+-	protected
+	float mAlpha
+=	Brief
+==	Detailed
+>	Default
+
+-	protected
+	ResourcePtr<Shader> mShader
+=	Brief
+==	Detailed

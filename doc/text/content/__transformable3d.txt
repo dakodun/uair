@@ -1,0 +1,154 @@
+__	Class List
+	Transformable3D
+--
+	inc/uair/transformable3d.hpp
+	src/transformable3d.cpp
+--
+	class Transformable3D
+--
+	Brief
+--
+	Detailed
+__
+
++	public
+	virtual ~Transformable3D() = default
+=	Brief
+==	Detailed
+
++	public
+	glm::vec3 GetPosition() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	void SetPosition(const glm::vec3& newPos)
+=	Brief
+==	Detailed
+>	const glm::vec3& newPos: 
+
++	public
+	glm::vec3 GetOrigin() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	void SetOrigin(const glm::vec3& newOrigin)
+=	Brief
+==	Detailed
+>	const glm::vec3& newOrigin: 
+
++	public
+	glm::vec3 GetScale() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	void SetScale(const glm::vec3& newScale)
+=	Brief
+==	Detailed
+>	const glm::vec3& newScale: 
+
++	public
+	glm::vec3 GetRotation() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	void SetRotation(const glm::vec3& newRotation)
+=	Brief
+==	Detailed
+>	const glm::vec3& newRotation: 
+
++	public
+	glm::vec3 GetSkew() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	void SetSkew(const glm::vec3& newSkew)
+=	Brief
+==	Detailed
+>	const glm::vec3& newSkew: 
+
++	public
+	glm::mat4 GetTransformationMatrix() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	void SetTransformationMatrix(const glm::mat4& newTrans)
+=	Brief
+==	Detailed
+>	const glm::mat4& newTrans: 
+
++	public
+	std::vector<glm::vec3> GetLocalBoundingBox() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	std::vector<glm::vec3> GetGlobalBoundingBox() const
+=	Brief
+==	Detailed
+<	Return
+
+
++	protected
+	virtual void UpdateGlobalBoundingBox() = 0
+=	Brief
+==	Detailed
+
+
+-	protected
+	glm::vec3 mPosition
+=	Brief
+==	Detailed
+>	Default
+
+-	protected
+	glm::vec3 mOrigin
+=	Brief
+==	Detailed
+>	Default
+
+-	protected
+	glm::mat4 mTransformation
+=	Brief
+==	Detailed
+>	Default
+
+-	protected
+	glm::vec3 mScale
+=	Brief
+==	Detailed
+>	Default
+
+-	protected
+	glm::vec3 mRotation
+=	Brief
+==	Detailed
+>	Default
+
+-	protected
+	glm::vec3 mSkew
+=	Brief
+==	Detailed
+>	Default
+
+-	protected
+	std::vector<glm::vec3> mLocalBoundingBox
+=	Brief
+==	Detailed
+
+-	protected
+	std::vector<glm::vec3> mGlobalBoundingBox
+=	Brief
+==	Detailed

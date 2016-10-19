@@ -1,0 +1,146 @@
+__	Class List
+	InputManager::InputDevice
+--
+	inc/uair/inputmanager.hpp
+	src/inputmanager.cpp
+--
+	class InputDevice
+--
+	Brief
+--
+	Detailed
+__
+
++	public
+	InputDevice()
+=	Brief
+==	Detailed
+
++	public
+	InputDevice(const unsigned int& buttonCount, const unsigned int& controlCount, const std::vector<ControlCaps>& caps)
+=	Brief
+==	Detailed
+>	const unsigned int& buttonCount: 
+>	const unsigned int& controlCount: 
+>	const std::vector<ControlCaps>& caps: 
+<	Return
+
++	public
+	unsigned int GetButtonCount() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	bool GetButtonDown(const unsigned int& button) const
+=	Brief
+==	Detailed
+>	const unsigned int& button: 
+<	Return
+
++	public
+	bool GetButtonPressed(const unsigned int& button) const
+=	Brief
+==	Detailed
+>	const unsigned int& button: 
+<	Return
+
++	public
+	bool GetButtonReleased(const unsigned int& button) const
+=	Brief
+==	Detailed
+>	const unsigned int& button: 
+<	Return
+
++	public
+	unsigned int GetButtonState(const unsigned int& button) const
+=	Brief
+==	Detailed
+>	const unsigned int& button: 
+<	Return
+
++	public
+	unsigned int GetControlCount() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	bool HasControl(const Device& control) const
+=	Brief
+==	Detailed
+>	const Device& control: 
+<	Return
+
++	public
+	int GetControl(const Device& control) const
+=	Brief
+==	Detailed
+>	const Device& control: 
+<	Return
+
++	public
+	int GetControlScaled(const Device& control, std::pair<int, int> range = std::make_pair(0, 255)) const
+=	Brief
+==	Detailed
+>	const Device& control: 
+>	std::pair<int, int> range: 
+<	Return
+
++	public
+	std::pair<int, int> GetControlRange(const Device& control) const
+=	Brief
+==	Detailed
+>	const Device& control: 
+<	Return
+
++	public
+	std::vector<Device> GetLinkedDevices(const unsigned int& collectionID) const
+=	Brief
+==	Detailed
+>	const unsigned int& collectionID: 
+<	Return
+
++	public
+	unsigned int GetLinkID(const Device& control) const
+=	Brief
+==	Detailed
+>	const Device& control: 
+<	Return
+
+
+-	private
+	unsigned int mButtonCount
+=	Brief
+==	Detailed
+
+-	private
+	unsigned int mControlCount
+=	Brief
+==	Detailed
+
+-	private
+	std::map<Device, ControlCaps> mControlCaps
+=	Brief
+==	Detailed
+
+-	private
+	std::map<unsigned int, unsigned int> mButtonStates
+=	Brief
+==	Detailed
+
+-	private
+	std::map<Device, int> mControlStates
+=	Brief
+==	Detailed
+
+-	private
+	std::map<unsigned int, std::vector<Device> > mLinkCollections
+=	Brief
+==	Detailed
+
+
+~	public
+	struct ControlCaps
+=	Description
+<	Link

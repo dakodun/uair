@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+	<head>
+			<link rel="stylesheet" type="text/css" href="../style.css">
+	</head>
+	
+	<body>
+		<div id="main">
+			<!-- Page Header -->
+			<div id="header">
+				<div id="headerTitle">Uair Engine</div>
+				<div id="headerSubtitle">Alpha</div>
+			</div>
+			
+			<!-- Page Navigation -->
+			<div id="navigation">
+				<div id="navigationBar">
+					<div class="navigationBarItem"><a href="../index.html">Home</a></div>
+					<div class="navigationBarSeperator"><img src="../img/seperator.png"></img></div>
+					<div class="navigationBarItem"><a href="_classlist.html" id="navigationBarItemCurrent">Class List</a></div>
+					<div class="navigationBarSeperator"><img src="../img/seperator.png"></img></div>
+					<div class="navigationBarItem"><a href="_filelist.html">File List</a></div>
+					<div class="navigationBarSeperator"><img src="../img/seperator.png"></img></div>
+				</div>
+				<div id="navigationTitle">
+					class System
+					<br>
+			</div>
+			
+			<!-- Page Content -->
+			<div id="content">
+				<div class="spacer16"></div>
+				<div class="contentHeading">Overview</div>
+				<div class="spacer8"></div>
+				<div class="contentBlock">
+					Detailed
+				</div>
+				
+				<div class="spacer16"></div>
+				
+				<span class="contentSubHeading">Member Functions</span>
+				<div class="contentItemContainer">
+					<div class="contentItemA">Public:</div>
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+							</span>
+							<a href="#anchSystem">
+								System()
+							</a>
+							<span class="contentItemBReg">
+								 = default
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+							</span>
+							<a href="#anchSystem2">
+								System(const System&amp; other)
+							</a>
+							<span class="contentItemBReg">
+								 = delete
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+							</span>
+							<a href="#anchSystem3">
+								System(System&amp;&amp; other)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								virtual
+							</span>
+							<a href="#anch~System">
+								~System()
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								System&amp;
+							</span>
+							<a href="#anchoperator=">
+								operator=(System other)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								friend void
+							</span>
+							<a href="#anchswap">
+								swap(System&amp; first, System&amp; second)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchRegisterEntity">
+								RegisterEntity(EntityManager::Handle handle)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchUnregisterEntity">
+								UnregisterEntity(EntityManager::Handle handle)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+				</div>
+				
+				<div class="spacer8"></div>
+				
+				<span class="contentSubHeading">Data Members</span>
+				<div class="contentItemContainer">
+					<div class="contentItemA">Protected:</div>
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								std::vector&lt;EntityManager::Handle&gt;
+							</span>
+							<a href="#anchmRegisteredEntities">
+								mRegisteredEntities
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+				</div>
+				
+				<div class="spacer32"></div>
+				
+				<div class="contentHeading">Member Functions and Data Members</div>
+				
+				<div class="spacer12"></div>
+				
+				<span class="contentSubHeading" id="anchSystem">
+					System()
+					 = default
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchSystem2">
+					System(const System&amp; other)
+					 = delete
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const System&amp; other: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchSystem3">
+					System(System&amp;&amp; other)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						System&amp;&amp; other: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anch~System">
+					virtual
+					~System()
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchoperator=">
+					System&amp;
+					operator=(System other)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						System other: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchswap">
+					friend void
+					swap(System&amp; first, System&amp; second)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						System&amp; first: 
+					</div>
+					<div class="contentItemC">
+						System&amp; second: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchRegisterEntity">
+					void
+					RegisterEntity(EntityManager::Handle handle)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						EntityManager::Handle handle: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchUnregisterEntity">
+					void
+					UnregisterEntity(EntityManager::Handle handle)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						EntityManager::Handle handle: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmRegisteredEntities">
+					std::vector&lt;EntityManager::Handle&gt;
+					mRegisteredEntities
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer32"></div>
+				
+				<div class="contentHeading">Source Files</div>
+				
+				<div class="spacer8"></div>
+				
+				<div class="contentBlock">
+					<a href="source/inc/uair/systemmanager.hpp">inc/uair/systemmanager.hpp</a>
+				</div>
+				
+				<div class="spacer4"></div>
+				
+				<div class="contentBlock">
+					<a href="source/src/systemmanager.cpp">src/systemmanager.cpp</a>
+				</div>
+				
+				<div class="spacer32"></div>
+			</div>
+			
+			<!-- Page Footer -->
+			<div id="footer">
+				Documentation last updated on the 6th of February, 2014.
+			</div>
+		</div>
+	</body>
+</html>
+

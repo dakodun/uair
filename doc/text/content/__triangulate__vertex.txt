@@ -1,0 +1,26 @@
+__	Class List
+	Triangulate::Vertex
+--
+	inc/uair/triangulate.hpp
+--
+	class Vertex
+--
+	Brief
+--
+	Detailed
+__
+
+-	public
+	glm::vec2 mPoint
+=	Brief
+==	Detailed
+
+-	public
+	std::vector<unsigned int> mNeighbourIndices
+=	Brief
+==	Detailed
+
+-	public
+	std::vector<GLfloat> mNeighbourWeights
+=	Brief
+==	Detailed

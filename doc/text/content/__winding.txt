@@ -1,0 +1,16 @@
+__	Class List
+	Winding
+--
+	inc/uair/polygon.hpp
+--
+	enum class Winding
+--
+	Brief
+--
+	Detailed
+__
+
+~	public
+	CW = 0u, CCW
+=	Description
+<	Link

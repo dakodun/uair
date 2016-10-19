@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html>
+	<head>
+			<link rel="stylesheet" type="text/css" href="../style.css">
+	</head>
+	
+	<body>
+		<div id="main">
+			<!-- Page Header -->
+			<div id="header">
+				<div id="headerTitle">Uair Engine</div>
+				<div id="headerSubtitle">Alpha</div>
+			</div>
+			
+			<!-- Page Navigation -->
+			<div id="navigation">
+				<div id="navigationBar">
+					<div class="navigationBarItem"><a href="../index.html">Home</a></div>
+					<div class="navigationBarSeperator"><img src="../img/seperator.png"></img></div>
+					<div class="navigationBarItem"><a href="_classlist.html" id="navigationBarItemCurrent">Class List</a></div>
+					<div class="navigationBarSeperator"><img src="../img/seperator.png"></img></div>
+					<div class="navigationBarItem"><a href="_filelist.html">File List</a></div>
+					<div class="navigationBarSeperator"><img src="../img/seperator.png"></img></div>
+				</div>
+				<div id="navigationTitle">
+					class VBO
+					<br>
+			</div>
+			
+			<!-- Page Content -->
+			<div id="content">
+				<div class="spacer16"></div>
+				<div class="contentHeading">Overview</div>
+				<div class="spacer8"></div>
+				<div class="contentBlock">
+					Detailed
+				</div>
+				
+				<div class="spacer16"></div>
+				
+				<span class="contentSubHeading">Member Functions</span>
+				<div class="contentItemContainer">
+					<div class="contentItemA">Public:</div>
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+							</span>
+							<a href="#anchVBO">
+								VBO()
+							</a>
+							<span class="contentItemBReg">
+								 = default
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+							</span>
+							<a href="#anchVBO2">
+								VBO(const VBO&amp; other)
+							</a>
+							<span class="contentItemBReg">
+								 = delete
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+							</span>
+							<a href="#anchVBO3">
+								VBO(VBO&amp;&amp; other)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+							</span>
+							<a href="#anch~VBO">
+								~VBO()
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								VBO&amp;
+							</span>
+							<a href="#anchoperator=">
+								operator=(VBO other)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								friend void
+							</span>
+							<a href="#anchswap">
+								swap(VBO&amp; first, VBO&amp; second)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchInitialise">
+								Initialise()
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchAddData">
+								AddData(const std::vector&lt;VBOVertex&gt;&amp; vertData, const std::vector&lt;VBOIndex&gt;&amp; indData)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchAddData2">
+								AddData(const std::vector&lt;VBOVertex&gt;&amp; vertData, const std::vector&lt;VBOIndex&gt;&amp; indData, const std::vector&lt;Segment&gt;&amp; segments)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchDraw">
+								Draw(const unsigned int&amp; pass = 0u)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchDraw2">
+								Draw(const FBO&amp; fbo, const unsigned int&amp; pass = 0u)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+					<div class="contentItemA">Private:</div>
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchDraw3">
+								Draw(const unsigned int&amp; targetID, const unsigned int&amp; pass)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+				</div>
+				
+				<div class="spacer8"></div>
+				
+				<span class="contentSubHeading">Data Members</span>
+				<div class="contentItemContainer">
+					<div class="contentItemA">Public:</div>
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								static ResourcePtr&lt;Shader&gt;
+							</span>
+							<a href="#anchmDefaultShader">
+								mDefaultShader
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								GLenum
+							</span>
+							<a href="#anchmType">
+								mType
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								std::size_t
+							</span>
+							<a href="#anchmMinimumSize">
+								mMinimumSize
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+					<div class="contentItemA">Private:</div>
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								GLuint
+							</span>
+							<a href="#anchmVertVBOID">
+								mVertVBOID
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								GLuint
+							</span>
+							<a href="#anchmIndVBOID">
+								mIndVBOID
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								std::map&lt; unsigned int, std::vector&lt;Segment&gt; &gt;
+							</span>
+							<a href="#anchmSegmentInfo">
+								mSegmentInfo
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								std::map&lt;GLuint, GLuint&gt;
+							</span>
+							<a href="#anchmVAOStore">
+								mVAOStore
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+				</div>
+				
+				<div class="spacer32"></div>
+				
+				<div class="contentHeading">Member Functions and Data Members</div>
+				
+				<div class="spacer12"></div>
+				
+				<span class="contentSubHeading" id="anchVBO">
+					VBO()
+					 = default
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchVBO2">
+					VBO(const VBO&amp; other)
+					 = delete
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const VBO&amp; other: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchVBO3">
+					VBO(VBO&amp;&amp; other)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						VBO&amp;&amp; other: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anch~VBO">
+					~VBO()
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchoperator=">
+					VBO&amp;
+					operator=(VBO other)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						VBO other: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchswap">
+					friend void
+					swap(VBO&amp; first, VBO&amp; second)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						VBO&amp; first: 
+					</div>
+					<div class="contentItemC">
+						VBO&amp; second: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchInitialise">
+					void
+					Initialise()
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchAddData">
+					void
+					AddData(const std::vector&lt;VBOVertex&gt;&amp; vertData, const std::vector&lt;VBOIndex&gt;&amp; indData)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const std::vector&lt;VBOVertex&gt;&amp; vertData: 
+					</div>
+					<div class="contentItemC">
+						const std::vector&lt;VBOIndex&gt;&amp; indData: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchAddData2">
+					void
+					AddData(const std::vector&lt;VBOVertex&gt;&amp; vertData, const std::vector&lt;VBOIndex&gt;&amp; indData, const std::vector&lt;Segment&gt;&amp; segments)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const std::vector&lt;VBOVertex&gt;&amp; vertData: 
+					</div>
+					<div class="contentItemC">
+						const std::vector&lt;VBOIndex&gt;&amp; indData: 
+					</div>
+					<div class="contentItemC">
+						const std::vector&lt;Segment&gt;&amp; segments: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchDraw">
+					void
+					Draw(const unsigned int&amp; pass = 0u)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const unsigned int&amp; pass: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchDraw2">
+					void
+					Draw(const FBO&amp; fbo, const unsigned int&amp; pass = 0u)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const FBO&amp; fbo: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; pass: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchDraw3">
+					void
+					Draw(const unsigned int&amp; targetID, const unsigned int&amp; pass)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const unsigned int&amp; targetID: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; pass: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmDefaultShader">
+					static ResourcePtr&lt;Shader&gt;
+					mDefaultShader
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmType">
+					GLenum
+					mType
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Default Value:</div>
+					<div class="contentItemC">
+						Default
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmMinimumSize">
+					std::size_t
+					mMinimumSize
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Default Value:</div>
+					<div class="contentItemC">
+						Default
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmVertVBOID">
+					GLuint
+					mVertVBOID
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Default Value:</div>
+					<div class="contentItemC">
+						Default
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmIndVBOID">
+					GLuint
+					mIndVBOID
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Default Value:</div>
+					<div class="contentItemC">
+						Default
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmSegmentInfo">
+					std::map&lt; unsigned int, std::vector&lt;Segment&gt; &gt;
+					mSegmentInfo
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmVAOStore">
+					std::map&lt;GLuint, GLuint&gt;
+					mVAOStore
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer32"></div>
+				
+				<div class="contentHeading">Source Files</div>
+				
+				<div class="spacer8"></div>
+				
+				<div class="contentBlock">
+					<a href="source/inc/uair/vbo.hpp">inc/uair/vbo.hpp</a>
+				</div>
+				
+				<div class="spacer4"></div>
+				
+				<div class="contentBlock">
+					<a href="source/src/vbo.cpp">src/vbo.cpp</a>
+				</div>
+				
+				<div class="spacer32"></div>
+			</div>
+			
+			<!-- Page Footer -->
+			<div id="footer">
+				Documentation last updated on the 6th of February, 2014.
+			</div>
+		</div>
+	</body>
+</html>
+

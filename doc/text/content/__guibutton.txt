@@ -1,0 +1,148 @@
+__	Class List
+	GUIButton
+--
+	inc/uair/guibutton.hpp
+	src/guibutton.cpp
+--
+	class GUIButton : public GUIElement
+--
+	Brief
+--
+	Detailed
+__
+
++	public
+	GUIButton(const Properties& properties)
+=	Brief
+==	Detailed
+>	const Properties& properties: 
+
++	public
+	void HandleMessageQueue(const MessageQueue::Entry& e, GUI* caller = nullptr)
+=	Brief
+==	Detailed
+>	const MessageQueue::Entry& e: 
+>	GUI* caller: 
+
++	public
+	void Input(GUI* caller = nullptr)
+=	Brief
+==	Detailed
+>	GUI* caller: 
+
++	public
+	void Process(GUI* caller = nullptr)
+=	Brief
+==	Detailed
+>	GUI* caller: 
+
++	public
+	void PostProcess(const unsigned int& processed, GUI* caller = nullptr)
+=	Brief
+==	Detailed
+>	const unsigned int& processed: 
+>	GUI* caller: 
+
++	public
+	void AddToBatch(RenderBatch& batch, GUI* caller = nullptr)
+=	Brief
+==	Detailed
+>	RenderBatch& batch: 
+>	GUI* caller: 
+
++	public
+	glm::vec2 GetPosition() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	void SetPosition(const glm::vec2& newPos)
+=	Brief
+==	Detailed
+>	const glm::vec2& newPos: 
+
++	public
+	static unsigned int GetTypeID()
+=	Brief
+==	Detailed
+<	Return
+
+
++	protected
+	void UpdateRenderState(const unsigned int& state)
+=	Brief
+==	Detailed
+>	const unsigned int& state: 
+
+
+-	protected
+	std::string mName
+=	Brief
+==	Detailed
+
+-	protected
+	bool mInArea
+=	Brief
+==	Detailed
+>	Default
+
+-	protected
+	unsigned int mState
+=	Brief
+==	Detailed
+>	Default
+
+-	protected
+	glm::vec2 mPosition
+=	Brief
+==	Detailed
+
+-	protected
+	float mWidth
+=	Brief
+==	Detailed
+>	Default
+
+-	protected
+	float mHeight
+=	Brief
+==	Detailed
+>	Default
+
+-	protected
+	glm::vec2 mTextOffset
+=	Brief
+==	Detailed
+
+-	protected
+	std::string mMessage
+=	Brief
+==	Detailed
+
+
+-	private
+	Shape mButtonTop
+=	Brief
+==	Detailed
+
+-	private
+	Shape mButtonBottom
+=	Brief
+==	Detailed
+
+-	private
+	RenderString mButtonText
+=	Brief
+==	Detailed
+
+
+~	public
+	class ClickedMessage : public Message
+=	Description
+<	Link
+
+~	public
+	struct Properties
+=	Description
+<	Link

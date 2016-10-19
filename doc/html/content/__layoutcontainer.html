@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html>
+	<head>
+			<link rel="stylesheet" type="text/css" href="../style.css">
+	</head>
+	
+	<body>
+		<div id="main">
+			<!-- Page Header -->
+			<div id="header">
+				<div id="headerTitle">Uair Engine</div>
+				<div id="headerSubtitle">Alpha</div>
+			</div>
+			
+			<!-- Page Navigation -->
+			<div id="navigation">
+				<div id="navigationBar">
+					<div class="navigationBarItem"><a href="../index.html">Home</a></div>
+					<div class="navigationBarSeperator"><img src="../img/seperator.png"></img></div>
+					<div class="navigationBarItem"><a href="_classlist.html" id="navigationBarItemCurrent">Class List</a></div>
+					<div class="navigationBarSeperator"><img src="../img/seperator.png"></img></div>
+					<div class="navigationBarItem"><a href="_filelist.html">File List</a></div>
+					<div class="navigationBarSeperator"><img src="../img/seperator.png"></img></div>
+				</div>
+				<div id="navigationTitle">
+					class LayoutContainer : public LayoutBase
+					<br>
+			</div>
+			
+			<!-- Page Content -->
+			<div id="content">
+				<div class="spacer16"></div>
+				<div class="contentHeading">Overview</div>
+				<div class="spacer8"></div>
+				<div class="contentBlock">
+					Detailed
+				</div>
+				
+				<div class="spacer16"></div>
+				
+				<span class="contentSubHeading">Member Functions</span>
+				<div class="contentItemContainer">
+					<div class="contentItemA">Public:</div>
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+							</span>
+							<a href="#anchLayoutContainer">
+								LayoutContainer(const glm::vec2&amp; position, const float&amp; width, const float&amp; height)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+							</span>
+							<a href="#anchLayoutContainer2">
+								LayoutContainer(const glm::vec2&amp; position, const float&amp; width, const float&amp; height, LayoutContainer* parentContainer)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+							</span>
+							<a href="#anchLayoutContainer3">
+								LayoutContainer(const glm::vec2&amp; position, const float&amp; width, const float&amp; height, LayoutDivision* parentDivision, const unsigned int&amp; row, const unsigned int&amp; column)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchSetPosition">
+								SetPosition(const glm::vec2&amp; position, const CoordinateSpace&amp; coordinateSpace = CoordinateSpace::Local)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchSetWidth">
+								SetWidth(const float&amp; width)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchSetHeight">
+								SetHeight(const float&amp; height)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								glm::vec2
+							</span>
+							<a href="#anchGetPosition">
+								GetPosition(const CoordinateSpace&amp; coordinateSpace = CoordinateSpace::Local)
+							</a>
+							<span class="contentItemBReg">
+								 const
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								float
+							</span>
+							<a href="#anchGetWidth">
+								GetWidth()
+							</a>
+							<span class="contentItemBReg">
+								 const
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								float
+							</span>
+							<a href="#anchGetHeight">
+								GetHeight()
+							</a>
+							<span class="contentItemBReg">
+								 const
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								Handle
+							</span>
+							<a href="#anchAddContainer">
+								AddContainer(const glm::vec2&amp; position, const float&amp; width, const float&amp; height)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchRemoveContainer">
+								RemoveContainer(const Handle&amp; handle)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								LayoutContainer&amp;
+							</span>
+							<a href="#anchGetContainer">
+								GetContainer(const Handle&amp; handle)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								Handle
+							</span>
+							<a href="#anchAddDivision">
+								AddDivision(const unsigned int&amp; rows, const unsigned int&amp; columns)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchRemoveDivision">
+								RemoveDivision(const Handle&amp; handle)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								LayoutDivision&amp;
+							</span>
+							<a href="#anchGetDivision">
+								GetDivision(const Handle&amp; handle)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								void
+							</span>
+							<a href="#anchAssignElement">
+								AssignElement(LayoutElement* element)
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								std::vector&lt;Shape&gt;
+							</span>
+							<a href="#anchGetShapes">
+								GetShapes()
+							</a>
+							<span class="contentItemBReg">
+							</span>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+				</div>
+				
+				<div class="spacer8"></div>
+				
+				<span class="contentSubHeading">Data Members</span>
+				<div class="contentItemContainer">
+					<div class="contentItemA">Private:</div>
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								glm::vec2
+							</span>
+							<a href="#anchmPosition">
+								mPosition
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								float
+							</span>
+							<a href="#anchmWidth">
+								mWidth
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								float
+							</span>
+							<a href="#anchmHeight">
+								mHeight
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								Store&lt;LayoutBase, LayoutContainer&gt;
+							</span>
+							<a href="#anchmContainers">
+								mContainers
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								Store&lt;LayoutBase, LayoutDivision&gt;
+							</span>
+							<a href="#anchmDivisions">
+								mDivisions
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								LayoutContainer*
+							</span>
+							<a href="#anchmParentContainer">
+								mParentContainer
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								LayoutDivision*
+							</span>
+							<a href="#anchmParentDivision">
+								mParentDivision
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								unsigned int
+							</span>
+							<a href="#anchmRow">
+								mRow
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+						
+						<div class="contentItemB">
+							<span class="contentItemBReg">
+								unsigned int
+							</span>
+							<a href="#anchmColumn">
+								mColumn
+							</a>
+						</div>
+						<div class="contentItemC">
+							Brief
+						</div>
+				</div>
+				
+				<div class="spacer8"></div>
+				
+				<span class="contentSubHeading">Other</span>
+				<div class="contentItemContainer">
+					<div class="contentItemA">Public:</div>
+						<div class="contentItemB">
+							<a href="Link.html">
+								typedef std::tuple&lt;unsigned int, unsigned int, unsigned int&gt; Handle
+							</a>
+						</div>
+						<div class="contentItemC">
+							Description
+						</div>
+				</div>
+				
+				<div class="spacer32"></div>
+				
+				<div class="contentHeading">Member Functions and Data Members</div>
+				
+				<div class="spacer12"></div>
+				
+				<span class="contentSubHeading" id="anchLayoutContainer">
+					LayoutContainer(const glm::vec2&amp; position, const float&amp; width, const float&amp; height)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const glm::vec2&amp; position: 
+					</div>
+					<div class="contentItemC">
+						const float&amp; width: 
+					</div>
+					<div class="contentItemC">
+						const float&amp; height: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchLayoutContainer2">
+					LayoutContainer(const glm::vec2&amp; position, const float&amp; width, const float&amp; height, LayoutContainer* parentContainer)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const glm::vec2&amp; position: 
+					</div>
+					<div class="contentItemC">
+						const float&amp; width: 
+					</div>
+					<div class="contentItemC">
+						const float&amp; height: 
+					</div>
+					<div class="contentItemC">
+						LayoutContainer* parentContainer: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchLayoutContainer3">
+					LayoutContainer(const glm::vec2&amp; position, const float&amp; width, const float&amp; height, LayoutDivision* parentDivision, const unsigned int&amp; row, const unsigned int&amp; column)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const glm::vec2&amp; position: 
+					</div>
+					<div class="contentItemC">
+						const float&amp; width: 
+					</div>
+					<div class="contentItemC">
+						const float&amp; height: 
+					</div>
+					<div class="contentItemC">
+						LayoutDivision* parentDivision: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; row: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; column: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchSetPosition">
+					void
+					SetPosition(const glm::vec2&amp; position, const CoordinateSpace&amp; coordinateSpace = CoordinateSpace::Local)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const glm::vec2&amp; position: 
+					</div>
+					<div class="contentItemC">
+						const CoordinateSpace&amp; coordinateSpace: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchSetWidth">
+					void
+					SetWidth(const float&amp; width)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const float&amp; width: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchSetHeight">
+					void
+					SetHeight(const float&amp; height)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const float&amp; height: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetPosition">
+					glm::vec2
+					GetPosition(const CoordinateSpace&amp; coordinateSpace = CoordinateSpace::Local)
+					 const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const CoordinateSpace&amp; coordinateSpace: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetWidth">
+					float
+					GetWidth()
+					 const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetHeight">
+					float
+					GetHeight()
+					 const
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchAddContainer">
+					Handle
+					AddContainer(const glm::vec2&amp; position, const float&amp; width, const float&amp; height)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const glm::vec2&amp; position: 
+					</div>
+					<div class="contentItemC">
+						const float&amp; width: 
+					</div>
+					<div class="contentItemC">
+						const float&amp; height: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchRemoveContainer">
+					void
+					RemoveContainer(const Handle&amp; handle)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const Handle&amp; handle: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetContainer">
+					LayoutContainer&amp;
+					GetContainer(const Handle&amp; handle)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const Handle&amp; handle: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchAddDivision">
+					Handle
+					AddDivision(const unsigned int&amp; rows, const unsigned int&amp; columns)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const unsigned int&amp; rows: 
+					</div>
+					<div class="contentItemC">
+						const unsigned int&amp; columns: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchRemoveDivision">
+					void
+					RemoveDivision(const Handle&amp; handle)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const Handle&amp; handle: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetDivision">
+					LayoutDivision&amp;
+					GetDivision(const Handle&amp; handle)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						const Handle&amp; handle: 
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchAssignElement">
+					void
+					AssignElement(LayoutElement* element)
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Parameters:</div>
+					<div class="contentItemC">
+						LayoutElement* element: 
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchGetShapes">
+					std::vector&lt;Shape&gt;
+					GetShapes()
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Return Value:</div>
+					<div class="contentItemC">
+						Return
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmPosition">
+					glm::vec2
+					mPosition
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Default Value:</div>
+					<div class="contentItemC">
+						Default
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmWidth">
+					float
+					mWidth
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Default Value:</div>
+					<div class="contentItemC">
+						Default
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmHeight">
+					float
+					mHeight
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Default Value:</div>
+					<div class="contentItemC">
+						Default
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmContainers">
+					Store&lt;LayoutBase, LayoutContainer&gt;
+					mContainers
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmDivisions">
+					Store&lt;LayoutBase, LayoutDivision&gt;
+					mDivisions
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmParentContainer">
+					LayoutContainer*
+					mParentContainer
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Default Value:</div>
+					<div class="contentItemC">
+						Default
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmParentDivision">
+					LayoutDivision*
+					mParentDivision
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Default Value:</div>
+					<div class="contentItemC">
+						Default
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmRow">
+					unsigned int
+					mRow
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Default Value:</div>
+					<div class="contentItemC">
+						Default
+					</div>
+				</div>
+				
+				<div class="spacer24"></div>
+				
+				<span class="contentSubHeading" id="anchmColumn">
+					unsigned int
+					mColumn
+				</span>
+				<div class="contentItemContainer">
+					<div class="contentItemD">
+						Detailed
+					</div>
+					<div class="contentItemB">Default Value:</div>
+					<div class="contentItemC">
+						Default
+					</div>
+				</div>
+				
+				<div class="spacer32"></div>
+				
+				<div class="contentHeading">Source Files</div>
+				
+				<div class="spacer8"></div>
+				
+				<div class="contentBlock">
+					<a href="source/inc/uair/layoutcontainer.hpp">inc/uair/layoutcontainer.hpp</a>
+				</div>
+				
+				<div class="spacer4"></div>
+				
+				<div class="contentBlock">
+					<a href="source/src/layoutcontainer.cpp">src/layoutcontainer.cpp</a>
+				</div>
+				
+				<div class="spacer32"></div>
+			</div>
+			
+			<!-- Page Footer -->
+			<div id="footer">
+				Documentation last updated on the 6th of February, 2014.
+			</div>
+		</div>
+	</body>
+</html>
+

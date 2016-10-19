@@ -1,0 +1,25 @@
+__	Class List
+	SoundLoaderOgg
+--
+	inc/uair/soundloaderogg.hpp
+	src/soundloaderogg.cpp
+--
+	class SoundLoaderOgg
+--
+	Brief
+--
+	Detailed
+__
+
++	public 
+	void Decode(std::ifstream& oggFile, std::function<int (const int& serial, const int& numChannels, const int& numSamples, std::vector<int>& samples)> audioCallback)
+=	Brief
+==	Detailed
+>	std::ifstream& oggFile: 
+>	std::function<int (const int& serial, const int& numChannels, const int& numSamples, std::vector<int>& samples)> audioCallback: 
+
+
+~	public
+	struct OggStream
+=	Description
+<	Link

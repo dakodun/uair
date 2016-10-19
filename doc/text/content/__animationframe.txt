@@ -1,0 +1,41 @@
+__	Class List
+	AnimationFrame
+--
+	inc/uair/shape.hpp
+--
+	struct AnimationFrame
+--
+	Brief
+--
+	Detailed
+__
+
+-	public
+	ResourcePtr<Texture> mTexture
+=	Brief
+==	Detailed
+
+-	public
+	std::vector<glm::vec2> mTexCoords
+=	Brief
+==	Detailed
+
+-	public
+	std::vector<glm::vec2> mTexCoordsExtra
+=	Brief
+==	Detailed
+
+-	public
+	float mLayer
+=	Brief
+==	Detailed
+
+-	public
+	glm::vec2 mMinST
+=	Brief
+==	Detailed
+
+-	public
+	glm::vec2 mMaxST
+=	Brief
+==	Detailed

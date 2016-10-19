@@ -1,0 +1,106 @@
+__	Class List
+	RenderString
+--
+	inc/uair/renderstring.hpp
+	src/renderstring.cpp
+--
+	class RenderString : public Transformable2D, public Renderable
+--
+	Brief
+--
+	Detailed
+__
+
++	public
+	std::string GetTag() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	void SetFont(ResourcePtr<Font> font)
+=	Brief
+==	Detailed
+>	ResourcePtr<Font> font: 
+
++	public
+	void SetFont(Font* font)
+=	Brief
+==	Detailed
+>	Font* font: 
+
++	public
+	void SetText(const std::u16string& newText)
+=	Brief
+==	Detailed
+>	const std::u16string& newText: 
+<	Return
+
++	public
+	std::u16string GetText() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	void SetSize(const unsigned int& size)
+=	Brief
+==	Detailed
+>	const unsigned int& size: 
+<	Return
+
+
++	protected
+	void UpdateGlobalBoundingBox()
+=	Brief
+==	Detailed
+
++	protected
+	void UpdateGlobalMask()
+=	Brief
+==	Detailed
+
++	protected
+	void CreateLocalMask()
+=	Brief
+==	Detailed
+
++	protected
+	std::list<RenderBatchData> Upload()
+=	Brief
+==	Detailed
+<	Return
+
+
++	private
+	void CreateQuads()
+=	Brief
+==	Detailed
+
+
+-	private
+	ResourcePtr<Font> mFont
+=	Brief
+==	Detailed
+
+-	private
+	std::u16string mString
+=	Brief
+==	Detailed
+
+-	private
+	unsigned int mSize
+=	Brief
+==	Detailed
+>	Default
+
+-	private
+	std::list<Shape> mQuads
+=	Brief
+==	Detailed
+
+-	private
+	glm::vec2 mTextScale
+=	Brief
+==	Detailed
+>	Default

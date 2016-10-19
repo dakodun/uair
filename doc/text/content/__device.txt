@@ -1,0 +1,15 @@
+__	Class List
+	Device
+--
+	inc/uair/inputenums.hpp
+--
+	enum class Device : unsigned int
+--
+	Brief
+--
+	Detailed
+__
+
+~	public
+	Unknown = 0u, AxisX = 1u, AxisY, AxisZ, AxisRx, AxisRy, AxisRz, Slider, Dial, Wheel, HatSwitch, Count
+=	Description

@@ -1,0 +1,85 @@
+__	Class List
+	Camera
+--
+	inc/uair/camera.hpp
+	src/camera.cpp
+--
+	class Camera
+--
+	Brief
+--
+	Detailed
+__
+
++	public
+	void Rotate(const Axis& axis, const float& angle)
+=	Brief
+==	Detailed
+>	const Axis& axis: 
+>	const float& angle: 
+
++	public
+	void Move(const Axis& axis, const float& distance)
+=	Brief
+==	Detailed
+>	const Axis& axis: 
+>	const float& distance: 
+
++	public
+	glm::mat4 GetMatrix()
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	void LockToPlane(const Plane& plane = Plane::None)
+=	Brief
+==	Detailed
+>	const Plane& plane: 
+
++	private
+	void UpdateAngle(float& oldAngle, const float& angleChange)
+=	Brief
+==	Detailed
+>	float& oldAngle: 
+>	const float& angleChange: 
+
++	private
+	void UpdatePosition(const float& distanceChange, const int& axisIndex)
+=	Brief
+==	Detailed
+>	const float& distanceChange: 
+>	const int& axisIndex: 
+
++	private
+	void UpdateView()
+=	Brief
+==	Detailed
+
+-	private
+	bool mUpdate
+=	Brief
+==	Detailed
+
+-	private
+	glm::mat4 mView
+=	Brief
+==	Detailed
+>	Default
+
+-	private
+	glm::vec3 mAngles
+=	Brief
+==	Detailed
+>	Default
+
+-	private
+	glm::vec3 mPosition
+=	Brief
+==	Detailed
+>	Default
+
+-	private
+	Plane mLockedPlane
+=	Brief
+==	Detailed

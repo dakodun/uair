@@ -1,0 +1,11 @@
+__	Class List
+	SceneManagerPtr
+--
+	inc/uair/scenemanager.hpp
+--
+	typedef std::shared_ptr<SceneManager> SceneManagerPtr
+--
+	Brief
+--
+	Detailed
+__

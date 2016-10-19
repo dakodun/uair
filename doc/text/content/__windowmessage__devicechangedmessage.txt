@@ -1,0 +1,78 @@
+__	Class List
+	WindowMessage::DeviceChangedMessage
+--
+	inc/uair/windowmessages.hpp
+	src/windowmessages.cpp
+--
+	class DeviceChangedMessage : public Message
+--
+	Brief
+--
+	Detailed
+__
+
++	public
+	DeviceChangedMessage() = default
+=	Brief
+==	Detailed
+
++	public
+	DeviceChangedMessage(const int& id, const bool& status)
+=	Brief
+==	Detailed
+>	const int& id:
+>	const bool& status:
+
++	public
+	DeviceChangedMessage(const int& id, const bool& status, const unsigned int& buttonCount, const unsigned int& controlCount, const std::vector<InputManager::InputDevice::ControlCaps>& caps)
+=	Brief
+==	Detailed
+>	const int& id:
+>	const bool& status:
+>	const unsigned int& buttonCount:
+>	const unsigned int& controlCount:
+>	const std::vector<InputManager::InputDevice::ControlCaps>& caps:
+
++	public
+	void Serialise(cereal::BinaryOutputArchive& archive) const
+=	Brief
+==	Detailed
+>	cereal::BinaryOutputArchive& archive: 
+
++	public
+	void Serialise(cereal::BinaryInputArchive& archive)
+=	Brief
+==	Detailed
+>	cereal::BinaryInputArchive& archive: 
+
++	public
+	static constexpr unsigned int GetTypeID()
+=	Brief
+==	Detailed
+<	Return
+
+
+-	public
+	int mID
+=	Brief
+==	Detailed
+
+-	public
+	bool mStatus
+=	Brief
+==	Detailed
+
+-	public
+	unsigned int mButtonCount
+=	Brief
+==	Detailed
+
+-	public
+	unsigned int mControlCount
+=	Brief
+==	Detailed
+
+-	public
+	std::vector<InputManager::InputDevice::ControlCaps> mCaps
+=	Brief
+==	Detailed

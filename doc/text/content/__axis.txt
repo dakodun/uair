@@ -1,0 +1,15 @@
+__	Class List
+	Axis
+--
+	inc/uair/camera.hpp
+--
+	enum class Axis
+--
+	Brief
+--
+	Detailed
+__
+
+~	public
+	X = 0u, Y, Z
+=	Description

@@ -1,0 +1,65 @@
+__	Class List
+	WindowMessage::MouseMoveMessage
+--
+	inc/uair/windowmessages.hpp
+	src/windowmessages.cpp
+--
+	class MouseMoveMessage : public Message
+--
+	Brief
+--
+	Detailed
+__
+
++	public
+	MouseMoveMessage() = default
+=	Brief
+==	Detailed
+
++	public
+	MouseMoveMessage(const int& localX, const int& localY, const int& globalX, const int& globalY)
+=	Brief
+==	Detailed
+>	const int& localX: 
+>	const int& localY: 
+>	const int& globalX: 
+>	const int& globalY: 
+
++	public
+	void Serialise(cereal::BinaryOutputArchive& archive) const
+=	Brief
+==	Detailed
+>	cereal::BinaryOutputArchive& archive: 
+
++	public
+	void Serialise(cereal::BinaryInputArchive& archive)
+=	Brief
+==	Detailed
+>	cereal::BinaryInputArchive& archive: 
+
++	public
+	static constexpr unsigned int GetTypeID()
+=	Brief
+==	Detailed
+<	Return
+
+
+-	public
+	int mLocalX
+=	Brief
+==	Detailed
+
+-	public
+	int mLocalY
+=	Brief
+==	Detailed
+
+-	public
+	int mGlobalX
+=	Brief
+==	Detailed
+
+-	public
+	int mGlobalY
+=	Brief
+==	Detailed

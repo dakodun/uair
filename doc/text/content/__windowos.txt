@@ -1,0 +1,12 @@
+__	Class List
+	WindowOS
+--
+	inc/uair/window.hpp
+--
+	typedef uair::WindowWin32 WindowOS /
+	typedef uair::WindowLinux WindowOS
+--
+	Brief
+--
+	Detailed
+__

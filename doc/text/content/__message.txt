@@ -1,0 +1,29 @@
+__	Class List
+	Message
+--
+	inc/uair/messagequeue.hpp
+	src/messagequeue.cpp
+--
+	class Message
+--
+	Brief
+--
+	Detailed
+__
+
++	public
+virtual ~Message()
+=	Brief
+==	Detailed
+
++	public
+virtual void Serialise(cereal::BinaryOutputArchive& archive) const = 0
+=	Brief
+==	Detailed
+>	cereal::BinaryOutputArchive& archive: 
+
++	public
+virtual void Serialise(cereal::BinaryInputArchive& archive) = 0
+=	Brief
+==	Detailed
+>	cereal::BinaryInputArchive& archive: 

@@ -1,0 +1,11 @@
+__	Class List
+	Font::Rectangle
+--
+	inc/uair/font.hpp
+--
+	typedef std::pair<glm::ivec2, glm::ivec2> Rectangle
+--
+	Brief
+--
+	Detailed
+__

@@ -1,0 +1,85 @@
+__	Class List
+	PBO
+--
+	inc/uair/pbo.hpp
+	src/pbo.cpp
+--
+	class PBO
+--
+	Brief
+--
+	Detailed
+__
+
++	public
+	PBO() = default
+=	Brief
+==	Detailed
+
++	public
+	PBO(const PBO& other) = delete
+=	Brief
+==	Detailed
+>	const PBO& other: 
+
++	public
+	PBO(PBO&& other)
+=	Brief
+==	Detailed
+>	PBO&& other: 
+
++	public
+	~PBO()
+=	Brief
+==	Detailed
+
++	public
+	PBO& operator=(PBO other)
+=	Brief
+==	Detailed
+>	PBO other: 
+<	Return
+
++	public
+	friend void swap(PBO& first, PBO& second)
+=	Brief
+==	Detailed
+>	PBO& first: 
+>	PBO& second: 
+
++	public
+	void BufferData(const GLenum& target, const GLsizeiptr& size, const GLenum& usage)
+=	Brief
+==	Detailed
+>	const GLenum& target: 
+>	const GLsizeiptr& size: 
+>	const GLenum& usage: 
+
++	public
+	void MapBuffer(const GLuint& attachmentPoint)
+=	Brief
+==	Detailed
+>	const GLuint& attachmentPoint: 
+
++	public
+	void EnsureInitialised()
+=	Brief
+==	Detailed
+
++	public
+	void Clear()
+=	Brief
+==	Detailed
+
++	public
+	unsigned int GetPBOID() const
+=	Brief
+==	Detailed
+<	Return
+
+
+-	private
+	GLuint mPBOID
+=	Brief
+==	Detailed
+>	Default

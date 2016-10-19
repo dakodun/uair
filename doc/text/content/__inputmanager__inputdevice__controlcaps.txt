@@ -1,0 +1,44 @@
+__	Class List
+	InputManager::InputDevice::ControlCaps
+--
+	inc/uair/inputmanager.hpp
+--
+	struct ControlCaps
+--
+	Brief
+--
+	Detailed
+__
+
++	public
+	void Serialise(cereal::BinaryOutputArchive& archive) const
+=	Brief
+==	Detailed
+>	cereal::BinaryOutputArchive& archive: 
+
++	public
+	void Serialise(cereal::BinaryInputArchive& archive)
+=	Brief
+==	Detailed
+>	cereal::BinaryInputArchive& archive: 
+
+
+-	public
+	Device mDevice
+=	Brief
+==	Detailed
+
+-	public
+	int mLowerRange
+=	Brief
+==	Detailed
+
+-	public
+	int mUpperRange
+=	Brief
+==	Detailed
+
+-	public
+	unsigned int mCollectionID
+=	Brief
+==	Detailed

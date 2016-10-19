@@ -1,0 +1,11 @@
+__	Class List
+	EntitySystem::EntityHandle
+--
+	inc/uair/entitysystem.hpp
+--
+	typedef EntityManager::Handle EntityHandle
+--
+	Brief
+--
+	Detailed
+__

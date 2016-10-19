@@ -1,0 +1,247 @@
+__	Class List
+	Font
+--
+	inc/uair/font.hpp
+	src/font.cpp
+--
+	class Font : public Resource
+--
+	Brief
+--
+	Detailed
+__
+
++	public
+	Font(const unsigned int& textureSize)
+=	Brief
+==	Detailed
+>	const unsigned int& textureSize: 
+
++	public
+	Font()
+=	Brief
+==	Detailed
+
++	public
+	Font(const Font& other) = delete
+=	Brief
+==	Detailed
+>	const Font& other: 
+
++	public
+	Font(Font&& other)
+=	Brief
+==	Detailed
+>	Font&& other:
+
++	public
+	~Font()
+=	Brief
+==	Detailed
+
++	public
+	Font& operator=(Font other)
+=	Brief
+==	Detailed
+>	Font other: 
+<	Return
+
++	public
+	friend void swap(Font& first, Font& second)
+=	Brief
+==	Detailed
+>	Font& first: 
+>	Font& second: 
+
++	public
+	void CreateCache(const std::string& cacheFilename)
+=	Brief
+==	Detailed
+>	const std::string& cacheFilename: 
+
++	public
+	bool LoadFromCache(const std::string& cacheFilename)
+=	Brief
+==	Detailed
+>	const std::string& cacheFilename: 
+<	Return
+
++	public
+	bool LoadFromFile(const std::string& filename, const unsigned int& pointSize = 72u)
+=	Brief
+==	Detailed
+>	const std::string& filename: 
+>	const unsigned int& pointSize: 
+<	Return
+
++	public
+	void LoadGlyph(const char16_t& charCode)
+=	Brief
+==	Detailed
+>	const char16_t& charCode: 
+
++	public
+	void LoadGlyphs(const std::vector<char16_t>& charCodes)
+=	Brief
+==	Detailed
+>	const std::vector<char16_t>& charCodes: 
+
++	public
+	Glyph GetGlyph(const char16_t& codePoint)
+=	Brief
+==	Detailed
+>	const char16_t& codePoint: 
+<	Return
+
++	public
+	int GetKerning(const char16_t& firstCodePoint, const char16_t& secondCodePoint)
+=	Brief
+==	Detailed
+>	const char16_t& firstCodePoint: 
+>	const char16_t& secondCodePoint: 
+<	Return
+
++	public
+	unsigned int GetFontSize() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	int GetLineHeight() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	unsigned int GetTextureID() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	unsigned int GetTextureWidth() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	unsigned int GetTextureHeight() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	static unsigned int GetTypeID()
+=	Brief
+==	Detailed
+<	Return
+
+
++	private
+	Shape CreateGlyphShape(const char16_t& charCode, Glyph& glyphObject)
+=	Brief
+==	Detailed
+>	const char16_t& charCode: 
+>	Glyph& glyphObject: 
+<	Return
+
++	private
+	void UpdateTexture(const std::vector< std::pair<char16_t, Shape> >& newShapes)
+=	Brief
+==	Detailed
+>	const std::vector< std::pair<char16_t, Shape> >& newShapes: 
+
++	private
+	void UpdateKerningMap(const std::vector< std::pair<char16_t, Shape> >& newShapes)
+=	Brief
+==	Detailed
+>	const std::vector< std::pair<char16_t, Shape> >& newShapes: 
+
++	private
+	Glyph Pack(Shape& shape)
+=	Brief
+==	Detailed
+>	Shape& shape: 
+<	Return
+
++	private
+	void PositionBase(Shape& baseShape, const unsigned int& padding)
+=	Brief
+==	Detailed
+>	Shape& baseShape: 
+>	const unsigned int& padding: 
+
+
+-	public
+	static FT_Library* mFTLibraryPtr
+=	Brief
+==	Detailed
+>	Default
+
+
+-	private
+	FT_Face mFTFace
+=	Brief
+==	Detailed
+>	Default
+
+-	private
+	unsigned int mFontSize
+=	Brief
+==	Detailed
+>	Default
+
+-	private
+	int mLineHeight
+=	Brief
+==	Detailed
+>	Default
+
+-	private
+	std::map<char16_t, Glyph> mGlyphs
+=	Brief
+==	Detailed
+
+-	private
+	std::map<std::pair<char16_t, char16_t>, int> mKernMap
+=	Brief
+==	Detailed
+
+-	private
+	unsigned int mTextureSize
+=	Brief
+==	Detailed
+
+-	private
+	FBO mFBO
+=	Brief
+==	Detailed
+
+-	private
+	Texture mTexture
+=	Brief
+==	Detailed
+
+-	private
+	RenderBuffer mRenderBuffer
+=	Brief
+==	Detailed
+
+-	private
+	std::list< std::list<Rectangle> > mRectangles
+=	Brief
+==	Detailed
+>	Default
+
+
+~	public
+	struct Glyph
+=	Description
+<	Link
+
+
+~	private
+	typedef std::pair<glm::ivec2, glm::ivec2> Rectangle
+=	Description
+<	Link

@@ -1,0 +1,163 @@
+__	Class List
+	Shader
+--
+	inc/uair/shader.hpp
+	src/shader.cpp
+--
+	class Shader : public Resource
+--
+	Brief
+--
+	Detailed
+__
+
++	public
+	Shader() = default
+=	Brief
+==	Detailed
+
++	public
+	Shader(const Shader& other) = delete
+=	Brief
+==	Detailed
+>	const Shader& other: 
+
++	public
+	Shader(Shader&& other)
+=	Brief
+==	Detailed
+>	Shader&& other: 
+
++	public
+	~Shader()
+=	Brief
+==	Detailed
+
++	public
+	Shader& operator=(Shader other)
+=	Brief
+==	Detailed
+>	Shader other: 
+<	Return
+
++	public
+	friend void swap(Shader& first, Shader& second)
+=	Brief
+==	Detailed
+>	Shader& first: 
+>	Shader& second: 
+
++	public
+	void LinkProgram()
+=	Brief
+==	Detailed
+
++	public
+	void UseProgram()
+=	Brief
+==	Detailed
+
++	public
+	void VertexFromFile(const std::string& vertexShaderFile)
+=	Brief
+==	Detailed
+>	const std::string& vertexShaderFile: 
+
++	public
+	void VertexFromString(const std::string& vertexShaderString)
+=	Brief
+==	Detailed
+>	const std::string& vertexShaderString: 
+
++	public
+	void FragmentFromFile(const std::string& fragmentShaderFile)
+=	Brief
+==	Detailed
+>	const std::string& fragmentShaderFile: 
+
++	public
+	void FragmentFromString(const std::string& fragmentShaderString)
+=	Brief
+==	Detailed
+>	const std::string& fragmentShaderString: 
+
++	public
+	virtual void InitCallback()
+=	Brief
+==	Detailed
+
++	public
+	virtual void VAOCallback()
+=	Brief
+==	Detailed
+
++	public
+	virtual void RenderCallback()
+=	Brief
+==	Detailed
+
++	public
+	void Initialise()
+=	Brief
+==	Detailed
+
++	public
+	void Clear()
+=	Brief
+==	Detailed
+
++	public
+	GLuint GetProgramID() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	static unsigned int GetTypeID()
+=	Brief
+==	Detailed
+<	Return
+
+
+-	protected
+	GLuint mProgramID
+=	Brief
+==	Detailed
+>	Default
+
+-	protected
+	std::string mVertShaderString
+=	Brief
+==	Detailed
+
+-	protected
+	std::string mFragShaderString
+=	Brief
+==	Detailed
+
+
+-	private
+	GLint mProjectionMatrixLocation
+=	Brief
+==	Detailed
+
+-	private
+	GLint mViewMatrixLocation
+=	Brief
+==	Detailed
+
+-	private
+	GLint mModelMatrixLocation
+=	Brief
+==	Detailed
+
+-	private
+	GLint mTextureLocation
+=	Brief
+==	Detailed
+
+
+~	public
+	typedef std::function<void ()> SetupCallback
+=	Description
+<	Link

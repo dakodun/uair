@@ -1,0 +1,62 @@
+__	Class List
+	Component
+--
+	inc/uair/component.hpp
+	src/component.cpp
+--
+	class Component
+--
+	Brief
+--
+	Detailed
+__
+
++	public
+	Component(const std::string& componentName = "")
+=	Brief
+==	Detailed
+>	const std::string& componentName: 
+
++	public
+	Component(const Component& other) = delete
+=	Brief
+==	Detailed
+>	const Component& other: 
+
++	public
+	Component(Component&& other)
+=	Brief
+==	Detailed
+>	Component&& other: 
+
++	public
+	virtual ~Component()
+=	Brief
+==	Detailed
+
++	public
+	Component& operator=(Component other)
+=	Brief
+==	Detailed
+>	Component other: 
+<	Return
+
++	public
+	friend void swap(Component& first, Component& second)
+=	Brief
+==	Detailed
+>	Component& first: 
+>	Component& second: 
+
++	public
+	std::string GetName() const
+=	Brief
+==	Detailed
+<	Return
+
+
+-	protected
+	std::string mName
+=	Brief
+==	Detailed
+>	Default

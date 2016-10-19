@@ -1,0 +1,45 @@
+__	Class List
+	WindowWin32::InputDevice
+--
+	inc/uair/windowwin32.hpp
+	src/windowwin32.cpp
+--
+	struct InputDevice
+--
+	Brief
+--
+	Detailed
+__
+
+-	public
+	int mID
+=	Brief
+==	Detailed
+>	Default
+
+-	public
+	unsigned int mButtonCount
+=	Brief
+==	Detailed
+>	Default
+
+-	public
+	unsigned int mControlCount
+=	Brief
+==	Detailed
+>	Default
+
+-	public
+	std::vector<InputManager::InputDevice::ControlCaps> mControls
+=	Brief
+==	Detailed
+
+-	public
+	std::vector<bool> mButtonStates
+=	Brief
+==	Detailed
+
+-	public
+	std::map<Device, int> mControlStates
+=	Brief
+==	Detailed

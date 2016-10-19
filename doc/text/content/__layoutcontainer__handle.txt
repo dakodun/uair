@@ -1,0 +1,11 @@
+__	Class List
+	LayoutContainer::Handle
+--
+	inc/uair/layoutcontainer.hpp
+--
+	typedef std::tuple<unsigned int, unsigned int, unsigned int> Handle
+--
+	Brief
+--
+	Detailed
+__

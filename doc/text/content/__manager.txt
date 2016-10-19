@@ -1,0 +1,183 @@
+__	Class List
+	Manager
+--
+	inc/uair/manager.hpp
+--
+	template <typename B>
+	Manager
+--
+	Handles resources that derive from a common base type.
+--
+	A Manager is declared with a base type (for example, [link:Resource|__resource.html]) allowing it to manage any
+	type that derives from that base type. The Manager controls the derived objects through
+	their entire lifetime (being responsible for their creation and destruction) and exposes
+	them via handles and references. In order for a base type to be eligible for management it
+	must implement a static GetTypeID function that returns an id (unsigned int) that is unique
+	from all other derived types of the managed base type.
+__
+
++	public
+	Manager() = default
+=	Brief
+==	Detailed
+
++	public
+	Manager(const Manager& other) = delete
+=	Brief
+==	Detailed
+>	const Manager& other: 
+
++	public
+	Manager(Manager&& other)
+=	Brief
+==	Detailed
+>	Manager&& other: 
+
++	public
+	~Manager()
+=	Brief
+==	Detailed
+
++	public
+	Manager& operator=(Manager other)
+=	Brief
+==	Detailed
+>	Manager other: 
+<	Return
+
++	public
+	friend void swap(Manager& first, Manager& second)
+=	Brief
+==	Detailed
+>	Manager& first: 
+>	Manager& second: 
+
++	public
+	template <typename T>
+	void Register()
+=	Registers a derived type (T) to be managed by this manager.
+==	Registers a derived type (T) to be managed by this manager. The derived type must implement a static GetTypeID
+	function that returns an id (unsigned int) that is unique from all other derived types of the managed base type.
+
++	public
+	template <typename T>
+	bool IsRegistered()
+=	Indicates if a derived type has been registered to the manager.
+<	Returns true if the type has been registered, otherwise returns false.
+
++	public
+	template <typename T, typename ...Ps>
+	Handle Add(const std::string& name, const Ps&... params)
+=	Creates an object of the specified derived type and returns a handle to it.
+==	Creates an object of the specified derived type and returns a handle to it. The specified type must be registered
+	beforehand (using the [link:Register|__manager.html#anchRegister] function)
+>	const std::string& name: a non-unqiue name used to identify the object within the store.
+>	const Ps&... params: the parameters to forward to the constructor of the specified derived type.
+<	A handle that can be used to retrieve or remove the newly created object (see [link:Manager::Handle|__manager_handle.html]).
+
++	public
+	template <typename T>
+	void Remove(const Handle& handle)
+=	Brief
+==	Detailed
+>	const Handle& handle: 
+
++	public
+	template <typename T>
+	void Remove(const std::string& name)
+=	Brief
+==	Detailed
+>	const std::string& name: 
+
++	public
+	template <typename T>
+	void Remove()
+=	Brief
+==	Detailed
+
++	public
+	void Remove(const Handle& handle)
+=	Brief
+==	Detailed
+>	const Handle& handle: 
+
++	public
+	void Remove(const std::string& name)
+=	Brief
+==	Detailed
+>	const std::string& name: 
+
++	public
+	void Remove()
+=	Brief
+==	Detailed
+
++	public
+	template <typename T>
+	T& Get(const Handle& handle)
+=	Brief
+==	Detailed
+>	const Handle& handle: 
+<	Return
+
++	public
+	template <typename T>
+	std::list< std::reference_wrapper<T> > Get(const std::string& name)
+=	Brief
+==	Detailed
+>	const std::string& name: 
+<	Return
+
++	public
+	template <typename T>
+	std::list< std::reference_wrapper<T> > Get()
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	B* GetAsBase(const Handle& handle)
+=	Brief
+==	Detailed
+>	const Handle& handle: 
+<	Return
+
++	public
+	template <typename T>
+	std::list<Handle> GetHandles(const std::string& name) const
+=	Brief
+==	Detailed
+>	const std::string& name: 
+<	Return
+
++	public
+	template <typename T>
+	std::list<Handle> GetHandles() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	std::list<Handle> GetHandles(const std::string& name) const
+=	Brief
+==	Detailed
+>	const std::string& name: 
+<	Return
+
++	public
+	std::list<Handle> GetHandles() const
+=	Brief
+==	Detailed
+<	Return
+
+
+-	private
+	std::map<unsigned int, StoreBase<B>*> mLookup
+=	Brief
+==	Detailed
+
+
+~	public
+	class Handle
+=	Description
+<	Link

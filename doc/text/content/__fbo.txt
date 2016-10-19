@@ -1,0 +1,113 @@
+__	Class List
+	FBO
+--
+	inc/uair/fbo.hpp
+	src/fbo.cpp
+--
+	class FBO
+--
+	Brief
+--
+	Detailed
+__
+
++	public
+	FBO() = default
+=	Brief
+==	Detailed
+
++	public
+	FBO(const FBO& other) = delete
+=	Brief
+==	Detailed
+>	const FBO& other: 
+
++	public
+	FBO(FBO&& other)
+=	Brief
+==	Detailed
+>	FBO&& other: 
+
++	public
+	~FBO()
+=	Brief
+==	Detailed
+
++	public
+	FBO& operator=(FBO other)
+=	Brief
+==	Detailed
+>	FBO other: 
+<	Return
+
++	public
+	friend void swap(FBO& first, FBO& second)
+=	Brief
+==	Detailed
+>	FBO& first: 
+>	FBO& second: 
+
++	public
+	bool AttachTexture(ResourcePtr<Texture> texture, const GLenum& attachmentPoint, const GLint& textureLayer, const GLint& mipmapLevel = 0)
+=	Brief
+==	Detailed
+>	ResourcePtr<Texture> texture: 
+>	const GLenum& attachmentPoint: 
+>	const GLint& textureLayer: 
+>	const GLint& mipmapLevel: 
+<	Return
+
++	public
+	bool AttachTexture(Texture* texture, const GLenum& attachmentPoint, const GLint& textureLayer, const GLint& mipmapLevel = 0)
+=	Brief
+==	Detailed
+>	Texture* texture: 
+>	const GLenum& attachmentPoint: 
+>	const GLint& textureLayer: 
+>	const GLint& mipmapLevel: 
+<	Return
+
++	public
+	bool AttachRenderBuffer(ResourcePtr<RenderBuffer> renderBuffer, const GLenum& attachmentPoint)
+=	Brief
+==	Detailed
+>	ResourcePtr<RenderBuffer> renderBuffer: 
+>	const GLenum& attachmentPoint: 
+<	Return
+
++	public
+	bool AttachRenderBuffer(RenderBuffer* renderBuffer, const GLenum& attachmentPoint)
+=	Brief
+==	Detailed
+>	RenderBuffer* renderBuffer: 
+>	const GLenum& attachmentPoint: 
+<	Return
+
++	public
+	void MapBuffers(const std::vector<GLuint>& attachmentPoints)
+=	Brief
+==	Detailed
+>	const std::vector<GLuint>& attachmentPoints: 
+
++	public
+	void EnsureInitialised()
+=	Brief
+==	Detailed
+
++	public
+	void Clear()
+=	Brief
+==	Detailed
+
++	public
+	unsigned int GetFBOID() const
+=	Brief
+==	Detailed
+<	Return
+
+
+-	protected
+	GLuint mFBOID
+=	Brief
+==	Detailed
+>	Default

@@ -1,0 +1,46 @@
+__	Class List
+	EntityManager::Handle
+--
+	inc/uair/entity.hpp
+--
+	class Handle
+--
+	Brief
+--
+	Detailed
+__
+
++	public
+	Handle(const unsigned int& index, const unsigned int& counter, const std::string& name = "")
+=	Brief
+==	Detailed
+>	const unsigned int& index: 
+>	const unsigned int& counter: 
+>	const std::string& name: 
+<	Return
+
++	public
+	bool operator ==(const Handle &other) const
+=	Brief
+==	Detailed
+>	const Handle &other: 
+<	Return
+
+
+-	public
+	unsigned int mIndex
+=	Brief
+==	Detailed
+>	Default
+
+-	public
+	unsigned int mCounter
+=	Brief
+==	Detailed
+>	Default
+
+-	public
+	std::string mName
+=	Brief
+==	Detailed
+>	Default

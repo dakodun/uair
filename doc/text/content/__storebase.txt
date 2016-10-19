@@ -1,0 +1,56 @@
+__	Class List
+	StoreBase
+--
+	inc/uair/manager.hpp
+--
+	template <class B>
+	class StoreBase
+--
+	Brief
+--
+	Detailed
+__
+
++	public
+	virtual ~StoreBase()	
+=	Brief
+==	Detailed
+
++	public
+	virtual void Remove(const unsigned int& index, const unsigned int& counter) = 0
+=	Brief
+==	Detailed
+>	const unsigned int& index: 
+>	const unsigned int& counter: 
+
++	public
+	virtual void Remove(const std::string& name) = 0
+=	Brief
+==	Detailed
+>	const std::string& name: 
+
++	public
+	virtual void Remove() = 0
+=	Brief
+==	Detailed
+
++	public
+	virtual B* GetAsBase(const unsigned int& index, const unsigned int& counter) const = 0
+=	Brief
+==	Detailed
+>	const unsigned int& index: 
+>	const unsigned int& counter: 
+<	Return
+
++	public
+	virtual std::list< std::tuple<unsigned int, unsigned int, std::string> > GetHandles(const std::string& name) const = 0
+=	Brief
+==	Detailed
+>	const std::string& name: 
+<	Return
+
++	public
+	virtual std::list< std::tuple<unsigned int, unsigned int, std::string> > GetHandles() const = 0
+=	Brief
+==	Detailed
+<	Return

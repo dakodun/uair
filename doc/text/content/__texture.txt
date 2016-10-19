@@ -1,0 +1,163 @@
+__	Class List
+	Texture
+--
+	inc/uair/texture.hpp
+	src/texture.cpp
+--
+	class Texture : public Resource
+--
+	Brief
+--
+	Detailed
+__
+
++	public
+	Texture() = default
+=	Brief
+==	Detailed
+
++	public
+	Texture(const Texture& other) = delete
+=	Brief
+==	Detailed
+>	const Texture& other: 
+
++	public
+	Texture(Texture&& other)
+=	Brief
+==	Detailed
+>	Texture&& other: 
+
++	public
+	~Texture()
+=	Brief
+==	Detailed
+
++	public
+	Texture& operator=(Texture other)
+=	Brief
+==	Detailed
+>	Texture other: 
+<	Return
+
++	public
+	friend void swap(Texture& first, Texture& second)
+=	Brief
+==	Detailed
+>	Texture& first: 
+>	Texture& second: 
+
++	public
+	bool AddFromFile(const std::string& filename, const bool& flip = true)
+=	Brief
+==	Detailed
+>	const std::string& filename: 
+>	const bool& flip: 
+<	Return
+
++	public
+	bool AddFromMemory(std::vector<unsigned char> data, const unsigned int& width, const unsigned int& height, const bool& flip = true)
+=	Brief
+==	Detailed
+>	std::vector<unsigned char> data: 
+>	const unsigned int& width: 
+>	const unsigned int& height: 
+>	const bool& flip: 
+<	Return
+
++	public
+	bool CreateTexture()
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	void EnsureInitialised()
+=	Brief
+==	Detailed
+
++	public
+	void Clear()
+=	Brief
+==	Detailed
+
++	public
+	unsigned int GetTextureID() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	unsigned int GetWidth() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	unsigned int GetHeight() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	unsigned int GetDepth() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	LayerData GetData(const std::size_t& index) const
+=	Brief
+==	Detailed
+>	const std::size_t& index: 
+<	Return
+
++	public
+	static unsigned int GetTypeID()
+=	Brief
+==	Detailed
+<	Return
+
+
+-	private
+	GLuint mTextureID
+=	Brief
+==	Detailed
+>	Default
+
+-	private
+	std::vector<TexelLayerPair> mData
+=	Brief
+==	Detailed
+
+-	private
+	std::vector<LayerData> mLayerData
+=	Brief
+==	Detailed
+
+-	private
+	unsigned int mWidth
+=	Brief
+==	Detailed
+
+-	private
+	unsigned int mHeight
+=	Brief
+==	Detailed
+
+-	private
+	bool mIsTextureNull
+=	Brief
+==	Detailed
+>	Default
+
+
+~	public
+	struct LayerData
+=	Description
+<	Link
+
+~	public
+	typedef std::pair< std::vector<unsigned char>, LayerData> TexelLayerPair;
+=	Description
+<	Link

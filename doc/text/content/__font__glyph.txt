@@ -1,0 +1,53 @@
+__	Class List
+	Font::Glyph
+--
+	inc/uair/font.hpp
+--
+	struct Glyph
+--
+	Brief
+--
+	Detailed
+__
+
+-	public
+	Shape mBaseShape
+=	Brief
+==	Detailed
+>	Default
+
+-	public
+	glm::ivec2 mDimensions
+=	Brief
+==	Detailed
+>	Default
+
+-	public
+	std::vector<glm::vec2> mTexCoords
+=	Brief
+==	Detailed
+>	Default
+
+-	public
+	unsigned int mLayer
+=	Brief
+==	Detailed
+>	Default
+
+-	public
+	int mAdvance
+=	Brief
+==	Detailed
+>	Default
+
+-	public
+	int mDrop
+=	Brief
+==	Detailed
+>	Default
+
+-	public
+	glm::ivec2 mBearing
+=	Brief
+==	Detailed
+>	Default

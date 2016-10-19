@@ -1,0 +1,12 @@
+__	Class List
+	OpenGLContextOS
+--
+	inc/uair/openglcontext.hpp
+--
+	typedef uair::OpenGLContextWin32 OpenGLContextOS /
+	typedef uair::OpenGLContextLinux OpenGLContextOS
+--
+	Brief
+--
+	Detailed
+__

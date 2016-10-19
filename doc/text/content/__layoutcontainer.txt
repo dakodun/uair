@@ -1,0 +1,192 @@
+__	Class List
+	LayoutContainer
+--
+	inc/uair/layoutcontainer.hpp
+	src/layoutcontainer.cpp
+--
+	class LayoutContainer : public LayoutBase
+--
+	Brief
+--
+	Detailed
+__
+
++	public
+	LayoutContainer(const glm::vec2& position, const float& width, const float& height)
+=	Brief
+==	Detailed
+>	const glm::vec2& position: 
+>	const float& width: 
+>	const float& height: 
+
++	public
+	LayoutContainer(const glm::vec2& position, const float& width, const float& height, LayoutContainer* parentContainer)
+=	Brief
+==	Detailed
+>	const glm::vec2& position: 
+>	const float& width: 
+>	const float& height: 
+>	LayoutContainer* parentContainer: 
+
++	public
+	LayoutContainer(const glm::vec2& position, const float& width, const float& height, LayoutDivision* parentDivision, const unsigned int& row, const unsigned int& column)
+=	Brief
+==	Detailed
+>	const glm::vec2& position: 
+>	const float& width: 
+>	const float& height: 
+>	LayoutDivision* parentDivision: 
+>	const unsigned int& row: 
+>	const unsigned int& column: 
+
++	public
+	void SetPosition(const glm::vec2& position, const CoordinateSpace& coordinateSpace = CoordinateSpace::Local)
+=	Brief
+==	Detailed
+>	const glm::vec2& position: 
+>	const CoordinateSpace& coordinateSpace: 
+
++	public
+	void SetWidth(const float& width)
+=	Brief
+==	Detailed
+>	const float& width: 
+
++	public
+	void SetHeight(const float& height)
+=	Brief
+==	Detailed
+>	const float& height: 
+
++	public
+	glm::vec2 GetPosition(const CoordinateSpace& coordinateSpace = CoordinateSpace::Local) const
+=	Brief
+==	Detailed
+>	const CoordinateSpace& coordinateSpace: 
+<	Return
+
++	public
+	float GetWidth() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	float GetHeight() const
+=	Brief
+==	Detailed
+<	Return
+
++	public
+	Handle AddContainer(const glm::vec2& position, const float& width, const float& height)
+=	Brief
+==	Detailed
+>	const glm::vec2& position: 
+>	const float& width: 
+>	const float& height: 
+<	Return
+
++	public
+	void RemoveContainer(const Handle& handle)
+=	Brief
+==	Detailed
+>	const Handle& handle: 
+
++	public
+	LayoutContainer& GetContainer(const Handle& handle)
+=	Brief
+==	Detailed
+>	const Handle& handle: 
+<	Return
+
++	public
+	Handle AddDivision(const unsigned int& rows, const unsigned int& columns)
+=	Brief
+==	Detailed
+>	const unsigned int& rows: 
+>	const unsigned int& columns: 
+<	Return
+
++	public
+	void RemoveDivision(const Handle& handle)
+=	Brief
+==	Detailed
+>	const Handle& handle: 
+
++	public
+	LayoutDivision& GetDivision(const Handle& handle)
+=	Brief
+==	Detailed
+>	const Handle& handle: 
+<	Return
+
++	public
+	void AssignElement(LayoutElement* element)
+=	Brief
+==	Detailed
+>	LayoutElement* element: 
+
++	public
+	std::vector<Shape> GetShapes()
+=	Brief
+==	Detailed
+<	Return
+
+
+-	private
+	glm::vec2 mPosition
+=	Brief
+==	Detailed
+>	Default
+
+-	private
+	float mWidth
+=	Brief
+==	Detailed
+>	Default
+
+-	private
+	float mHeight
+=	Brief
+==	Detailed
+>	Default
+
+-	private
+	Store<LayoutBase, LayoutContainer> mContainers
+=	Brief
+==	Detailed
+
+-	private
+	Store<LayoutBase, LayoutDivision> mDivisions
+=	Brief
+==	Detailed
+
+-	private
+	LayoutContainer* mParentContainer
+=	Brief
+==	Detailed
+>	Default
+
+-	private
+	LayoutDivision* mParentDivision
+=	Brief
+==	Detailed
+>	Default
+
+-	private
+	unsigned int mRow
+=	Brief
+==	Detailed
+>	Default
+
+-	private
+	unsigned int mColumn
+=	Brief
+==	Detailed
+>	Default
+
+
+~	public
+	typedef std::tuple<unsigned int, unsigned int, unsigned int> Handle
+=	Description
+<	Link

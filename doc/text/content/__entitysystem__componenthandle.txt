@@ -1,0 +1,11 @@
+__	Class List
+	EntitySystem::ComponentHandle
+--
+	inc/uair/entitysystem.hpp
+--
+	typedef Manager<Component>::Handle ComponentHandle
+--
+	Brief
+--
+	Detailed
+__
