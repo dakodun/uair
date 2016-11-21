@@ -36,8 +36,6 @@
 #include "util.hpp"
 
 namespace uair {
-float Shape::mFrameLowerLimit = 0.0f;
-
 Shape::Shape(const std::vector<Contour>& contours, const CoordinateSpace& coordinateSpace) {
 	AddContours(contours, coordinateSpace);
 }
@@ -199,7 +197,7 @@ std::string Shape::GetTag() const {
 	return "Shape";
 }
 
-void Shape::Process() {
+void Shape::Process(float deltaTime) {
 	if (mIsAnimated) { // if shape is animated...
 		int currentFrame = mCurrentFrame; // get current animation frame
 		while (mAnimationTimer >= mAnimationLimit) { // while the animation timer eclipses the limit (speed)...
@@ -225,7 +223,7 @@ void Shape::Process() {
 		}
 		
 		mCurrentFrame = currentFrame; // set current animation frame
-		mAnimationTimer += mFrameLowerLimit; // increment animation timer
+		mAnimationTimer += deltaTime; // increment animation timer
 	}
 }
 
@@ -410,6 +408,22 @@ void Shape::AddFrameStrip(Texture* texture, const unsigned int& layer, const uns
 	AddFrameStrip(ResourcePtr<Texture>(texture), layer, numFrames, numPerRow, numPerCol, offset); // add naked pointer to resource pointer and call parent function
 }
 
+AnimationFrame Shape::GetFrame() const {
+	if (mCurrentFrame < mFrames.size()) { // if the current frame is valid (false if shape isn't animated)...
+		return mFrames.at(mCurrentFrame); // return a copy of the current frame object
+	}
+	
+	throw std::runtime_error("shape isn't animated (no frame to return)");
+}
+
+AnimationFrame Shape::GetFrame(const unsigned int& frame) const {
+	if (frame < mFrames.size()) { // if requested frame is valid...
+		return mFrames.at(frame); // return a copy of the requested frame object
+	}
+	
+	throw std::runtime_error("requested frame is invalid");
+}
+
 void Shape::SetAnimation(const float& speed, const unsigned int& start, const unsigned int& end, const int& loops) {
 	size_t frameCount = mFrames.size(); // get the frame count
 	
@@ -442,6 +456,10 @@ void Shape::SetCurrentFrame(const unsigned int& frame) {
 		mAnimationTimer = 0.0f; // reset the current animation timer
 		mCurrentFrame = std::min(frameCount - 1, static_cast<size_t>(frame)); // set the end frame
 	}
+}
+
+unsigned int Shape::GetCurrentFrame() const {
+	return mCurrentFrame;
 }
 
 unsigned int Shape::GetFrameCount() {

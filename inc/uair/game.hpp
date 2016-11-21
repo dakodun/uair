@@ -53,8 +53,8 @@ class Game {
 		void Run();
 		
 		void Input();
-		void Process();
-		void PostProcess(const unsigned int & processed);
+		void Process(float deltaTime);
+		void PostProcess(const unsigned int & processed, float deltaTime);
 		void Render(const unsigned int & pass);
 		
 		void Init();
@@ -205,6 +205,7 @@ class Game {
 		void MakeCurrent(WindowPtr windowPtr, OpenGLContextPtr contextPtr);
 	
 	public :
+		bool mFrameLimit = false;
 		float mFrameLowerLimit = 0.02f;
 		float mFrameUpperLimit = 1.0f;
 		

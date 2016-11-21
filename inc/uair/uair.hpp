@@ -67,6 +67,7 @@
 
 #include "gui.hpp"
 #include "guibutton.hpp"
+#include "guiinputbox.hpp"
 #include "layoutcontainer.hpp"
 #include "layoutdivision.hpp"
 #include "layoutelement.hpp"

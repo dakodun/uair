@@ -41,6 +41,16 @@
 #include "shape.hpp"
 
 namespace uair {
+namespace charset {
+static const std::vector<char16_t> BASICLATIN = {32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+		48, 49, 50, 51, 52, 53, 54, 55, 56, 57,
+		58, 59, 60, 61, 62, 63, 64,
+		65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90,
+		91, 92, 93, 94, 95, 96,
+		97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122,
+		123, 124, 125, 126};
+}
+
 class RenderBatch;
 class Polygon;
 
@@ -83,6 +93,10 @@ class Font : public Resource {
 		unsigned int GetTextureWidth() const; // return the font's texture's width
 		unsigned int GetTextureHeight() const; // return the font's texture's height
 		
+		int GetAdvanceMax() const;
+		int GetDropMax() const;
+		glm::ivec2 GetBearingMax() const;
+		
 		static unsigned int GetTypeID();
 	private :
 		Shape CreateGlyphShape(const char16_t& charCode, Glyph& glyphObject); // create a shape of a glyph from a font file
@@ -98,6 +112,10 @@ class Font : public Resource {
 		FT_Face mFTFace = nullptr; // pointer to the face object of a font file
 		unsigned int mFontSize = 1u; // the base size of the font
 		int mLineHeight = 0; // the vertical offset of a new line
+		
+		int mAdvanceMax = 0; // the longest horizontal advance of all glyphs
+		int mDropMax = 0; // the biggest drop of all glyphs
+		glm::ivec2 mBearingMax = glm::ivec2(); // the widest and highest bearings of all glyphs
 		
 		std::map<char16_t, Glyph> mGlyphs; // glyph objects containing metrics and rendering data for a character
 		std::map<std::pair<char16_t, char16_t>, int> mKernMap; // kerning values between two characters

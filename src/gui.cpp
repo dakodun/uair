@@ -82,17 +82,17 @@ void GUI::Input() {
 	}
 }
 
-void GUI::Process() {
+void GUI::Process(float deltaTime) {
 	for (auto eleHandle = mElementHandles.begin(); eleHandle != mElementHandles.end(); ++eleHandle) {
 		auto ele = mElementManager.GetAsBase(*eleHandle);
-		ele->Process(this);
+		ele->Process(deltaTime, this);
 	}
 }
 
-void GUI::PostProcess(const unsigned int& processed) {
+void GUI::PostProcess(const unsigned int& processed, float deltaTime) {
 	for (auto eleHandle = mElementHandles.begin(); eleHandle != mElementHandles.end(); ++eleHandle) {
 		auto ele = mElementManager.GetAsBase(*eleHandle);
-		ele->PostProcess(processed, this);
+		ele->PostProcess(processed, deltaTime, this);
 	}
 }
 

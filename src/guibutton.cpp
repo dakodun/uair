@@ -186,11 +186,11 @@ void GUIButton::Input(GUI* caller) {
 	}
 }
 
-void GUIButton::Process(GUI* caller) {
+void GUIButton::Process(float deltaTime, GUI* caller) {
 	
 }
 
-void GUIButton::PostProcess(const unsigned int& processed, GUI* caller) {
+void GUIButton::PostProcess(const unsigned int& processed, float deltaTime, GUI* caller) {
 	
 }
 

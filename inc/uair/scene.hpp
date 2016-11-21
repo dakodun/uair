@@ -44,8 +44,8 @@ class Scene {
 		
 		virtual void HandleMessageQueue(const MessageQueue::Entry& e) = 0;
 		virtual void Input() = 0;
-		virtual void Process() = 0;
-		virtual void PostProcess(const unsigned int& processed) = 0;
+		virtual void Process(float deltaTime) = 0;
+		virtual void PostProcess(const unsigned int& processed, float deltaTime) = 0;
 		virtual void Render(const unsigned int& pass) = 0;
 		
 		virtual void OnEnter() = 0;

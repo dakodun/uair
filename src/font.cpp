@@ -127,7 +127,9 @@ void Font::CreateCache(const std::string& cacheFilename) {
 	{ // add the font dimensions
 		std::string outString;
 		outString = util::ToString(mFontSize) + " " + util::ToString(mLineHeight) + " " + util::ToString(mTexture.GetWidth()) + " " +
-				util::ToString(mTexture.GetHeight()) + " " + util::ToString(mTexture.GetDepth());
+				util::ToString(mTexture.GetHeight()) + " " + util::ToString(mTexture.GetDepth()) + " " +
+				util::ToString(mAdvanceMax) + " " + util::ToString(mDropMax) + " " + util::ToString(mBearingMax.x) + " " +
+				util::ToString(mBearingMax.y);
 		cacheFile.mBuffer.push_back(outString);
 	}
 	
@@ -212,7 +214,8 @@ bool Font::LoadFromCache(const std::string& cacheFilename) {
 	
 	File cacheFile;
 	unsigned int fontSize, width, height, depth;
-	int lineHeight;
+	int lineHeight, advanceMax, dropMax;
+	glm::ivec2 bearingMax;
 	std::vector<unsigned char> textureData;
 	std::vector< std::pair<char16_t, Glyph> > glyphPairs;
 	std::map<std::pair<char16_t, char16_t>, int> kerningData;
@@ -242,6 +245,10 @@ bool Font::LoadFromCache(const std::string& cacheFilename) {
 			width      = util::FromString<unsigned int>(parts.at(2));
 			height     = util::FromString<unsigned int>(parts.at(3));
 			depth      = util::FromString<unsigned int>(parts.at(4));
+			
+			advanceMax = util::FromString<int>(parts.at(5));
+			dropMax    = util::FromString<int>(parts.at(6));
+			bearingMax = glm::ivec2(util::FromString<int>(parts.at(7)), util::FromString<int>(parts.at(8)));
 		}
 		
 		{ // load the font's texture data
@@ -365,6 +372,10 @@ bool Font::LoadFromCache(const std::string& cacheFilename) {
 	mFontSize   = std::max(1u, fontSize); // set the font size (and ensure it's valid)
 	mLineHeight = lineHeight; // set the new line vertical offset
 	
+	mAdvanceMax = advanceMax; // set the longest horizontal advance of all glyphs
+	mDropMax = dropMax; // set the biggest drop of all glyphs
+	mBearingMax = bearingMax; // set the widest and highest bearings of all glyphs
+	
 	return true;
 }
 
@@ -462,6 +473,18 @@ unsigned int Font::GetTextureWidth() const {
 
 unsigned int Font::GetTextureHeight() const {
 	return mTexture.GetHeight();
+}
+
+int Font::GetAdvanceMax() const {
+	return mAdvanceMax;
+}
+
+int Font::GetDropMax() const {
+	return mDropMax;
+}
+
+glm::ivec2 Font::GetBearingMax() const {
+	return mBearingMax;
 }
 
 unsigned int Font::GetTypeID() {
@@ -570,6 +593,10 @@ Shape Font::CreateGlyphShape(const char16_t& charCode, Glyph& glyphObject) {
 			glyphObject.mAdvance = mFTFace->glyph->metrics.horiAdvance >> 9; 
 			glyphObject.mDrop = (mFTFace->glyph->metrics.height >> 9) - (mFTFace->glyph->metrics.horiBearingY >> 9);
 			glyphObject.mBearing = glm::ivec2(mFTFace->glyph->metrics.horiBearingX >> 9, mFTFace->glyph->metrics.horiBearingY >> 9);
+			
+			mAdvanceMax = std::max(mAdvanceMax, glyphObject.mAdvance);
+			mDropMax = std::max(mDropMax, glyphObject.mDrop);
+			mBearingMax = glm::vec2(std::max(mBearingMax.x, glyphObject.mBearing.x), std::max(mBearingMax.y, glyphObject.mBearing.y));
 			
 			return shp;
 		}

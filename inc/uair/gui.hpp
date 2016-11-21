@@ -48,11 +48,11 @@ class GUIElement {
 			
 		}
 		
-		virtual void Process(GUI* caller = nullptr) {
+		virtual void Process(float deltaTime, GUI* caller = nullptr) {
 			
 		}
 		
-		virtual void PostProcess(const unsigned int& processed, GUI* caller = nullptr) {
+		virtual void PostProcess(const unsigned int& processed, float deltaTime, GUI* caller = nullptr) {
 			
 		}
 		
@@ -64,7 +64,7 @@ class GUIElement {
 typedef Manager<GUIElement>::Handle ElementHandle;
 enum class GUIElements : unsigned int {
 	Button = 1u,
-	SimpleInput
+	InputBox
 };
 
 class GUI {
@@ -96,8 +96,8 @@ class GUI {
 		
 		void HandleMessageQueue(const MessageQueue::Entry& e);
 		void Input();
-		void Process();
-		void PostProcess(const unsigned int& processed);
+		void Process(float deltaTime);
+		void PostProcess(const unsigned int& processed, float deltaTime);
 		
 		void AddToBatch(RenderBatch& batch);
 	private :

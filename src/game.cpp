@@ -56,7 +56,6 @@ Game::Game() {
 		std::cout << "unable to initiate the freetype2 library: " << ftError << std::endl;
 	}
 	
-	Shape::mFrameLowerLimit = mFrameLowerLimit;
 	Font::mFTLibraryPtr = &mFTLibrary; // set the freetype library used by the font class to the newly initialised one
 	GUI::mInputManagerPtr = mInputManager;
 	GUI::mMessageQueuePtr = &mMessageQueue;
@@ -88,37 +87,44 @@ void Game::Run() {
 		Input(); // handle all user input
 		mInputManager->Process(); // process the input manager (to update states)
 		
+		// if we have a frame limit do the below
 		{ // handle process timing
-			unsigned int processed = 0u; // the number of process calls this frame
-			
 			double prevFrameTime = mTimer.GetElapsedTime(); // the time since the prvious frame
 			mTimer.Reset(); // reset the frame timer
 			
-			if (prevFrameTime > mFrameUpperLimit) { // if our time is longer than the upper frame limit...
-				prevFrameTime = mFrameUpperLimit; // cap it at the upper limit
-			}
-			
-			mAccumulator += prevFrameTime; // increase the accumulated time
-			
-			while (mAccumulator >= mFrameLowerLimit) { // whilst the accumulated time is above the lower frame limit...
-				Process(); // handle all processing
-				++processed; // increase the process call count
+			if (mFrameLimit) {
+				unsigned int processed = 0u; // the number of process calls this frame
 				
-				mAccumulator -= mFrameLowerLimit; // decrease the accumulated time
-				
-				if (mOpen == false) { // if we are to quit the game...
-					mWindow->Quit();
-					Clear();
-					break;
+				if (prevFrameTime > mFrameUpperLimit) { // if our time is longer than the upper frame limit...
+					prevFrameTime = mFrameUpperLimit; // cap it at the upper limit
 				}
 				
-				if (mSceneManager->mNextScene) { // if there is a scene change waiting...
-					break; // stop processing this scene, saving the accumulated time leftover
+				mAccumulator += prevFrameTime; // increase the accumulated time
+				
+				while (mAccumulator >= mFrameLowerLimit) { // whilst the accumulated time is above the lower frame limit...
+					Process(mFrameLowerLimit); // handle all processing
+					++processed; // increase the process call count
+					
+					mAccumulator -= mFrameLowerLimit; // decrease the accumulated time
+					
+					if (mOpen == false) { // if we are to quit the game...
+						mWindow->Quit();
+						Clear();
+						break;
+					}
+					
+					if (mSceneManager->mNextScene) { // if there is a scene change waiting...
+						break; // stop processing this scene, saving the accumulated time leftover
+					}
+				}
+				
+				if (processed > 0u) { // if we have had at least 1 process call...
+					PostProcess(processed, mFrameLowerLimit); // handle all post processing
 				}
 			}
-			
-			if (processed > 0u) { // if we have had at least 1 process call...
-				PostProcess(processed); // handle all post processing
+			else {
+				Process(prevFrameTime);
+				PostProcess(1u, prevFrameTime);
 			}
 		}
 		
@@ -150,9 +156,9 @@ void Game::Input() {
 	} */
 }
 
-void Game::Process() {
+void Game::Process(float deltaTime) {
 	if (mSceneManager->mCurrScene) {
-		mSceneManager->mCurrScene->Process();
+		mSceneManager->mCurrScene->Process(deltaTime);
 	}
 	
 	/* for (unsigned int i = 0u; i < mEntitySystem.mMessageSystem.mMessageQueue.size(); ++i) {
@@ -160,9 +166,9 @@ void Game::Process() {
 	} */
 }
 
-void Game::PostProcess(const unsigned int & processed) {
+void Game::PostProcess(const unsigned int & processed, float deltaTime) {
 	if (mSceneManager->mCurrScene) {
-		mSceneManager->mCurrScene->PostProcess(processed);
+		mSceneManager->mCurrScene->PostProcess(processed, deltaTime);
 	}
 	
 	/* for (unsigned int i = 0u; i < mEntitySystem.mMessageSystem.mMessageQueue.size(); ++i) {

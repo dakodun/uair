@@ -75,8 +75,8 @@ class GUIButton : public GUIElement {
 		
 		void HandleMessageQueue(const MessageQueue::Entry& e, GUI* caller = nullptr);
 		void Input(GUI* caller = nullptr);
-		void Process(GUI* caller = nullptr);
-		void PostProcess(const unsigned int& processed, GUI* caller = nullptr);
+		void Process(float deltaTime, GUI* caller = nullptr);
+		void PostProcess(const unsigned int& processed, float deltaTime, GUI* caller = nullptr);
 		
 		void AddToBatch(RenderBatch& batch, GUI* caller = nullptr);
 		

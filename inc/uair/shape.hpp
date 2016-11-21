@@ -51,7 +51,6 @@ struct AnimationFrame {
 
 class Shape : public Polygon, public Renderable {
 	friend class RenderBatch;
-	friend class RenderString;
 	
 	public :
 		Shape() = default;
@@ -78,7 +77,7 @@ class Shape : public Polygon, public Renderable {
 		std::string GetTag() const;
 		
 		// process the shape's animation
-		void Process();
+		void Process(float deltaTime);
 		
 		// set the winding rule for filled drawing (forces retriangulation)
 		void SetWindingRule(const WindingRule& windingRule);
@@ -99,9 +98,13 @@ class Shape : public Polygon, public Renderable {
 		void AddFrameStrip(Texture* texture, const unsigned int& layer, const unsigned int& numFrames, const unsigned int& numPerRow,
 				const unsigned int& numPerCol, const glm::ivec2& offset = glm::ivec2(0, 0));
 		
+		AnimationFrame GetFrame() const;
+		AnimationFrame GetFrame(const unsigned int& frame) const;
+		
 		// set the animation attributes
 		void SetAnimation(const float& speed, const unsigned int& start, const unsigned int& end, const int& loops = -1);
 		void SetCurrentFrame(const unsigned int& frame);
+		unsigned int GetCurrentFrame() const;
 		unsigned int GetFrameCount();
 	protected :
 		// transform the shape into the correct format for rendering
@@ -120,8 +123,6 @@ class Shape : public Polygon, public Renderable {
 		// recalculate the texture coords for extra vertices added during triangulation
 		void CalculateExtraTexCoords(AnimationFrame& frame);
 	
-	public :
-		static float mFrameLowerLimit;
 	private :
 		WindingRule mWindingRule = WindingRule::Odd; // winding rule for triangulation
 		std::vector< std::vector<VBOIndex> > mIndices = {{}, {}, {}, {}, {}}; // indices used to render this shape in various styles (line, fill, etc) stored for efficiency
