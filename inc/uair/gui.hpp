@@ -64,6 +64,7 @@ class GUIElement {
 typedef Manager<GUIElement>::Handle ElementHandle;
 enum class GUIElements : unsigned int {
 	Button = 1u,
+	CheckBox,
 	InputBox
 };
 

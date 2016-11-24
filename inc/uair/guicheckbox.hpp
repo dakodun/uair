@@ -25,8 +25,8 @@
 **		   source distribution.
 ** **************************************************************** */
 
-#ifndef UAIRGUIBUTTON_HPP
-#define UAIRGUIBUTTON_HPP
+#ifndef UAIRGUICHECKBOX_HPP
+#define UAIRGUICHECKBOX_HPP
 
 #include "guibuttonbase.hpp"
 
@@ -34,43 +34,41 @@
 #include "renderstring.hpp"
 
 namespace uair {
-class GUIButton : public GUIButtonBase {
+class GUICheckBox : public GUIButtonBase {
 	public :
-		// the message that is sent to the main message queue when the button is clicked
-		class ClickedMessage : public Message {
+		// the message that is sent to the main message queue when the check box's state is changed
+		class StateChangedMessage : public Message {
 			public :
-				ClickedMessage() = default;
-				ClickedMessage(const std::string& buttonName);
+				StateChangedMessage() = default;
+				StateChangedMessage(const std::string& checkBoxName, const bool& checkBoxState);
 				
 				void Serialise(cereal::BinaryOutputArchive& archive) const;
 				void Serialise(cereal::BinaryInputArchive& archive);
 				
 				static constexpr unsigned int GetTypeID() {
-					return 100u;
+					return 102u;
 				}
 			
 			public :
-				std::string mButtonName; // the (non-unique) name of the button that sent this message
+				std::string mCheckBoxName; // the (non-unique) name of the check box that sent this message
+				bool mNewState;
 		};
 	public :
-		// an aggregate used for initialising a button with various properties
 		struct Properties {
-			std::string mName; // the (non-unique) name of the button
+			std::string mName;
 			
-			glm::vec2 mPosition; // the position of the button
-			unsigned int mWidth; // the width of the button
-			unsigned int mHeight; // the height of the button AT IT'S HEIGHEST (including drop shadow)
-			glm::vec3 mButtonColourTop; // the colour of the top (dynamic) part of the button
-			glm::vec3 mButtonColourBase; // the colour of the bottom (drop shadow) of the button
+			glm::vec2 mPosition;
+			unsigned int mSize;
+			glm::vec3 mInputColour;
 			
-			ResourcePtr<Font> mFont; // a pointer to the font used to draw the text on the button
-			std::u16string mText; // the string associated with the text drawn on the button
-			unsigned int mTextSize; // the size of the text drawn on the button
-			glm::vec3 mTextColour; // the colour of the text drawn on the button
-			glm::vec2 mTextOffset; // the offset (from the centre) of the text drawn on the button
+			ResourcePtr<Font> mFont;
+			unsigned int mTextSize;
+			std::u16string mLabelText;
+			
+			bool mDefaultState;
 		};
 	public :
-		GUIButton(const Properties& properties);
+		GUICheckBox(const Properties& properties);
 		
 		void Process(float deltaTime, GUI* caller = nullptr);
 		void PostProcess(const unsigned int& processed, float deltaTime, GUI* caller = nullptr);
@@ -86,14 +84,14 @@ class GUIButton : public GUIButtonBase {
 		void OnStateChange();
 	
 	protected :
+		bool mChecked = false;
 		bool mUpdated = false;
 		
-		Shape mButtonTop;
-		Shape mButtonBottom;
-		RenderString mButtonText;
-		
-		glm::vec2 mTextOffset;
-		std::string mMessage; // the pre-serialised message that is sent when this button is clicked
+		Shape mCheckBase;
+		Shape mCheckTop;
+		Shape mCheckHighlight;
+		Shape mCheckMark;
+		Shape mCheckMarkHighlight;
 };
 }
 

@@ -28,14 +28,31 @@
 #include "guiinputbox.hpp"
 
 #include "font.hpp"
+#include "openglstates.hpp"
 #include "renderbatch.hpp"
 #include "windowmessages.hpp"
-#include "openglstates.hpp"
 
 namespace uair {
-GUIInputBox::GUIInputBox(const Properties& properties) : mName(properties.mName), mPosition(properties.mPosition),
-		mWidth(static_cast<float>(properties.mWidth)),
-		mHeight(static_cast<float>(properties.mHeight)) {
+GUIInputBox::StringChangedMessage::StringChangedMessage(const std::string& inputBoxName, const std::u16string& inputBoxString) :
+		mInputBoxName(inputBoxName), mNewString(inputBoxString) {
+	
+	
+}
+
+void GUIInputBox::StringChangedMessage::Serialise(cereal::BinaryOutputArchive& archive) const {
+	archive(mInputBoxName, mNewString);
+}
+
+void GUIInputBox::StringChangedMessage::Serialise(cereal::BinaryInputArchive& archive) {
+	archive(mInputBoxName, mNewString);
+}
+
+
+GUIInputBox::GUIInputBox(const Properties& properties) {
+	mName = properties.mName;
+	mPosition = properties.mPosition;
+	mWidth = static_cast<float>(properties.mWidth);
+	mHeight  = static_cast<float>(properties.mHeight);
 	
 	{ // set up members needed to render string offscreen
 		unsigned int width = mWidth - 8.0f;
@@ -70,22 +87,23 @@ GUIInputBox::GUIInputBox(const Properties& properties) : mName(properties.mName)
 	// set up the text box highlight
 	mInputHighlight.AddContour(Contour({glm::vec2(2.0f, 2.0f), glm::vec2(mWidth - 2.0f, 2.0f),
 			glm::vec2(mWidth - 2.0f, mHeight - 9.0f), glm::vec2(2.0f, mHeight - 9.0f)}));
-	mInputHighlight.SetColour(glm::vec3(0.87f));
+	mInputHighlight.SetColour(glm::vec3(0.87f, 0.87f, 0.87f));
 	
 	// set up the text box text area
 	mInput.AddContour(Contour({glm::vec2(4.0f, 4.0f), glm::vec2(mWidth - 4.0f, 4.0f),
 			glm::vec2(mWidth - 4.0f, mHeight - 11.0f), glm::vec2(4.0f, mHeight - 11.0f)}));
-	mInput.SetColour(glm::vec3(1.0f));
+	mInput.SetColour(glm::vec3(1.0f, 1.0f, 1.0f));
 	mInput.AddFrame(&mStringTexture, 0u);
 	
 	// set up the caret and position it within the text box via origin offsetting
 	mCaret.AddContour(Contour({glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f),
 			glm::vec2(1.0f, properties.mTextSize), glm::vec2(0.0f, properties.mTextSize)}));
-	mCaret.SetColour(glm::vec3(0.0f));
+	mCaret.SetColour(glm::vec3(0.0f, 0.0f, 0.0f));
 	mCaret.SetOrigin(glm::vec2(-5.0f, -4.0f - (((mHeight - 15.0f) - properties.mTextSize) / 2.0f)));
 	mCaret.SetDepth(-20.0f);
 	
 	{ // set up the render string that is drawn to a seperate texture
+		mString = properties.mDefaultText;
 		mInputString.SetFont(properties.mFont);
 		mInputString.SetSize(properties.mTextSize);
 		mInputString.SetText(properties.mDefaultText);
@@ -112,109 +130,28 @@ GUIInputBox::GUIInputBox(const Properties& properties) : mName(properties.mName)
 			mInArea = true; // indicate that the cursor is within the boundary
 			
 			if (!mActive) { // if the text box isn't active by default...
-				UpdateRenderState(1u); // set the render state to indicate hovering
+				mInputHighlight.SetColour(glm::vec3(0.6f, 0.6f, 0.6f)); // set the render state to indicate hovering
 			}
 			else {
-				UpdateRenderState(2u); // otherwise indicate active
-			}
-		}
-	}
-}
-
-void GUIInputBox::HandleMessageQueue(const MessageQueue::Entry& e, GUI* caller) {
-	using namespace WindowMessage;
-	switch (e.GetTypeID()) {
-		case MouseMoveMessage::GetTypeID() : {
-			MouseMoveMessage msg = e.Deserialise<MouseMoveMessage>();
-			
-			// if the mouse cursor is inside the input box's bounding box...
-			if (msg.mLocalX > mPosition.x && msg.mLocalX < mPosition.x + mWidth &&
-					msg.mLocalY > mPosition.y && msg.mLocalY < mPosition.y + mHeight) {
-				
-				if (!mInArea) {
-					mInArea = true;
-					
-					if (!mActive) {
-						UpdateRenderState(1u);
-					}
-					
-					if (caller) {
-						caller->mUpdated = true;
-					}
-				}
-			}
-			else {
-				if (mInArea) {
-					mInArea = false;
-					
-					if (!mActive) {
-						UpdateRenderState(0u);
-					}
-					
-					if (caller) {
-						caller->mUpdated = true;
-					}
-				}
-			}
-			
-			break;
-		}
-		case TextInputMessage::GetTypeID() : {
-			TextInputMessage msg = e.Deserialise<TextInputMessage>();
-			
-			if (mActive) {
-				if (msg.mInput == 8) {
-					if (mInputString.RemoveText(1u)) {
-						mUpdated = true;
-					}
-				}
-				else {
-					if (mAllowedInput.find(msg.mInput) != mAllowedInput.end()) {
-						mInputString.AddText(msg.mInput);
-						mUpdated = true;
-					}
-				}
-			}
-			
-			break;
-		}
-		default : {
-			break;
-		}
-	}
-}
-
-void GUIInputBox::Input(GUI* caller) {
-	if (auto mSharedInputManagerPtr = GUI::mInputManagerPtr.lock()) {
-		if (mSharedInputManagerPtr->GetMousePressed(Mouse::Left)) {
-			if (mInArea && !mActive) {
-				mActive = true;
-				UpdateRenderState(2u);
-				
-				if (caller) {
-					caller->mUpdated = true;
-				}
-			}
-			else if (!mInArea && mActive) {
-				mActive = false;
-				UpdateRenderState(0u);
-				
-				if (caller) {
-					caller->mUpdated = true;
-				}
+				mInputHighlight.SetColour(glm::vec3(0.53f, 0.65f, 0.95f)); // otherwise indicate active
 			}
 		}
 	}
 }
 
 void GUIInputBox::Process(float deltaTime, GUI* caller) {
-	if (mUpdated) { // if the string has been updated since last loop...
+	if (mStringUpdated) { // if the string has been updated since last loop...
 		UpdateStringTexture(); // update the caret and string position and the string texture
-		mUpdated = false;
-		
+		mStringUpdated = false;
+		mUpdated = true;
+	}
+	
+	if (mUpdated) {
 		if (caller) {
 			caller->mUpdated = true;
 		}
+		
+		mUpdated = false;
 	}
 	
 	if (mActive) { // if the input box is accepting input...
@@ -259,35 +196,93 @@ void GUIInputBox::SetPosition(const glm::vec2& newPos) {
 	mCaret.SetPosition(mPosition);
 }
 
-std::u16string GUIInputBox::GetString() {
-	return mInputString.GetText();
-}
-
-void GUIInputBox::SetString(const std::u16string& newString) {
-	mInputString.SetText(newString);
-	mUpdated = true;
-}
-
 unsigned int GUIInputBox::GetTypeID() {
 	return static_cast<unsigned int>(GUIElements::InputBox);
 }
 
-void GUIInputBox::UpdateRenderState(const unsigned int& state) {
-	switch (state) {
-		case 0u : { // inactive
-			mInputHighlight.SetColour(glm::vec3(0.82f));
-			break;
+void GUIInputBox::OnHoverChange() {
+	if (mInArea) {
+		if (!mActive) {
+			mInputHighlight.SetColour(glm::vec3(0.6f, 0.6f, 0.6f));
 		}
-		case 1u : { // inactive - hover
-			mInputHighlight.SetColour(glm::vec3(0.6f));
-			break;
+		
+		mUpdated = true;
+	}
+	else {
+		if (!mActive) {
+			mInputHighlight.SetColour(glm::vec3(0.82f, 0.82f, 0.82f));
 		}
-		case 2u : { // active
-			mInputHighlight.SetColour(glm::vec3(0.53f, 0.65f, 0.95f));
-			break;
+		
+		mUpdated = true;
+	}
+}
+
+void GUIInputBox::OnStateChange() {
+	if (mActive) {
+		mInputHighlight.SetColour(glm::vec3(0.53f, 0.65f, 0.95f));
+		mUpdated = true;
+	}
+	else {
+		mInputHighlight.SetColour(glm::vec3(0.82f, 0.82f, 0.82f));
+		mUpdated = true;
+	}
+}
+
+void GUIInputBox::OnTextRemoved() {
+	if (mInputString.RemoveText(1u)) {
+		mStringUpdated = true;
+		
+		if (GUI::mMessageQueuePtr) { // if the message queue pointer is valid...
+			std::stringstream strStream;
+			StringChangedMessage msg(mName, mString);
+			
+			{
+				// create an output archive using cereal and our stringstream and serialise the message
+				cereal::BinaryOutputArchive archiveOutBinary(strStream);
+				archiveOutBinary(msg);
+			} // flush the archive on destruction
+			
+			// send a message indicating a state change
+			GUI::mMessageQueuePtr->PushMessageString(StringChangedMessage::GetTypeID(), strStream.str());
 		}
-		default :
-			break;
+	}
+}
+
+void GUIInputBox::OnTextAdded(const char16_t& newChar) {
+	mInputString.AddText(newChar);
+	mStringUpdated = true;
+	
+	if (GUI::mMessageQueuePtr) { // if the message queue pointer is valid...
+		std::stringstream strStream;
+		StringChangedMessage msg(mName, mString);
+		
+		{
+			// create an output archive using cereal and our stringstream and serialise the message
+			cereal::BinaryOutputArchive archiveOutBinary(strStream);
+			archiveOutBinary(msg);
+		} // flush the archive on destruction
+		
+		// send a message indicating a state change
+		GUI::mMessageQueuePtr->PushMessageString(StringChangedMessage::GetTypeID(), strStream.str());
+	}
+}
+
+void GUIInputBox::OnTextSet(const std::u16string& newString) {
+	mInputString.SetText(newString);
+	mStringUpdated = true;
+	
+	if (GUI::mMessageQueuePtr) { // if the message queue pointer is valid...
+		std::stringstream strStream;
+		StringChangedMessage msg(mName, mString);
+		
+		{
+			// create an output archive using cereal and our stringstream and serialise the message
+			cereal::BinaryOutputArchive archiveOutBinary(strStream);
+			archiveOutBinary(msg);
+		} // flush the archive on destruction
+		
+		// send a message indicating a state change
+		GUI::mMessageQueuePtr->PushMessageString(StringChangedMessage::GetTypeID(), strStream.str());
 	}
 }
 
@@ -300,7 +295,6 @@ void GUIInputBox::UpdateStringTexture() {
 			stringWidth = (bbox.at(2u).x - bbox.at(0u).x);
 		}
 	}
-	
 	
 	if ((stringWidth < mWidth - 11.0f)) { // if the string width is smaller than the input box's input area...
 		mInputString.SetPosition(glm::vec2(0.0f, mInputString.GetPosition().y)); // set the string to the left of the input box's input area

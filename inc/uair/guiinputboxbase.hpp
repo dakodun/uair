@@ -25,59 +25,40 @@
 **		   source distribution.
 ** **************************************************************** */
 
-#ifndef UAIRUAIR_HPP
-#define UAIRUAIR_HPP
-
-#include "init.hpp"
-
-#include "messagequeue.hpp"
-#include "openglcontext.hpp"
-#include "openglstates.hpp"
-#include "window.hpp"
-#include "windowdisplaysettings.hpp"
-#include "windowstyles.hpp"
-#include "windowmessages.hpp"
-
-#include "manager.hpp"
-#include "scene.hpp"
-#include "scenemanager.hpp"
-#include "timer.hpp"
-#include "util.hpp"
-#include "file.hpp"
-
-#include "entitysystem.hpp"
-
-#include "polygon.hpp"
-#include "transformable2d.hpp"
-#include "transformable3d.hpp"
-#include "triangulate.hpp"
-
-#include "font.hpp"
-#include "signeddistancefield.hpp"
-#include "renderbatch.hpp"
-#include "renderable.hpp"
-#include "shape.hpp"
-#include "renderstring.hpp"
-#include "texture.hpp"
-#include "renderbuffer.hpp"
-#include "fbo.hpp"
-#include "pbo.hpp"
-#include "vbo.hpp"
-#include "camera.hpp"
+#ifndef UAIRGUIINPUTBOXBASE_HPP
+#define UAIRGUIINPUTBOXBASE_HPP
 
 #include "gui.hpp"
-#include "guibuttonbase.hpp"
-#include "guiinputboxbase.hpp"
-#include "guibutton.hpp"
-#include "guicheckbox.hpp"
-#include "guiinputbox.hpp"
-#include "layoutcontainer.hpp"
-#include "layoutdivision.hpp"
-#include "layoutelement.hpp"
-#include "layoutptr.hpp"
 
-#include "sound.hpp"
-
-#include "game.hpp"
+namespace uair {
+class GUIInputBoxBase : public GUIElement {
+	public :
+		void HandleMessageQueue(const MessageQueue::Entry& e, GUI* caller = nullptr);
+		void Input(GUI* caller = nullptr);
+		
+		std::u16string GetString();
+		void SetString(const std::u16string& newString);
+	protected :
+		virtual void OnHoverChange() = 0;
+		virtual void OnStateChange() = 0;
+		virtual void OnTextRemoved() = 0;
+		virtual void OnTextAdded(const char16_t& newChar) = 0;
+		virtual void OnTextSet(const std::u16string& newString) = 0;
+	
+	protected :
+		std::string mName;
+		
+		bool mInArea = false; // indicates if the cursor is within the input box's bounding box (hovering)
+		
+		glm::vec2 mPosition;
+		float mWidth = 0.0f;
+		float mHeight = 0.0f;
+		
+		bool mActive = false; // indicates if the input box is accepting text input
+		
+		std::set<char16_t> mAllowedInput; // a set used for character lookup when entering text (permitted characters)
+		std::u16string mString;
+};
+}
 
 #endif

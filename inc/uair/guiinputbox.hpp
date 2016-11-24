@@ -28,15 +28,31 @@
 #ifndef UAIRGUIINPUTBOX_HPP
 #define UAIRGUIINPUTBOX_HPP
 
-#include "gui.hpp"
+#include "guiinputboxbase.hpp"
+
 #include "shape.hpp"
 #include "renderstring.hpp"
-#include "renderbuffer.hpp"
 
 namespace uair {
-class Font;
-
-class GUIInputBox : public GUIElement {
+class GUIInputBox : public GUIInputBoxBase {
+	public :
+		// the message that is sent to the main message queue when the input box's string is changed
+		class StringChangedMessage : public Message {
+			public :
+				StringChangedMessage() = default;
+				StringChangedMessage(const std::string& inputBoxName, const std::u16string& inputBoxString);
+				
+				void Serialise(cereal::BinaryOutputArchive& archive) const;
+				void Serialise(cereal::BinaryInputArchive& archive);
+				
+				static constexpr unsigned int GetTypeID() {
+					return 101u;
+				}
+			
+			public :
+				std::string mInputBoxName; // the (non-unique) name of the input box that sent this message
+				std::u16string mNewString;
+		};
 	public :
 		// an aggregate used for initialising an input box with various properties
 		struct Properties {
@@ -45,7 +61,7 @@ class GUIInputBox : public GUIElement {
 			glm::vec2 mPosition; // the position of the input box
 			unsigned int mWidth; // the width of the input box
 			unsigned int mHeight; // the height of the input box
-			glm::vec3 mInputColour; // the colour of the text in the input box
+			glm::vec3 mInputColour; // the colour of the input box's base
 			
 			ResourcePtr<Font> mFont; // a pointer to the font used to draw the text in the input box
 			unsigned int mTextSize; // the size of the text in the input box
@@ -57,8 +73,6 @@ class GUIInputBox : public GUIElement {
 	public :
 		GUIInputBox(const Properties& properties);
 		
-		void HandleMessageQueue(const MessageQueue::Entry& e, GUI* caller = nullptr);
-		void Input(GUI* caller = nullptr);
 		void Process(float deltaTime, GUI* caller = nullptr);
 		void PostProcess(const unsigned int& processed, float deltaTime, GUI* caller = nullptr);
 		
@@ -67,25 +81,24 @@ class GUIInputBox : public GUIElement {
 		glm::vec2 GetPosition() const;
 		void SetPosition(const glm::vec2& newPos);
 		
-		std::u16string GetString();
-		void SetString(const std::u16string& newString);
-		
 		static unsigned int GetTypeID();
 	protected :
 		void UpdateRenderState(const unsigned int& state);
 		void UpdateStringTexture();
+		
+		void OnHoverChange();
+		void OnStateChange();
+		void OnTextRemoved();
+		void OnTextAdded(const char16_t& newChar);
+		void OnTextSet(const std::u16string& newString);
 	
 	protected :
-		std::string mName;
+		bool mStringUpdated = false; // indicates that the input box's string must be redrawn
+		bool mUpdated = false;
 		
-		bool mInArea = false; // indicates if the cursor is within the input box's bounding box (hovering)
-		
-		glm::vec2 mPosition;
-		float mWidth = 0.0f;
-		float mHeight = 0.0f;
-		
-		bool mActive = false; // indicates if the input box is accepting text input
-		bool mUpdated = false; // indicates that the input box's string must be redrawn
+		Shape mInputBase;
+		Shape mInputHighlight;
+		Shape mInput;
 		
 		float mCaretTimer = 0.0f;
 		bool mCaretDisplay = false;
@@ -97,12 +110,6 @@ class GUIInputBox : public GUIElement {
 		Texture mStringTexture;
 		RenderBuffer mStringRenderBuffer;
 		FBO mStringFBO;
-		
-		std::set<char16_t> mAllowedInput; // a set used for character lookup when entering text (permitted characters)
-	private :
-		Shape mInputBase;
-		Shape mInputHighlight;
-		Shape mInput;
 };
 }
 
