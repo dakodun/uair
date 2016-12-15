@@ -50,8 +50,6 @@ struct AnimationFrame {
 };
 
 class Shape : public Polygon, public Renderable {
-	friend class RenderBatch;
-	
 	public :
 		Shape() = default;
 		explicit Shape(const std::vector<Contour>& contours, const CoordinateSpace& coordinateSpace = CoordinateSpace::Local);
@@ -103,6 +101,7 @@ class Shape : public Polygon, public Renderable {
 		
 		// set the animation attributes
 		void SetAnimation(const float& speed, const unsigned int& start, const unsigned int& end, const int& loops = -1);
+		bool IsAnimated() const;
 		void SetCurrentFrame(const unsigned int& frame);
 		unsigned int GetCurrentFrame() const;
 		unsigned int GetFrameCount();

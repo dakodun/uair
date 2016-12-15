@@ -63,7 +63,8 @@
 #include "fbo.hpp"
 #include "pbo.hpp"
 #include "vbo.hpp"
-#include "camera.hpp"
+#include "camera2d.hpp"
+#include "camera3d.hpp"
 
 #include "gui.hpp"
 #include "guibuttonbase.hpp"

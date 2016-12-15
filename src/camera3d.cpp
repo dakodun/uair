@@ -25,13 +25,13 @@
 **		   source distribution.
 ** **************************************************************** */
 
-#include "camera.hpp"
+#include "camera3d.hpp"
 
 #include <iostream>
 #include "util.hpp"
 
 namespace uair {
-void Camera::Rotate(const Axis& axis, const float& angle) {
+void Camera3D::Rotate(const Axis& axis, const float& angle) {
 	switch (axis) { // depending on axis to rotate around...
 		case Axis::Z : // roll
 			UpdateAngle(mAngles.z, angle); // update the accumulated roll angle
@@ -47,7 +47,7 @@ void Camera::Rotate(const Axis& axis, const float& angle) {
 	};
 }
 
-void Camera::Move(const Axis& axis, const float& distance) {
+void Camera3D::Move(const Axis& axis, const float& distance) {
 	switch (axis) { // depending on axis to move along...
 		case Axis::Z : // moving along z axis
 			UpdatePosition(distance, 2); // update the x, y and z positions
@@ -63,24 +63,24 @@ void Camera::Move(const Axis& axis, const float& distance) {
 	};
 }
 
-glm::mat4 Camera::GetMatrix() {
+glm::mat4 Camera3D::GetMatrix() {
 	UpdateView(); // update the view matrix
 	
 	return mView; // return the view matrix
 }
 
-void Camera::LockToPlane(const Plane& plane) {
+void Camera3D::LockToPlane(const Plane& plane) {
 	mLockedPlane = plane; // set the plane to lock the camera too
 }
 
-void Camera::UpdateAngle(float& oldAngle, const float& angleChange) {
+void Camera3D::UpdateAngle(float& oldAngle, const float& angleChange) {
 	if (!util::CompareFloats(angleChange, util::Equals, 0.0f)) { // if the change in angle is not zero (avoid unnecessary calculations)...
 		oldAngle = std::fmod(oldAngle + angleChange, 360.0f); // add the change in angle to the existing angle and clip it between 0 and 360
 		mUpdate = true; // indicate a view matrix update is required
 	}
 }
 
-void Camera::UpdatePosition(const float& distanceChange, const int& axisIndex) {
+void Camera3D::UpdatePosition(const float& distanceChange, const int& axisIndex) {
 	if (!util::CompareFloats(distanceChange, util::Equals, 0.0f)) { // if the amount to move is not zero (avoid unnecessary calculations)...
 		UpdateView(); // ensure view matrix is up to date
 		
@@ -105,7 +105,7 @@ void Camera::UpdatePosition(const float& distanceChange, const int& axisIndex) {
 	}
 }
 
-void Camera::UpdateView() {
+void Camera3D::UpdateView() {
 	if (mUpdate) { // if an update to the view matrix is required...
 		// convert angles to radians
 		float pi180 = static_cast<float>(util::PIOVER180);

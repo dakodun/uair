@@ -37,8 +37,6 @@
 
 namespace uair {
 class RenderString : public Transformable2D, public Renderable {
-	friend class RenderBatch;
-	
 	private :
 		// aggregate that holds a rendered characters glyph shape and information about the renderstring
 		// when it was created (to allow faster roll back)

@@ -449,6 +449,10 @@ void Shape::SetAnimation(const float& speed, const unsigned int& start, const un
 	}
 }
 
+bool Shape::IsAnimated() const {
+	return mIsAnimated;
+}
+
 void Shape::SetCurrentFrame(const unsigned int& frame) {
 	size_t frameCount = mFrames.size(); // get the frame count
 	

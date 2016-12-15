@@ -25,44 +25,36 @@
 **		   source distribution.
 ** **************************************************************** */
 
-#ifndef UAIRCAMERA_HPP
-#define UAIRCAMERA_HPP
+#ifndef UAIRCAMERA2D_HPP
+#define UAIRCAMERA2D_HPP
 
 #include <glm/glm.hpp>
 
 namespace uair {
-enum class Axis {
-	X = 0u,
-	Y,
-	Z
-};
-
-enum class Plane {
-	XY = 0u,
-	YZ,
-	XZ,
-	None
-};
-
-class Camera {
+class Camera2D {
 	public :
-		void Rotate(const Axis& axis, const float& angle); // rotate the camera around an axis
-		void Move(const Axis& axis, const float& distance); // move the camera along an axis
+		void Translate(const glm::vec2& translation);
+		void Rotate(const float& rotation);
+		void Scale(const float& scale);
 		
-		glm::mat4 GetMatrix(); // return a copy of the view matrix
+		void SetPosition(const glm::vec2& position);
+		glm::vec2 GetPosition() const;
+		void SetRotation(const float& rotation);
+		float GetRotation() const;
+		void SetScale(const float& scale);
+		float GetScale() const;
 		
-		void LockToPlane(const Plane& plane = Plane::None); // lock the camera to a plane (or none)
-	private :
-		void UpdateAngle(float& oldAngle, const float& angleChange); // update one of the axis' angles
-		void UpdatePosition(const float& distanceChange, const int& axisIndex); // update one of the axis' position
-		void UpdateView(); // update the view matrix
-	private :
+		glm::mat4 GetMatrix(const unsigned int& width, const unsigned int& height);
+	
+	public :
 		bool mUpdate = true;
+		unsigned int mWidth = 0u;
+		unsigned int mHeight = 0u;
 		glm::mat4 mView;
 		
-		glm::vec3 mAngles;
-		glm::vec3 mPosition;
-		Plane mLockedPlane = Plane::None;
+		glm::vec2 mPosition;
+		float mRotation = 0.0f;
+		float mScale = 1.0f;
 };
 }
 
