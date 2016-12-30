@@ -42,7 +42,7 @@ class FBO;
 
 typedef unsigned int VBOIndex;
 
-struct VBOVertex {
+struct EXPORTDLL VBOVertex {
 	float mX, mY, mZ;
 	float mNX, mNY, mNZ;
 	float mS, mT, mLayer;
@@ -51,7 +51,7 @@ struct VBOVertex {
 	float mExtra[2];
 };
 
-class VBO {
+class EXPORTDLL VBO {
 	public :
 		VBO() = default;
 		VBO(const VBO& other) = delete;

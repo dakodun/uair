@@ -28,6 +28,7 @@
 #ifndef UAIRRENDERSTRING_HPP
 #define UAIRRENDERSTRING_HPP
 
+#include "init.hpp"
 #include "transformable2d.hpp"
 #include "renderable.hpp"
 #include "renderbatch.hpp"
@@ -36,7 +37,7 @@
 #include "vbo.hpp"
 
 namespace uair {
-class RenderString : public Transformable2D, public Renderable {
+class EXPORTDLL RenderString : public Transformable2D, public Renderable {
 	private :
 		// aggregate that holds a rendered characters glyph shape and information about the renderstring
 		// when it was created (to allow faster roll back)
@@ -68,12 +69,12 @@ class RenderString : public Transformable2D, public Renderable {
 		bool RemoveText(const unsigned int& numChars); // remove a number of characters from the end of the existing string
 		std::u16string GetText() const; // returning the current existing string
 		void SetSize(const unsigned int& size); // set the size of the string
+		
+		std::list<RenderBatchData> Upload();
 	protected :
 		void UpdateGlobalBoundingBox();
 		void UpdateGlobalMask();
 		void CreateLocalMask();
-		
-		std::list<RenderBatchData> Upload();
 	private :
 		void UpdateRenderString();
 		void CreateRenderCharacters(const std::u16string& newString);

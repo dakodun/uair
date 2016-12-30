@@ -37,7 +37,7 @@ float Renderable::GetDepth() const {
 }
 
 void Renderable::SetDepth(const float& newDepth) {
-	mDepth = std::min(std::max(newDepth, -1000.0f), 999.0f); // cap the depth between -1000 and 999 inclusive
+	mDepth = newDepth;
 }
 
 glm::vec3 Renderable::GetColour() const {

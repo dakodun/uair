@@ -32,7 +32,7 @@
 #include "resource.hpp"
 
 namespace uair {
-class RenderBuffer : public Resource {
+class EXPORTDLL RenderBuffer : public Resource {
 	public :
 		RenderBuffer() = default;
 		RenderBuffer(const RenderBuffer& other) = delete;

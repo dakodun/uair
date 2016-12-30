@@ -28,13 +28,14 @@
 #ifndef UAIRWINDOWMESSAGES_HPP
 #define UAIRWINDOWMESSAGES_HPP
 
+#include "init.hpp"
 #include "messagequeue.hpp"
 #include "inputenums.hpp"
 #include "inputmanager.hpp"
 
 namespace uair {
 namespace WindowMessage {
-class CloseMessage : public Message {
+class EXPORTDLL CloseMessage : public Message {
 	public :
 		void Serialise(cereal::BinaryOutputArchive& archive) const;
 		void Serialise(cereal::BinaryInputArchive& archive);
@@ -46,7 +47,7 @@ class CloseMessage : public Message {
 };
 
 
-class SizeMessage : public Message {
+class EXPORTDLL SizeMessage : public Message {
 	public :
 		// a default constructor means we can create a temporary blank object without specifying parameters
 		SizeMessage() = default;
@@ -67,7 +68,7 @@ class SizeMessage : public Message {
 };
 
 
-class MoveMessage : public Message {
+class EXPORTDLL MoveMessage : public Message {
 	public :
 		MoveMessage() = default;
 		MoveMessage(const short& x, const short& y);
@@ -85,7 +86,7 @@ class MoveMessage : public Message {
 };
 
 
-class GainedFocusMessage : public Message {
+class EXPORTDLL GainedFocusMessage : public Message {
 	public :
 		void Serialise(cereal::BinaryOutputArchive& archive) const;
 		void Serialise(cereal::BinaryInputArchive& archive);
@@ -96,7 +97,7 @@ class GainedFocusMessage : public Message {
 };
 
 
-class LostFocusMessage : public Message {
+class EXPORTDLL LostFocusMessage : public Message {
 	public :
 		void Serialise(cereal::BinaryOutputArchive& archive) const;
 		void Serialise(cereal::BinaryInputArchive& archive);
@@ -107,7 +108,7 @@ class LostFocusMessage : public Message {
 };
 
 
-class DisplayChangeMessage : public Message {
+class EXPORTDLL DisplayChangeMessage : public Message {
 	public :
 		DisplayChangeMessage() = default;
 		DisplayChangeMessage(const short& width, const short& height);
@@ -125,7 +126,7 @@ class DisplayChangeMessage : public Message {
 };
 
 
-class LostCaptureMessage : public Message {
+class EXPORTDLL LostCaptureMessage : public Message {
 	public :
 		void Serialise(cereal::BinaryOutputArchive& archive) const;
 		void Serialise(cereal::BinaryInputArchive& archive);
@@ -136,7 +137,7 @@ class LostCaptureMessage : public Message {
 };
 
 
-class KeyboardKeyMessage : public Message {
+class EXPORTDLL KeyboardKeyMessage : public Message {
 	public :
 		KeyboardKeyMessage() = default;
 		KeyboardKeyMessage(const Keyboard& key, const unsigned int& type);
@@ -154,7 +155,7 @@ class KeyboardKeyMessage : public Message {
 };
 
 
-class TextInputMessage : public Message {
+class EXPORTDLL TextInputMessage : public Message {
 	public :
 		TextInputMessage() = default;
 		TextInputMessage(const char16_t& input);
@@ -171,7 +172,7 @@ class TextInputMessage : public Message {
 };
 
 
-class MouseButtonMessage : public Message {
+class EXPORTDLL MouseButtonMessage : public Message {
 	public :
 		MouseButtonMessage() = default;
 		MouseButtonMessage(const Mouse& button, const unsigned int& type);
@@ -189,7 +190,7 @@ class MouseButtonMessage : public Message {
 };
 
 
-class MouseWheelMessage : public Message {
+class EXPORTDLL MouseWheelMessage : public Message {
 	public :
 		MouseWheelMessage() = default;
 		MouseWheelMessage(const int& amount);
@@ -206,7 +207,7 @@ class MouseWheelMessage : public Message {
 };
 
 
-class MouseMoveMessage : public Message {
+class EXPORTDLL MouseMoveMessage : public Message {
 	public :
 		MouseMoveMessage() = default;
 		MouseMoveMessage(const int& localX, const int& localY, const int& globalX, const int& globalY);
@@ -226,7 +227,7 @@ class MouseMoveMessage : public Message {
 };
 
 
-class DeviceChangedMessage : public Message {
+class EXPORTDLL DeviceChangedMessage : public Message {
 	public :
 		DeviceChangedMessage() = default;
 		DeviceChangedMessage(const int& id, const bool& status);
@@ -249,7 +250,7 @@ class DeviceChangedMessage : public Message {
 };
 
 
-class DeviceButtonMessage : public Message {
+class EXPORTDLL DeviceButtonMessage : public Message {
 	public :
 		DeviceButtonMessage() = default;
 		DeviceButtonMessage(const int& id, const unsigned int& button, const unsigned int& type);
@@ -268,7 +269,7 @@ class DeviceButtonMessage : public Message {
 };
 
 
-class DeviceControlMessage : public Message {
+class EXPORTDLL DeviceControlMessage : public Message {
 	public :
 		DeviceControlMessage() = default;
 		DeviceControlMessage(const int& id, const Device& control, const int& value);

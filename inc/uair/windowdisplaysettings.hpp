@@ -28,8 +28,10 @@
 #ifndef UAIRWINDOWDISPLAYSETTINGS_HPP
 #define UAIRWINDOWDISPLAYSETTINGS_HPP
 
+#include "init.hpp"
+
 namespace uair {
-class WindowDisplaySettings {
+class EXPORTDLL WindowDisplaySettings {
 	public :
 		WindowDisplaySettings();
 		WindowDisplaySettings(const unsigned int & width, const unsigned int & height, const unsigned int & colourDepth = 32);

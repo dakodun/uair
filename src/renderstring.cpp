@@ -375,7 +375,7 @@ std::list<RenderBatchData> RenderString::Upload() {
 	
 	for (auto vertex = rbdList.back().mVertexData.begin(); vertex != rbdList.back().mVertexData.end(); ++vertex) {
 		glm::vec3 pos = transMat * glm::vec3(vertex->mX, vertex->mY, 1.0f); // get position of transformed vertex
-		vertex->mX = pos.x; vertex->mY = pos.y; vertex->mZ = mDepth + 1000.5f; // set the position of the transformed character
+		vertex->mX = pos.x; vertex->mY = pos.y; vertex->mZ = mDepth; // set the position of the transformed character
 		vertex->mR = mColour.x; vertex->mG = mColour.y; vertex->mB = mColour.z; vertex->mA = mAlpha; // set the colour of the transformed character
 	}
 	

@@ -1,0 +1,28 @@
+# makefile for Windows
+
+CXX=g++
+CXXFLAGS=-Wall -Wno-unused -std=c++11
+PRJPATHS=-I inc -I inc/uair -I inc/freetype
+EXTPATHS=
+PRJFLAGS=-DGLEW_STATIC=1 -DGLEW_MX=1 -DGLM_FORCE_RADIANS -DHAVE_GETTIMEOFDAY -D__WINDOWS_WASAPI__
+
+CXXLIBS=
+
+SOURCES=$(wildcard src/*.cpp) $(wildcard src/*.c)
+OBJECTS=$(patsubst src/%.cpp, obj/%.o, $(patsubst src/%.c, obj/%.o, $(SOURCES)))
+OBJECTS:=$(strip $(patsubst %linux.o, , $(OBJECTS)))
+
+TARGET=bin\libuair.a
+
+$(TARGET): $(OBJECTS)
+	ar rs $(TARGET) $(OBJECTS)
+
+obj/%.o: src/%.cpp
+	$(CXX) $(CXXFLAGS) $(PRJPATHS) $(EXTPATHS) $(PRJFLAGS) -o $@ -c $<
+	
+obj/%.o: src/%.c
+	$(CXX) $(CXXFLAGS) $(PRJPATHS) $(EXTPATHS) $(PRJFLAGS) -o $@ -c $<
+
+clean:
+	if exist obj\*.o del obj\*.o
+	if exist $(TARGET) del $(TARGET)

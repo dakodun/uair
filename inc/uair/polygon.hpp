@@ -34,6 +34,7 @@
 #include <glm/glm.hpp>
 #include <clipper.hpp>
 
+#include "init.hpp"
 #include "transformable2d.hpp"
 
 namespace uair {
@@ -51,7 +52,7 @@ enum class Winding {
 
 // bezier related code based on the excellent "A Primer on Bézier Curves" (http://pomax.github.io/bezierinfo/#decasteljau) by Mike "Pomax" Kamermans
 // additional code from Bartosz Ciechanowski (http://ciechanowski.me/blog/page/2/)
-class Contour {
+class EXPORTDLL Contour {
 	friend class Polygon;
 	friend class Shape;
 	
@@ -82,7 +83,7 @@ class Contour {
 		std::vector<glm::vec2> mBounds;
 };
 
-class Polygon : public Transformable2D {
+class EXPORTDLL Polygon : public Transformable2D {
 	public :
 		Polygon() = default;
 		explicit Polygon(const std::vector<Contour>& contours, const CoordinateSpace& coordinateSpace = CoordinateSpace::Local);

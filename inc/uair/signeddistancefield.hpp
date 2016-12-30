@@ -32,10 +32,11 @@
 #include <string>
 #include <glm/glm.hpp>
 
+#include "init.hpp"
 #include "texture.hpp"
 
 namespace uair {
-class SignedDistanceField {
+class EXPORTDLL SignedDistanceField {
 	public :
 		std::pair<std::vector<unsigned char>, glm::ivec2> GenerateFromFile(const std::string& textureFile);
 		std::pair<std::vector<unsigned char>, glm::ivec2> GenerateFromTexture(Texture* texture, const unsigned int& layer);

@@ -28,10 +28,11 @@
 #ifndef UAIRGUIINPUTBOXBASE_HPP
 #define UAIRGUIINPUTBOXBASE_HPP
 
+#include "init.hpp"
 #include "gui.hpp"
 
 namespace uair {
-class GUIInputBoxBase : public GUIElement {
+class EXPORTDLL GUIInputBoxBase : public GUIElement {
 	public :
 		void HandleMessageQueue(const MessageQueue::Entry& e, GUI* caller = nullptr);
 		void Input(GUI* caller = nullptr);

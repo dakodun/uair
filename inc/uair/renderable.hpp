@@ -39,8 +39,8 @@
 namespace uair {
 class RenderBatchData;
 
-class Renderable {
-	friend class RenderBatch;
+class EXPORTDLL Renderable {
+	// friend class RenderBatch;
 	
 	public :
 		virtual ~Renderable() = default;
@@ -57,7 +57,7 @@ class Renderable {
 		ResourcePtr<Shader> GetShader() const;
 		void SetShader(ResourcePtr<Shader> shader);
 		void SetShader(Shader* shader);
-	protected :
+		
 		virtual std::list<RenderBatchData> Upload() = 0;
 	public :
 		GLenum mRenderMode = GL_TRIANGLES;

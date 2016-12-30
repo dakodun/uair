@@ -30,12 +30,13 @@
 
 #include <atomic>
 
+#include "init.hpp"
 #include "RtAudio.h"
 #include "resource.hpp"
 #include "soundloaderogg.hpp"
 
 namespace uair {
-class SoundBuffer : public Resource {
+class EXPORTDLL SoundBuffer : public Resource {
 	public :
 		SoundBuffer() = default;
 		SoundBuffer(const SoundBuffer& other) = delete;

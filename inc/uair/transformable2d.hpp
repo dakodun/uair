@@ -33,8 +33,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "init.hpp"
+
 namespace uair {
-class Transformable2D {
+class EXPORTDLL Transformable2D {
 	public :
 		virtual ~Transformable2D() = default;
 		

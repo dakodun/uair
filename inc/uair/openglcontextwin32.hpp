@@ -35,7 +35,7 @@
 namespace uair {
 class Window;
 
-class OpenGLContextWin32 {
+class EXPORTDLL OpenGLContextWin32 {
 	friend class Game;
 	friend class WindowWin32;
 	

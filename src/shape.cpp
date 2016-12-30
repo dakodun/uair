@@ -687,7 +687,7 @@ void Shape::CreateVBOVertices(RenderBatchData& batchData, const std::vector<glm:
 	
 	for (unsigned int i = 0; i < vertices.size(); ++i) { // for all vertices...
 		VBOVertex vert; // create vertex suitable for rendering
-		vert.mX = vertices.at(i).x; vert.mY = vertices.at(i).y; vert.mZ = mDepth + 1000.5f;
+		vert.mX = vertices.at(i).x; vert.mY = vertices.at(i).y; vert.mZ = mDepth;
 		vert.mNX = 0.0f; vert.mNY = 0.0f; vert.mNZ = 1.0f;
 		vert.mS = texCoords.at(i).x; vert.mT = 1.0f - texCoords.at(i).y; vert.mLayer = texLayer;
 		vert.mR = colours.at(i).x; vert.mG = colours.at(i).y; vert.mB = colours.at(i).z; vert.mA = colours.at(i).w;

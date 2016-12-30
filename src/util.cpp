@@ -33,6 +33,9 @@
 
 namespace uair {
 namespace util {
+const float EPSILON = 1e-6f;
+const double PI = 3.1415926535897;
+const double PIOVER180 = PI / 180;
 unsigned int LOGLEVEL = 0u;
 std::string LOGLOCATION = "";
 

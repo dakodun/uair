@@ -45,11 +45,11 @@
 
 namespace uair {
 namespace util {
-static const float EPSILON = 1e-6f;
-static const double PI = 3.1415926535897;
-static const double PIOVER180 = PI / 180;
-extern unsigned int LOGLEVEL;
-extern std::string LOGLOCATION;
+EXPORTDLL extern const float EPSILON;
+EXPORTDLL extern const double PI;
+EXPORTDLL extern const double PIOVER180;
+EXPORTDLL extern unsigned int LOGLEVEL;
+EXPORTDLL extern std::string LOGLOCATION;
 
 enum {
 	LessThan = 0u,
@@ -57,24 +57,24 @@ enum {
 	GreaterThan
 };
 
-extern bool CompareFloats(const float& first, const unsigned int& comparison, const float& second, const float& variance = util::EPSILON);
-extern int FloatToInt(const float& f);
+EXPORTDLL extern bool CompareFloats(const float& first, const unsigned int& comparison, const float& second, const float& variance = util::EPSILON);
+EXPORTDLL extern int FloatToInt(const float& f);
 
-extern glm::mat3 GetTranslationMatrix(const glm::vec2& translation);
-extern glm::mat3 GetRotationMatrix(const float& angle);
-extern glm::mat3 GetScalingMatrix(const glm::vec2& scale);
-extern glm::mat3 GetSkewingMatrix(const glm::vec2& skew);
+EXPORTDLL extern glm::mat3 GetTranslationMatrix(const glm::vec2& translation);
+EXPORTDLL extern glm::mat3 GetRotationMatrix(const float& angle);
+EXPORTDLL extern glm::mat3 GetScalingMatrix(const glm::vec2& scale);
+EXPORTDLL extern glm::mat3 GetSkewingMatrix(const glm::vec2& skew);
 
-extern unsigned int NextPowerOf2(const unsigned int& input);
-extern int IsConvex(const glm::vec2& pointA, const glm::vec2& pointB, const glm::vec2& pointC);
-extern glm::vec2 ReflectPointByLine(const glm::vec2& pointA, const glm::vec2& pointB, const glm::vec2& pointC);
-extern glm::vec3 RotatePointAroundAxis(const glm::vec3& pointA, const glm::vec3& axis, const float& angle);
+EXPORTDLL extern unsigned int NextPowerOf2(const unsigned int& input);
+EXPORTDLL extern int IsConvex(const glm::vec2& pointA, const glm::vec2& pointB, const glm::vec2& pointC);
+EXPORTDLL extern glm::vec2 ReflectPointByLine(const glm::vec2& pointA, const glm::vec2& pointB, const glm::vec2& pointC);
+EXPORTDLL extern glm::vec3 RotatePointAroundAxis(const glm::vec3& pointA, const glm::vec3& axis, const float& angle);
 
-extern std::string GetGLErrorStatus();
-extern void LogMessage(const unsigned int& level, const std::string& message);
-extern void LogMessage(const unsigned int& level, const std::string& message, const std::string& filename);
+EXPORTDLL extern std::string GetGLErrorStatus();
+EXPORTDLL extern void LogMessage(const unsigned int& level, const std::string& message);
+EXPORTDLL extern void LogMessage(const unsigned int& level, const std::string& message, const std::string& filename);
 
-extern std::vector<std::string> SplitString(const std::string& string, const char& delimiter);
+EXPORTDLL extern std::vector<std::string> SplitString(const std::string& string, const char& delimiter);
 
 template<typename T>
 extern int SignOf(const T& input) {

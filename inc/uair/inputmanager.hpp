@@ -37,13 +37,14 @@
 #define CEREAL_SERIALIZE_FUNCTION_NAME Serialise
 #include "cereal/archives/binary.hpp"
 
+#include "init.hpp"
 #include "polygon.hpp"
 #include "inputenums.hpp"
 
 namespace uair {
 class Window;
 
-class InputManager {
+class EXPORTDLL InputManager {
 	friend class Game;
 	
 	public :

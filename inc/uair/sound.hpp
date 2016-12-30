@@ -28,10 +28,11 @@
 #ifndef UAIRSOUND_HPP
 #define UAIRSOUND_HPP
 
+#include "init.hpp"
 #include "soundbuffer.hpp"
 
 namespace uair {
-class Sound {
+class EXPORTDLL Sound {
 	public :
 		Sound();
 		Sound(const Sound& other);

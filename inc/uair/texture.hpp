@@ -37,7 +37,7 @@
 namespace uair {
 class FBO;
 
-class Texture : public Resource {
+class EXPORTDLL Texture : public Resource {
 	public :
 		struct LayerData { // data relating to an individual layer in a texture array
 			unsigned int mWidth; // the width of the layer without padding

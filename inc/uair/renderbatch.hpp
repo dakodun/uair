@@ -32,11 +32,12 @@
 #include <map>
 #include <vector>
 
+#include "init.hpp"
 #include "vbo.hpp"
 
 namespace uair {
 // render data from a renderable that is to be sent to vbo
-struct RenderBatchData {
+struct EXPORTDLL RenderBatchData {
 	std::vector<VBOVertex> mVertexData; // vertices to send to vbo
 	std::vector<VBOIndex> mIndexData; // indices to send to vbo
 	
@@ -48,7 +49,7 @@ struct RenderBatchData {
 };
 
 // 
-struct Segment {
+struct EXPORTDLL Segment {
 	unsigned int mPass;
 	GLuint mVAOID;
 	ResourcePtr<Shader> mShader;
@@ -65,9 +66,10 @@ struct Segment {
 class Renderable; // forward declare the renderable class
 
 // a batch of renderable objects that is processed and uploaded to a vbo
-class RenderBatch {
+class EXPORTDLL RenderBatch {
 	public :
 		void Add(Renderable& renderable, const unsigned int& pass = 0u); // add a renderable to the batch for the specified render pass
+		void Add(std::list<RenderBatchData> rbd, const unsigned int& pass = 0u);
 		void Upload(); // upload the batch to vbo
 		void Draw(const unsigned int& pass = 0u); // draw the specified pass to the default framebuffer
 		void Draw(const FBO& fbo, const unsigned int& pass); // draw the specified pass to the specified framebuffer

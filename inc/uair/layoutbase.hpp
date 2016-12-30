@@ -30,10 +30,11 @@
 
 #include <map>
 
+#include "init.hpp"
 #include "layoutptr.hpp"
 
 namespace uair {
-class LayoutBase {
+class EXPORTDLL LayoutBase {
 	public :
 		~LayoutBase() {
 			for (auto iter = mStore.begin(); iter != mStore.end(); ++iter) { // for all layoutptrs pointing to this layout...

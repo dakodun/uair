@@ -28,12 +28,13 @@
 #ifndef UAIRLAYOUTELEMENT_HPP
 #define UAIRLAYOUTELEMENT_HPP
 
+#include "init.hpp"
 #include "layoutcontainer.hpp"
 #include "layoutdivision.hpp"
 #include "polygon.hpp"
 
 namespace uair {
-class LayoutElement {
+class EXPORTDLL LayoutElement {
 	friend class LayoutContainer;
 	friend class LayoutDivision;
 	

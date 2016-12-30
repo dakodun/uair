@@ -31,7 +31,7 @@
 #include "init.hpp"
 
 namespace uair {
-class PBO {
+class EXPORTDLL PBO {
 	public :
 		PBO() = default;
 		PBO(const PBO& other) = delete;

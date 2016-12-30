@@ -42,7 +42,7 @@ namespace uair {
 // base class for all messages allowing interaction with a message system
 // derived classes should implement a static function that returns an unsigned integer (representing a unique typeid)
 // (static unsigned int GetTypeID()) user implemented typeids should start at 1000
-class Message {
+class EXPORTDLL Message {
 	public :
 		virtual ~Message();
 		
@@ -55,7 +55,7 @@ class Message {
 
 
 // 
-class MessageQueue {
+class EXPORTDLL MessageQueue {
 	public :
 		// an entry into the message queue containing the unique id for the message type and the serialised message data
 		// as well as a helper function to allow easier deserialistion

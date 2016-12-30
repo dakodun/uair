@@ -28,10 +28,12 @@
 #ifndef UAIRCAMERA2D_HPP
 #define UAIRCAMERA2D_HPP
 
+#include "init.hpp"
+
 #include <glm/glm.hpp>
 
 namespace uair {
-class Camera2D {
+class EXPORTDLL Camera2D {
 	public :
 		void Translate(const glm::vec2& translation);
 		void Rotate(const float& rotation);

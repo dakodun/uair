@@ -32,8 +32,8 @@
 
 namespace uair {
 namespace util {
-extern double GetSysTime();
-extern void Sleep(const DWORD& time);
+EXPORTDLL extern double GetSysTime();
+EXPORTDLL extern void Sleep(const DWORD& time);
 }
 }
 

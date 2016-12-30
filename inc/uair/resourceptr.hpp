@@ -30,8 +30,10 @@
 
 #include <iostream>
 
+#include "init.hpp"
+
 namespace uair {
-class ResourcePtrBase {
+class EXPORTDLL ResourcePtrBase {
 	friend class Resource;
 	
 	private :
@@ -46,7 +48,7 @@ class ResourcePtrBase {
 };
 
 template<class T>
-class ResourcePtr : public ResourcePtrBase {
+class EXPORTDLL ResourcePtr : public ResourcePtrBase {
 	friend class Resource;
 	
 	public :

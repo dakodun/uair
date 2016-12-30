@@ -35,7 +35,7 @@
 #include "resource.hpp"
 
 namespace uair {
-class Shader : public Resource {
+class EXPORTDLL Shader : public Resource {
 	public :
 		typedef std::function<void ()> SetupCallback;
 		

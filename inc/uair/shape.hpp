@@ -28,6 +28,7 @@
 #ifndef UAIRSHAPE_HPP
 #define UAIRSHAPE_HPP
 
+#include "init.hpp"
 #include "polygon.hpp"
 #include "renderable.hpp"
 #include "resourceptr.hpp"
@@ -39,7 +40,7 @@ namespace uair {
 class Game;
 class RenderBatch;
 
-struct AnimationFrame {
+struct EXPORTDLL AnimationFrame {
 	ResourcePtr<Texture> mTexture; // resource pointer to the texture source for this frame
 	std::vector<glm::vec2> mTexCoords; // texture coordinates for the vertices in the shape
 	std::vector<glm::vec2> mTexCoordsExtra; // texture coordinates for the extra vertices added by triangulation
@@ -49,7 +50,7 @@ struct AnimationFrame {
 	glm::vec2 mMaxST; // the bottom-right-most texture coord
 };
 
-class Shape : public Polygon, public Renderable {
+class EXPORTDLL Shape : public Polygon, public Renderable {
 	public :
 		Shape() = default;
 		explicit Shape(const std::vector<Contour>& contours, const CoordinateSpace& coordinateSpace = CoordinateSpace::Local);
@@ -105,7 +106,7 @@ class Shape : public Polygon, public Renderable {
 		void SetCurrentFrame(const unsigned int& frame);
 		unsigned int GetCurrentFrame() const;
 		unsigned int GetFrameCount();
-	protected :
+		
 		// transform the shape into the correct format for rendering
 		std::list<RenderBatchData> Upload();
 	private :

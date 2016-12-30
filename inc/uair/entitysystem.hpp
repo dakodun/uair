@@ -28,6 +28,7 @@
 #ifndef UAIRENTITYSYSTEM_HPP
 #define UAIRENTITYSYSTEM_HPP
 
+#include "init.hpp"
 #include "component.hpp"
 #include "manager.hpp"
 #include "entitymanager.hpp"
@@ -36,7 +37,7 @@
 
 namespace uair {
 // the main class of the ECS architecture that pulls the three concepts (of entity, component and system) together into one package
-class EntitySystem {
+class EXPORTDLL EntitySystem {
 	friend class Game;
 	
 	public :

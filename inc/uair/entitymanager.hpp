@@ -28,12 +28,13 @@
 #ifndef UAIRENTITYMANAGER_HPP
 #define UAIRENTITYMANAGER_HPP
 
+#include "init.hpp"
 #include "manager.hpp"
 #include "component.hpp"
 
 namespace uair {
 // an entity represents a game object and is essentially just a listing of components
-class Entity {
+class EXPORTDLL Entity {
 	public :
 		// assign a unique entity id (unique within entity manager that created entity) and an entity name
 		Entity(const unsigned int& entityID, const std::string& entityName = "");
@@ -107,7 +108,7 @@ class Entity {
 
 
 // a specialised version of the manager<T> class that handles creation, retrieval and removal of entity objects
-class EntityManager {
+class EXPORTDLL EntityManager {
 	public :
 		// a handle that is used to refer to resources handled instead of a pointer
 		class Handle {

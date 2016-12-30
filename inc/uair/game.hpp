@@ -33,6 +33,7 @@
 
 #include <vector>
 
+#include "init.hpp"
 #include "scenemanager.hpp"
 #include "inputmanager.hpp"
 #include "shader.hpp"
@@ -45,7 +46,7 @@
 #include "entitysystem.hpp"
 
 namespace uair {
-class Game {
+class EXPORTDLL Game {
 	public :
 		Game();
 		~Game();

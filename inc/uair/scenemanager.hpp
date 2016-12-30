@@ -32,10 +32,11 @@
 #include <unordered_map>
 #include <memory>
 
+#include "init.hpp"
 #include "scene.hpp"
 
 namespace uair {
-class SceneManager {
+class EXPORTDLL SceneManager {
 	friend class Game;
 	
 	public :

@@ -33,7 +33,7 @@
 #include "init.hpp"
 
 namespace uair {
-class OpenGLStates {
+class EXPORTDLL OpenGLStates {
 	public :
 		// bind and store currently bound target
 		static bool BindArrayBuffer(const GLuint& id);

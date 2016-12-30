@@ -31,10 +31,11 @@
 #include <string>
 #include <memory>
 
+#include "init.hpp"
 #include "messagequeue.hpp"
 
 namespace uair {
-class Scene {
+class EXPORTDLL Scene {
 	public :
 		Scene(std::string name) : mName(name) {
 			

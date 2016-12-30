@@ -28,12 +28,13 @@
 #ifndef UAIRGUIBUTTONBASE_HPP
 #define UAIRGUIBUTTONBASE_HPP
 
+#include "init.hpp"
 #include "gui.hpp"
 
 namespace uair {
 class Font;
 
-class GUIButtonBase : public GUIElement {
+class EXPORTDLL GUIButtonBase : public GUIElement {
 	public :
 		void HandleMessageQueue(const MessageQueue::Entry& e, GUI* caller = nullptr);
 		void Input(GUI* caller = nullptr);

@@ -28,13 +28,13 @@
 #ifndef UAIRGUIINPUTBOX_HPP
 #define UAIRGUIINPUTBOX_HPP
 
+#include "init.hpp"
 #include "guiinputboxbase.hpp"
-
 #include "shape.hpp"
 #include "renderstring.hpp"
 
 namespace uair {
-class GUIInputBox : public GUIInputBoxBase {
+class EXPORTDLL GUIInputBox : public GUIInputBoxBase {
 	public :
 		// the message that is sent to the main message queue when the input box's string is changed
 		class StringChangedMessage : public Message {

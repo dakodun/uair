@@ -33,6 +33,7 @@
 
 #include <glm/glm.hpp>
 
+#include "init.hpp"
 #include "layoutbase.hpp"
 #include "layoutcontainer.hpp"
 #include "manager.hpp"
@@ -41,7 +42,7 @@
 namespace uair {
 class LayoutElement;
 
-class LayoutDivision : public LayoutBase {
+class EXPORTDLL LayoutDivision : public LayoutBase {
 	public :
 		friend class LayoutContainer;
 		typedef std::tuple<unsigned int, unsigned int, unsigned int> Handle;

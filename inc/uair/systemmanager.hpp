@@ -28,6 +28,7 @@
 #ifndef UAIRSYSTEMMANAGER_HPP
 #define UAIRSYSTEMMANAGER_HPP
 
+#include "init.hpp"
 #include "manager.hpp"
 #include "component.hpp"
 #include "entitymanager.hpp"
@@ -36,7 +37,7 @@
 namespace uair {
 class SystemManager;
 
-class System {
+class EXPORTDLL System {
 	public :
 		System() = default;
 		System(const System& other) = delete;
@@ -59,7 +60,7 @@ class System {
 
 
 // a specialised version of the manager<T> class that handles creation, retrieval and removal of system objects
-class SystemManager {
+class EXPORTDLL SystemManager {
 	public :
 		SystemManager() = default;
 		SystemManager(const SystemManager& other) = delete;

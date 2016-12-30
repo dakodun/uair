@@ -48,7 +48,7 @@ enum class WindingRule: unsigned int {
 	AbsGeqTwo
 };
 
-class Triangulate {
+class EXPORTDLL Triangulate {
 	public :
 		class Vertex {
 			public :

@@ -33,8 +33,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "init.hpp"
+
 namespace uair {
-class Transformable3D {
+class EXPORTDLL Transformable3D {
 	public :
 		virtual ~Transformable3D() = default;
 		

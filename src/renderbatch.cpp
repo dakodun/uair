@@ -33,10 +33,21 @@
 #include "renderable.hpp"
 
 namespace uair {
-void RenderBatch::Add(Renderable& renderable, const unsigned int& pass) {	
+void RenderBatch::Add(Renderable& renderable, const unsigned int& pass) {
 	// call the renderables upload function and store the returned render data
 	std::list<RenderBatchData> rbd = renderable.Upload();
 	
+	for (auto iter = rbd.begin(); iter != rbd.end(); ++iter) { // for all render data in the returned list...
+		if (!iter->mShader) { // if the render data doesn't have a shader associated with it...
+			iter->mShader = VBO::mDefaultShader; // assign the default shader
+		}
+		
+		iter->mPass = pass; // set the pass that the data is to be rendered on
+		mRenderData.push_back(*iter); // add the data to the array
+	}
+}
+
+void RenderBatch::Add(std::list<RenderBatchData> rbd, const unsigned int& pass) {
 	for (auto iter = rbd.begin(); iter != rbd.end(); ++iter) { // for all render data in the returned list...
 		if (!iter->mShader) { // if the render data doesn't have a shader associated with it...
 			iter->mShader = VBO::mDefaultShader; // assign the default shader

@@ -55,11 +55,23 @@
 	#include "GL/wglew.h"
 	extern WGLEWContext* wglewGetContext();
 	extern WGLEWContext* CURRENTCONTEXTWIN32;
+	
+	#ifdef UAIRDYNAMIC // if we're compiling a dynamic library...
+		#ifdef UAIREXPORTDLL
+			#define EXPORTDLL __declspec(dllexport)
+		#else
+			#define EXPORTDLL __declspec(dllimport)
+		#endif
+	#else // otherwise we're compiling a static library...
+		#define EXPORTDLL
+	#endif
 #elif defined(linux) || defined(__linux)
 	#define UAIRLINUX
 	
 	#include "GL/glew.h"
 	#include "GL/glxew.h"
+	
+	#define EXPORTDLL
 #else
 	#error Unsupported OS
 #endif

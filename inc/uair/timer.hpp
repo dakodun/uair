@@ -28,10 +28,11 @@
 #ifndef UAIRTIMER_HPP
 #define UAIRTIMER_HPP
 
+#include "init.hpp"
 #include "util.hpp"
 
 namespace uair {
-class Timer {
+class EXPORTDLL Timer {
 	public :
 		Timer();
 		float GetElapsedTime() const;

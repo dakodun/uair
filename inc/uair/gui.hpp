@@ -30,6 +30,7 @@
 
 #include <memory>
 
+#include "init.hpp"
 #include "manager.hpp"
 #include "inputmanager.hpp"
 #include "messagequeue.hpp"
@@ -38,7 +39,7 @@ namespace uair {
 class RenderBatch;
 
 class GUI;
-class GUIElement {
+class EXPORTDLL GUIElement {
 	public :
 		virtual void HandleMessageQueue(const MessageQueue::Entry& e, GUI* caller = nullptr) {
 			
@@ -68,7 +69,7 @@ enum class GUIElements : unsigned int {
 	InputBox
 };
 
-class GUI {
+class EXPORTDLL GUI {
 	public :
 		GUI();
 		

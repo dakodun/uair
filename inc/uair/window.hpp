@@ -40,7 +40,7 @@
 #endif
 
 namespace uair {
-class Window : public WindowOS {
+class EXPORTDLL Window : public WindowOS {
 	friend class OpenGLContextOS;
 	
 	public :

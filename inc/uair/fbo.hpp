@@ -35,7 +35,7 @@
 #include "renderbuffer.hpp"
 
 namespace uair {
-class FBO {
+class EXPORTDLL FBO {
 	public :
 		FBO() = default;
 		FBO(const FBO& other) = delete;

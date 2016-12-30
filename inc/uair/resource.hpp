@@ -30,11 +30,12 @@
 
 #include <map>
 
+#include "init.hpp"
 #include "resourceptr.hpp"
 #include "manager.hpp"
 
 namespace uair {
-class Resource {
+class EXPORTDLL Resource {
 	public :
 		~Resource() {
 			for (auto iter = mStore.begin(); iter != mStore.end(); ++iter) { // for all resourceptrs pointing to this resource...

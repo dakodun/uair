@@ -28,13 +28,13 @@
 #ifndef UAIRGUICHECKBOX_HPP
 #define UAIRGUICHECKBOX_HPP
 
+#include "init.hpp"
 #include "guibuttonbase.hpp"
-
 #include "shape.hpp"
 #include "renderstring.hpp"
 
 namespace uair {
-class GUICheckBox : public GUIButtonBase {
+class EXPORTDLL GUICheckBox : public GUIButtonBase {
 	public :
 		// the message that is sent to the main message queue when the check box's state is changed
 		class StateChangedMessage : public Message {

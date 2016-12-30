@@ -28,11 +28,13 @@
 #ifndef UAIRFILE_HPP
 #define UAIRFILE_HPP
 
+#include "init.hpp"
+
 #include <vector>
 #include <string>
 
 namespace uair {
-class File {
+class EXPORTDLL File {
 	public :
 		File() = default;
 		File(const std::string & filename);

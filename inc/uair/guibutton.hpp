@@ -28,13 +28,13 @@
 #ifndef UAIRGUIBUTTON_HPP
 #define UAIRGUIBUTTON_HPP
 
+#include "init.hpp"
 #include "guibuttonbase.hpp"
-
 #include "shape.hpp"
 #include "renderstring.hpp"
 
 namespace uair {
-class GUIButton : public GUIButtonBase {
+class EXPORTDLL GUIButton : public GUIButtonBase {
 	public :
 		// the message that is sent to the main message queue when the button is clicked
 		class ClickedMessage : public Message {

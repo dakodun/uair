@@ -28,6 +28,8 @@
 #ifndef UAIRCAMERA3D_HPP
 #define UAIRCAMERA3D_HPP
 
+#include "init.hpp"
+
 #include <glm/glm.hpp>
 
 namespace uair {
@@ -45,7 +47,7 @@ enum class Plane {
 };
 
 // a 3d camera to be used with a perspective projection
-class Camera3D {
+class EXPORTDLL Camera3D {
 	public :
 		void Rotate(const Axis& axis, const float& angle); // rotate the camera around an axis
 		void Move(const Axis& axis, const float& distance); // move the camera along an axis

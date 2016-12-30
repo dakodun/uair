@@ -25,12 +25,14 @@
 **		   source distribution.
 ** **************************************************************** */
 
-#if defined(_WIN32) || defined(__WIN32__)
-	#include <windows.h>
-	
-	extern int main(int argc, char* argv[]);
-	
-	int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, INT) {
-		return main(__argc, __argv);
-	}
+#if !defined(UAIREXPORTDLL)
+	#if defined(_WIN32) || defined(__WIN32__)
+		#include <windows.h>
+		
+		extern int main(int argc, char* argv[]);
+		
+		int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, INT) {
+			return main(__argc, __argv);
+		}
+	#endif
 #endif

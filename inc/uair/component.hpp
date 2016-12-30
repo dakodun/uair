@@ -28,11 +28,13 @@
 #ifndef UAIRCOMPONENT_HPP
 #define UAIRCOMPONENT_HPP
 
+#include "init.hpp"
+
 #include <string>
 
 namespace uair {
 // base class for all components allowing them to be handled as the same resource (via base pointers)
-class Component {
+class EXPORTDLL Component {
 	public :
 		Component(const std::string& componentName = "");
 		Component(const Component& other) = delete;

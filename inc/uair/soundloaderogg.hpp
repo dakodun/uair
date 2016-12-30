@@ -35,8 +35,10 @@
 #include "ogg/ogg.h"
 #include "vorbis/codec.h"
 
+#include "init.hpp"
+
 namespace uair {
-class SoundLoaderOgg {
+class EXPORTDLL SoundLoaderOgg {
 	// container struct that holds objects relating to vorbis decoding
 	struct OggStream {
 		int mVorbis = 0; // is this stream a vorbis stream? (0: undefined, -1: no, 1: yes)

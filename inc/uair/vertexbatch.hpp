@@ -28,10 +28,11 @@
 #ifndef UAIRVERTEXBATCH_HPP
 #define UAIRVERTEXBATCH_HPP
 
+#include "init.hpp"
 #include "transformable3d.hpp"
 
 namespace uair {
-/* class VertexBatch : public Transformable3D, public Renderable {
+/* class EXPORTDLL VertexBatch : public Transformable3D, public Renderable {
 	public :
 		std::string GetTag() const;
 		
