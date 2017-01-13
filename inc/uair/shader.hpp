@@ -37,7 +37,7 @@
 namespace uair {
 class EXPORTDLL Shader : public Resource {
 	public :
-		typedef std::function<void ()> SetupCallback;
+		// typedef std::function<void ()> SetupCallback;
 		
 		Shader() = default;
 		Shader(const Shader& other) = delete;

@@ -259,13 +259,9 @@ void Shape::AddFrame(ResourcePtr<Texture> texture, const unsigned int& layer) {
 		if (layer < tex->GetDepth()) {
 			const Texture::LayerData& texData = tex->GetData(layer);
 			
-			// set default values for the texture ST coordinate bounds
-			glm::vec2 min = glm::vec2(0.0f, 0.0f); // top-left of texture
-			glm::vec2 max = glm::vec2(texData.mSMax, texData.mTMax); // bottom-right of texture
-			
 			AnimationFrame frame; // create a new frame
 			frame.mTexture = texture; // set the texture pointer of the frame
-			frame.mMinST = min; frame.mMaxST = max; // set the ST coordinate limits
+			frame.mMinST = glm::vec2(0.0f, 0.0f); frame.mMaxST = glm::vec2(texData.mSMax, texData.mTMax); // set the ST coordinate limits
 			
 			for (auto contour = mContours.begin(); contour != mContours.end(); ++contour) { // for all contours in the shape...
 				CalculateTexCoords(contour->GetPoints(), {frame.mMinST, frame.mMaxST}, frame.mTexCoords); // calculate the texture coordinates for the contour for the current frame
