@@ -285,29 +285,37 @@ uniform mat4 vertModel;
 uniform mat4 vertView;
 uniform mat4 vertProj;
 
-layout(location = 0) in vec4 vertPos;
-layout(location = 1) in vec3 vertNormal;
-layout(location = 2) in vec4 vertColour;
-layout(location = 3) in vec3 vertTexCoord;
-layout(location = 4) in float vertType;
-layout(location = 5) in float[2] vertExtra;
+layout(location = 0) in vec3 vertXYZ;
+layout(location = 1) in vec4 vertNormal;
+layout(location = 2) in vec2 vertST;
+layout(location = 3) in vec4 vertLWTT;
+layout(location = 4) in vec4 vertSTBounds;
+layout(location = 5) in vec4 vertRGBA;
+layout(location = 6) in vec2 vertScale;
 
-flat out vec4 fragColour;
-smooth out vec3 fragTexCoord;
-flat out float fragType;
-flat out float[2] fragExtra;
+smooth out vec3 fragSTL;
+flat out uint fragWrap;
+flat out uint fragType;
+flat out float fragIsTextured;
+flat out vec2 fragSTMin;
+flat out vec2 fragSTMax;
+flat out vec4 fragRGBA;
+flat out vec2 fragScale;
 
 void main() {
 	mat4 mvp = vertProj * vertView * vertModel;
-	gl_Position = mvp * vertPos;
+	gl_Position = mvp * vec4(vertXYZ, 1.0f);
 	
-	vec3 normal = vec3((vertView * vertModel) * vec4(vertNormal, 0.0));
+	vec3 normal = vec3((vertView * vertModel) * vec4(vertNormal.xyz, 1.0f));
 	
-	fragColour = vertColour;
-	fragTexCoord = vertTexCoord;
-	fragType = vertType;
-	
-	fragExtra = vertExtra;
+	fragSTL = vec3(vertST, vertLWTT.x);
+	fragWrap = uint(vertLWTT.y + 0.5f);
+	fragType = uint(vertLWTT.z + 0.5f);
+	fragIsTextured = vertLWTT.w;
+	fragSTMin = vertSTBounds.xy;
+	fragSTMax = vertSTBounds.zw;
+	fragRGBA = vertRGBA;
+	fragScale = vertScale;
 }
 	)";
 	mDefaultShader.VertexFromString(vertStr);
@@ -318,10 +326,14 @@ void main() {
 
 uniform sampler2DArray fragBaseTex;
 
-flat in vec4 fragColour;
-smooth in vec3 fragTexCoord;
-flat in float fragType;
-flat in float[2] fragExtra;
+smooth in vec3 fragSTL;
+flat in uint fragWrap;
+flat in uint fragType;
+flat in float fragIsTextured;
+flat in vec2 fragSTMin;
+flat in vec2 fragSTMax;
+flat in vec4 fragRGBA;
+flat in vec2 fragScale;
 
 vec4 finalColour;
 layout(location = 0) out vec4 fragData;
@@ -329,17 +341,44 @@ layout(location = 0) out vec4 fragData;
 const float smoothing = 64.0f;
 
 void main() {
-	if (fragType < 0.5f) {
-		vec4 texColour = clamp(texture(fragBaseTex, fragTexCoord) + (1.0 - fragExtra[0]), 0.0, 1.0);
-		vec4 colColour = vec4(fragColour);
+	if (fragType == 0u) {
+		vec3 texCoords = fragSTL;
 		
-		finalColour = texColour * colColour;
+		if (fragWrap & 1u) { // clip s
+			texCoords.x = ((texCoords.x - fragSTMin.x) * fragScale.x) + fragSTMin.x;
+			
+			if (texCoords.x > fragSTMax.x) {
+				discard;
+			}
+		}
+		else if (fragWrap & 4u) { // repeat s
+			texCoords.x = ((texCoords.x - fragSTMin.x) * fragScale.x) + fragSTMin.x;
+			texCoords.x = mod(texCoords.x, fragSTMax.x);
+		}
+		
+		if (fragWrap & 2u) { // clip t
+			texCoords.y = (((1.0f - texCoords.y) - fragSTMin.y) * fragScale.y) + fragSTMin.y;
+			
+			if (texCoords.y > fragSTMax.y) {
+				discard;
+			}
+			
+			texCoords.y = 1.0f - texCoords.y;
+		}
+		else if (fragWrap & 8u) { // repeat t
+			texCoords.y = (((1.0f - texCoords.y) - fragSTMin.y) * fragScale.y) + fragSTMin.y;
+			texCoords.y = mod(texCoords.y, fragSTMax.y);
+			texCoords.y = 1.0f - texCoords.y;
+		}
+		
+		vec4 texColour = clamp(texture(fragBaseTex, texCoords) + (1.0 - fragIsTextured), 0.0f, 1.0f);
+		finalColour = texColour * fragRGBA;
 	}
-	else if (fragType < 1.5f) {
-		float mask = texture(fragBaseTex, fragTexCoord).r; // get the mask value from the red channel of the texture
-		float edgeWidth = clamp(smoothing * (abs(dFdx(fragTexCoord.x)) + abs(dFdy(fragTexCoord.y))), 0.0f, 0.5f); // get the width of the edge (for smooth edges) depending on glyph size (clamped to 0.0f ... 0.5f)
+	else if (fragType == 1u) {
+		float mask = texture(fragBaseTex, fragSTL).r; // get the mask value from the red channel of the texture
+		float edgeWidth = clamp(smoothing * (abs(dFdx(fragSTL.x)) + abs(dFdy(fragSTL.y))), 0.0f, 0.5f); // get the width of the edge (for smooth edges) depending on glyph size (clamped to 0.0f ... 0.5f)
 		float alpha = smoothstep(0.5f - edgeWidth, 0.5f + edgeWidth, mask); // interpolate the mask value between the lower and upper edges
-		finalColour = vec4(fragColour.x, fragColour.y, fragColour.z, alpha);
+		finalColour = vec4(fragRGBA.x, fragRGBA.y, fragRGBA.z, alpha);
 		
 		// outline
 		/* vec4 outlineColour = vec4(1.0f, 0.0f, 0.0f, 1.0f);
@@ -365,6 +404,7 @@ void main() {
 	
 	fragData = finalColour;
 }
+
 	)";
 	mDefaultShader.FragmentFromString(fragStr);
 	

@@ -45,12 +45,18 @@ struct EXPORTDLL AnimationFrame {
 	std::vector<glm::vec2> mTexCoords; // texture coordinates for the vertices in the shape
 	std::vector<glm::vec2> mTexCoordsExtra; // texture coordinates for the extra vertices added by triangulation
 	
-	float mLayer; // the layer of the source texture
+	unsigned int mLayer; // the layer of the source texture
 	glm::vec2 mMinST; // the top-left-most texture coord
 	glm::vec2 mMaxST; // the bottom-right-most texture coord
 };
 
 class EXPORTDLL Shape : public Polygon, public Renderable {
+	public :
+		enum class WrapMode: unsigned int {
+			Stretch = 0u,
+			Clip = 1u,
+			Repeat = 4u
+		};
 	public :
 		Shape() = default;
 		explicit Shape(const std::vector<Contour>& contours, const CoordinateSpace& coordinateSpace = CoordinateSpace::Local);
@@ -107,6 +113,9 @@ class EXPORTDLL Shape : public Polygon, public Renderable {
 		unsigned int GetCurrentFrame() const;
 		unsigned int GetFrameCount();
 		
+		void SetWrapMode(const Texture::Coordinate& coord, const WrapMode& mode);
+		WrapMode GetWrapMode(const Texture::Coordinate& coord) const;
+		
 		// transform the shape into the correct format for rendering
 		std::list<RenderBatchData> Upload();
 	private :
@@ -138,8 +147,10 @@ class EXPORTDLL Shape : public Polygon, public Renderable {
 		float mAnimationLimit = 0.0f; // limit of animation (essentially it's speed)
 		float mAnimationTimer = 0.0f; // timer before switching to next frame
 		int mAnimationLoopCount = 0; // how many times to loop the animation (-1 implies infinitely)
-		unsigned int mAnimationStartFrame = 0; // frame to begin the animation on
-		unsigned int mAnimationEndFrame = 0; // frame to end the animation on
+		unsigned int mAnimationStartFrame = 0u; // frame to begin the animation on
+		unsigned int mAnimationEndFrame = 0u; // frame to end the animation on
+		std::vector<WrapMode> mWrapModes = {WrapMode::Stretch, WrapMode::Stretch};
+		unsigned int mWrapModeBitmask = 0u;
 };
 }
 

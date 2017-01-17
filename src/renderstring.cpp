@@ -331,9 +331,20 @@ std::list<RenderBatchData> RenderString::Upload() {
 			for (unsigned int i = 0u; i < 4u; ++i) {
 				VBOVertex vert; // create vertex suitable for rendering
 				vert.mX = vertices.at(i).x + charShape.GetPosition().x; vert.mY = vertices.at(i).y + charShape.GetPosition().y;
-				vert.mNX = 0.0f; vert.mNY = 0.0f; vert.mNZ = 1.0f;
-				vert.mS = texCoords.at(i).x; vert.mT = 1.0f - texCoords.at(i).y; vert.mLayer = frame.mLayer;
-				vert.mType = 1.0f; vert.mExtra[0] = 1.0f; vert.mExtra[1] = 0.0f;
+				
+				vert.mNormal = 0u;
+				vert.mNormal = vert.mNormal | (0u << 30); // padding
+				vert.mNormal = vert.mNormal | (1023u << 20); // z
+				vert.mNormal = vert.mNormal | (0u << 10); // y
+				vert.mNormal = vert.mNormal | (0u << 0); // x
+				
+				vert.mS = texCoords.at(i).x * 65535u; vert.mT = (1.0f - texCoords.at(i).y) * 65535u;
+				
+				vert.mLWTT = 0u;
+				vert.mLWTT = vert.mLWTT | (1u << 30); // "is textured" flag
+				vert.mLWTT = vert.mLWTT | (1u << 20); // render type (shape)
+				vert.mLWTT = vert.mLWTT | (0u << 10); // wrap mode bit mask
+				vert.mLWTT = vert.mLWTT | (frame.mLayer << 0); // layer (z coordinate of texture coordinates)
 				
 				mRBDData.mVertexData.push_back(std::move(vert));
 			}
@@ -342,9 +353,20 @@ std::list<RenderBatchData> RenderString::Upload() {
 			for (unsigned int i = 0u; i < 4u; ++i) {
 				VBOVertex vert; // create vertex suitable for rendering
 				vert.mX = 0.0f; vert.mY = 0.0f;
-				vert.mNX = 0.0f; vert.mNY = 0.0f; vert.mNZ = 1.0f;
-				vert.mS = 0.0f; vert.mT = 1.0f; vert.mLayer = 0.0f;
-				vert.mType = 1.0f; vert.mExtra[0] = 1.0f; vert.mExtra[1] = 0.0f;
+				
+				vert.mNormal = 0u;
+				vert.mNormal = vert.mNormal | (0u << 30); // padding
+				vert.mNormal = vert.mNormal | (1023u << 20); // z
+				vert.mNormal = vert.mNormal | (0u << 10); // y
+				vert.mNormal = vert.mNormal | (0u << 0); // x
+				
+				vert.mS = 0u; vert.mT = 65535u;
+				
+				vert.mLWTT = 0u;
+				vert.mLWTT = vert.mLWTT | (1u << 30); // "is textured" flag
+				vert.mLWTT = vert.mLWTT | (1u << 20); // render type (shape)
+				vert.mLWTT = vert.mLWTT | (0u << 10); // wrap mode bit mask
+				vert.mLWTT = vert.mLWTT | (0u << 0); // layer (z coordinate of texture coordinates)
 				
 				mRBDData.mVertexData.push_back(std::move(vert));
 			}
@@ -376,7 +398,10 @@ std::list<RenderBatchData> RenderString::Upload() {
 	for (auto vertex = rbdList.back().mVertexData.begin(); vertex != rbdList.back().mVertexData.end(); ++vertex) {
 		glm::vec3 pos = transMat * glm::vec3(vertex->mX, vertex->mY, 1.0f); // get position of transformed vertex
 		vertex->mX = pos.x; vertex->mY = pos.y; vertex->mZ = mDepth; // set the position of the transformed character
-		vertex->mR = mColour.x; vertex->mG = mColour.y; vertex->mB = mColour.z; vertex->mA = mAlpha; // set the colour of the transformed character
+		
+		// set the colour of the transformed character
+		vertex->mR = mColour.x * 255u; vertex->mG = mColour.y * 255u;
+		vertex->mB = mColour.z * 255u; vertex->mA = mAlpha * 255u;
 	}
 	
 	rbdList.back().mShader = GetShader(); // update the shader used to render this render string

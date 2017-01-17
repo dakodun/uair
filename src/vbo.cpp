@@ -88,8 +88,8 @@ void swap(VBO& first, VBO& second) {
 }
 
 void VBO::AddData(const std::vector<VBOVertex>& vertData, const std::vector<VBOIndex>& indData) {
-	unsigned int min = std::numeric_limits<unsigned int>::max();
-	unsigned int max = 0u;
+	VBOIndex min = std::numeric_limits<VBOIndex>::max();
+	VBOIndex max = 0u;
 	
 	for (auto iter = indData.begin(); iter != indData.end(); ++iter) {
 		min = std::min(min, *iter);

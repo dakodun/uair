@@ -466,6 +466,19 @@ unsigned int Shape::GetFrameCount() {
 	return mFrames.size();
 }
 
+void Shape::SetWrapMode(const Texture::Coordinate& coord, const WrapMode& mode) {
+	unsigned int index = static_cast<unsigned int>(coord);
+	mWrapModes.at(index) = mode;
+	
+	mWrapModeBitmask = 0u | static_cast<unsigned int>(mWrapModes.at(0u)) |
+			(static_cast<unsigned int>(mWrapModes.at(1u)) * 2u);
+}
+
+Shape::WrapMode Shape::GetWrapMode(const Texture::Coordinate& coord) const {
+	unsigned int index = static_cast<unsigned int>(coord);
+	return mWrapModes.at(index);
+}
+
 std::list<RenderBatchData> Shape::Upload() {
 	RenderBatchData rbd; // rendering data struct
 	std::vector<unsigned int> vertCounts; // count of vertices in each contour
@@ -663,12 +676,27 @@ void Shape::CalculateTexCoords(const std::vector<glm::vec2>& points, const std::
 void Shape::CreateVBOVertices(RenderBatchData& batchData, const std::vector<glm::vec2>& vertices, std::vector<glm::vec2> texCoords,
 		std::vector<glm::vec4> colours) {
 	
-	float texAvailable = 0.0f; // is shape textured
-	float texLayer = 0.0f; // layer of current frame texture
+	GLubyte texAvailable = 0u; // is shape textured
+	GLushort texLayer = 0u; // layer of current frame texture
+	glm::vec2 minST(0.0f, 0.0f); // the top left texture coordinate for the current frame
+	glm::vec2 maxST(1.0f, 1.0f); // the bottom right texture coordinate for the current frame
+	glm::vec2 textureSize(0.0f, 0.0f); // the size of the texture for the current frame
 	
 	if (mCurrentFrame < mFrames.size()) { // if shape is textured...
-		texAvailable = 1.0f; // shape is textured
-		texLayer = mFrames.at(mCurrentFrame).mLayer; // store layer of current frame texture
+		AnimationFrame& frame = mFrames.at(mCurrentFrame);
+		
+		texAvailable = 1u; // shape is textured
+		texLayer = std::min(frame.mLayer, 65535u); // store layer of current frame texture
+		minST.x = std::min(frame.mMinST.x, 1.0f); minST.y = std::min(frame.mMinST.y, 1.0f);
+		maxST.x = std::min(frame.mMaxST.x, 1.0f); maxST.y = std::min(frame.mMaxST.y, 1.0f);
+		
+		if (frame.mTexture) { // if the current frame has a valid texture...
+			// calculate the size of the texture for the uccrent frame by
+			// multiplying the total size of the texture by the texture coords
+			// (max - min) implies the rect representing the frame
+			textureSize.x = frame.mTexture->GetWidth() * (maxST.x - minST.x);
+			textureSize.y = frame.mTexture->GetHeight() * (maxST.y - minST.y);
+		}
 	}
 	
 	int difference = vertices.size() - texCoords.size(); // difference in count of texture coords
@@ -684,10 +712,48 @@ void Shape::CreateVBOVertices(RenderBatchData& batchData, const std::vector<glm:
 	for (unsigned int i = 0; i < vertices.size(); ++i) { // for all vertices...
 		VBOVertex vert; // create vertex suitable for rendering
 		vert.mX = vertices.at(i).x; vert.mY = vertices.at(i).y; vert.mZ = mDepth;
-		vert.mNX = 0.0f; vert.mNY = 0.0f; vert.mNZ = 1.0f;
-		vert.mS = texCoords.at(i).x; vert.mT = 1.0f - texCoords.at(i).y; vert.mLayer = texLayer;
-		vert.mR = colours.at(i).x; vert.mG = colours.at(i).y; vert.mB = colours.at(i).z; vert.mA = colours.at(i).w;
-		vert.mType = 0.0f; vert.mExtra[0] = texAvailable; vert.mExtra[1] = 0.0f;
+		
+		vert.mNormal = 0u;
+		vert.mNormal = vert.mNormal | (0u << 30); // padding
+		vert.mNormal = vert.mNormal | (1023u << 20); // z
+		vert.mNormal = vert.mNormal | (0u << 10); // y
+		vert.mNormal = vert.mNormal | (0u << 0); // x
+		
+		vert.mS = texCoords.at(i).x * 65535u; vert.mT = (1.0f - texCoords.at(i).y) * 65535u;
+		
+		vert.mLWTT = 0u;
+		vert.mLWTT = vert.mLWTT | (texAvailable << 30); // "is textured" flag
+		vert.mLWTT = vert.mLWTT | (0u << 20); // render type (shape)
+		vert.mLWTT = vert.mLWTT | (mWrapModeBitmask << 10); // wrap mode bit mask
+		vert.mLWTT = vert.mLWTT | (texLayer << 0); // layer (z coordinate of texture coordinates)
+		
+		vert.mMinS = minST.x * 65535u; vert.mMinT = minST.y * 65535u;
+		vert.mMaxS = maxST.x * 65535u; vert.mMaxT = maxST.y * 65535u;
+		
+		vert.mR = colours.at(i).x * 255u; vert.mG = colours.at(i).y * 255u;
+		vert.mB = colours.at(i).z * 255u; vert.mA = colours.at(i).w * 255u;
+		
+		glm::vec2 scale(0.0f, 0.0f);
+		if (textureSize.x != 0 && textureSize.y != 0 &&
+				maxST.x - minST.x != 0 && maxST.y - minST.y != 0) { // if texture and coordinates are valid...
+			
+			// caluclate the size of the shape (local bounding box)
+			glm::vec2 shapeSize;
+			std::vector<glm::vec2> bbox = GetLocalBoundingBox();
+			if (bbox.size() == 4) {
+				shapeSize = bbox.at(2) - bbox.at(0);
+			}
+			
+			// rescale the maximum t texture coordinate
+			glm::vec2 newMax(maxST.x * (shapeSize.x / textureSize.x),
+					maxST.y * (shapeSize.y / textureSize.y));
+			
+			// calculate the scale factor to move texture coordinates into the new range
+			scale = glm::vec2((newMax.x - minST.x) / (maxST.x - minST.x),
+					(newMax.y - minST.y) / (maxST.y - minST.y));
+		}
+		
+		vert.mScaleS = scale.x; vert.mScaleT = scale.y;
 		
 		batchData.mVertexData.push_back(vert); // add rendering vertex to rendering data
 	}

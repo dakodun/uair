@@ -43,12 +43,13 @@ class FBO;
 typedef unsigned int VBOIndex;
 
 struct EXPORTDLL VBOVertex {
-	float mX, mY, mZ;
-	float mNX, mNY, mNZ;
-	float mS, mT, mLayer;
-	float mR, mG, mB, mA;
-	float mType;
-	float mExtra[2];
+	GLfloat mX, mY, mZ; // vertex position (3 4-byte values)
+	GLuint mNormal; // vertex normal (with padding) (1 4-byte)
+	GLushort mS, mT; // texture coordinates (2 2-byte values (1 4-byte))
+	GLuint mLWTT; // texture layer, wrap mode, render type and "is textured" flag (1 4-byte)
+	GLushort mMinS, mMinT, mMaxS, mMaxT; // texture coordinate bounds (4 2-byte values (2 4-byte))
+	GLubyte mR, mG, mB, mA; // colour and alpha values (4 1-byte values (1 4-byte))
+	GLfloat mScaleS, mScaleT; // shape to texture scale (2 4-byte values)
 };
 
 class EXPORTDLL VBO {

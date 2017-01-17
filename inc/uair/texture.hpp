@@ -40,13 +40,18 @@ class FBO;
 class EXPORTDLL Texture : public Resource {
 	public :
 		struct LayerData { // data relating to an individual layer in a texture array
-			unsigned int mWidth; // the width of the layer without padding
-			unsigned int mHeight; // the height of the layer without padding
+			unsigned int mWidth; // the width of the layer excluding padding
+			unsigned int mHeight; // the height of the layer excluding padding
 			
-			float mSMax; // the max s coordinate without padding
-			float mTMax; // the max t coordinate without padding
+			float mSMax; // the max s coordinate excluding padding
+			float mTMax; // the max t coordinate excluding padding
 		};
 		
+		enum class Coordinate: unsigned int {
+			S = 0u,
+			T
+		};
+	public :
 		Texture() = default;
 		Texture(const Texture& other) = delete;
 		Texture(Texture&& other);

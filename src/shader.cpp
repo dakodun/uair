@@ -197,13 +197,15 @@ void Shader::VAOCallback() {
 	glEnableVertexAttribArray(3);
 	glEnableVertexAttribArray(4);
 	glEnableVertexAttribArray(5);
+	glEnableVertexAttribArray(6);
 	
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, sizeof(VBOVertex), (void*)(offsetof(VBOVertex, mX)));
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, sizeof(VBOVertex), (void*)(offsetof(VBOVertex, mNX)));
-	glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE, sizeof(VBOVertex), (void*)(offsetof(VBOVertex, mR)));
-	glVertexAttribPointer(3, 3, GL_FLOAT, GL_TRUE, sizeof(VBOVertex), (void*)(offsetof(VBOVertex, mS)));
-	glVertexAttribPointer(4, 1, GL_FLOAT, GL_TRUE, sizeof(VBOVertex), (void*)(offsetof(VBOVertex, mType)));
-	glVertexAttribPointer(5, 2, GL_FLOAT, GL_TRUE, sizeof(VBOVertex), (void*)(offsetof(VBOVertex, mExtra)));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VBOVertex), (void*)(offsetof(VBOVertex, mX)));
+	glVertexAttribPointer(1, GL_BGRA, GL_UNSIGNED_INT_2_10_10_10_REV, GL_TRUE, sizeof(VBOVertex), (void*)(offsetof(VBOVertex, mNormal)));
+	glVertexAttribPointer(2, 2, GL_UNSIGNED_SHORT, GL_TRUE, sizeof(VBOVertex), (void*)(offsetof(VBOVertex, mS)));
+	glVertexAttribPointer(3, 4, GL_UNSIGNED_INT_2_10_10_10_REV, GL_FALSE, sizeof(VBOVertex), (void*)(offsetof(VBOVertex, mLWTT)));
+	glVertexAttribPointer(4, 4, GL_UNSIGNED_SHORT, GL_TRUE, sizeof(VBOVertex), (void*)(offsetof(VBOVertex, mMinS)));
+	glVertexAttribPointer(5, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(VBOVertex), (void*)(offsetof(VBOVertex, mR)));
+	glVertexAttribPointer(6, 2, GL_FLOAT, GL_FALSE, sizeof(VBOVertex), (void*)(offsetof(VBOVertex, mScaleS)));
 }
 
 void Shader::RenderCallback() {
