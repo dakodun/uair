@@ -63,7 +63,7 @@ class EXPORTDLL GUIButton : public GUIButtonBase {
 			glm::vec3 mButtonColourTop; // the colour of the top (dynamic) part of the button
 			glm::vec3 mButtonColourBase; // the colour of the bottom (drop shadow) of the button
 			
-			ResourcePtr<Font> mFont; // a pointer to the font used to draw the text on the button
+			ResourcePtr<FontBase> mFont; // a pointer to the font used to draw the text on the button
 			std::u16string mText; // the string associated with the text drawn on the button
 			unsigned int mTextSize; // the size of the text drawn on the button
 			glm::vec3 mTextColour; // the colour of the text drawn on the button

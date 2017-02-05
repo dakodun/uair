@@ -33,7 +33,7 @@
 #include "renderable.hpp"
 #include "renderbatch.hpp"
 #include "resourceptr.hpp"
-#include "font.hpp"
+#include "sdffont.hpp"
 #include "vbo.hpp"
 
 namespace uair {
@@ -56,13 +56,13 @@ class EXPORTDLL RenderString : public Transformable2D, public Renderable {
 	
 	public :
 		RenderString() = default;
-		RenderString(ResourcePtr<Font> font, const unsigned int& size, const std::u16string& text = u"");
-		RenderString(Font* font, const unsigned int& size, const std::u16string& text = u"");
+		RenderString(ResourcePtr<FontBase> font, const unsigned int& size, const std::u16string& text = u"");
+		RenderString(FontBase* font, const unsigned int& size, const std::u16string& text = u"");
 		
 		std::string GetTag() const;
 		
-		void SetFont(ResourcePtr<Font> font); // set the font from a resource pointer
-		void SetFont(Font* font); // set the font from a raw pointer
+		void SetFont(ResourcePtr<FontBase> font); // set the font from a resource pointer
+		void SetFont(FontBase* font); // set the font from a raw pointer
 		void SetText(const std::u16string& newText); // change the string completely
 		void AddText(const std::u16string& newText); // add a string to the end of the existing string
 		void AddText(const char16_t& newChar); // add a character to the end of the existing string
@@ -80,7 +80,7 @@ class EXPORTDLL RenderString : public Transformable2D, public Renderable {
 		void CreateRenderCharacters(const std::u16string& newString);
 	
 	private :
-		ResourcePtr<Font> mFont; // the font associated with this render string
+		ResourcePtr<FontBase> mFont; // the font associated with this render string
 		unsigned int mSize = 1u; // the size the string is to be rendered at
 		std::u16string mString = u""; // the content of the render string
 		
@@ -97,6 +97,7 @@ class EXPORTDLL RenderString : public Transformable2D, public Renderable {
 		
 		unsigned int mCharsRendered = 0u; // the number of characters in the renderstring that have been rendered
 		RenderBatchData mRBDData; // untransformed data for the renderbatch that is used to draw this renderstring
+		unsigned int mFontType = 0u;
 };
 }
 

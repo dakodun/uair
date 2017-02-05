@@ -27,7 +27,7 @@
 
 #include "guibutton.hpp"
 
-#include "font.hpp"
+#include "fontbase.hpp"
 #include "renderbatch.hpp"
 #include "windowmessages.hpp"
 

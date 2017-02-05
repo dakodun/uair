@@ -31,6 +31,7 @@
 
 #include "openglstates.hpp"
 #include "shape.hpp"
+#include "sdffont.hpp"
 #include "font.hpp"
 #include "soundbuffer.hpp"
 #include "gui.hpp"
@@ -43,6 +44,7 @@ Game::Game() {
 	
 	try {
 		RegisterResourceType<Texture>();
+		RegisterResourceType<SDFFont>();
 		RegisterResourceType<Font>();
 		RegisterResourceType<RenderBuffer>();
 		RegisterResourceType<Shader>();
@@ -56,7 +58,7 @@ Game::Game() {
 		std::cout << "unable to initiate the freetype2 library: " << ftError << std::endl;
 	}
 	
-	Font::mFTLibraryPtr = &mFTLibrary; // set the freetype library used by the font class to the newly initialised one
+	FontBase::mFTLibraryPtr = &mFTLibrary; // set the freetype library used by the font class to the newly initialised one
 	GUI::mInputManagerPtr = mInputManager;
 	GUI::mMessageQueuePtr = &mMessageQueue;
 }

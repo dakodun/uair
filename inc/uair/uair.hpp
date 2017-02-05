@@ -52,6 +52,7 @@
 #include "transformable3d.hpp"
 #include "triangulate.hpp"
 
+#include "sdffont.hpp"
 #include "font.hpp"
 #include "signeddistancefield.hpp"
 #include "renderbatch.hpp"

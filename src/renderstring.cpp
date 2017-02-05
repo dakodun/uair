@@ -35,7 +35,7 @@
 #include "shape.hpp"
 
 namespace uair {
-RenderString::RenderString(ResourcePtr<Font> font, const unsigned int& size, const std::u16string& text) :
+RenderString::RenderString(ResourcePtr<FontBase> font, const unsigned int& size, const std::u16string& text) :
 		mFont(font), mSize(size), mAppendString(text) {
 	
 	if (mFont) { // if we have a valid font...
@@ -43,6 +43,8 @@ RenderString::RenderString(ResourcePtr<Font> font, const unsigned int& size, con
 		
 		float fontSize = static_cast<float>(mFont->GetFontSize()); // get the size of the font
 		mTextScale = glm::vec2(mSize / fontSize, mSize / fontSize); // calculate the scale factor for the render string
+		
+		mFontType = mFont->GetType();
 	}
 	
 	UpdateRenderString(); // ensure all characters are ready to be rendered
@@ -50,7 +52,7 @@ RenderString::RenderString(ResourcePtr<Font> font, const unsigned int& size, con
 	mRBDData.mTag = GetTag(); // update the tag of the batch data
 }
 
-RenderString::RenderString(Font* font, const unsigned int& size, const std::u16string& text) : mSize(size),
+RenderString::RenderString(FontBase* font, const unsigned int& size, const std::u16string& text) : mSize(size),
 		mAppendString(text) {
 	
 	mFont.Set(font); // set the resource pointer
@@ -60,6 +62,8 @@ RenderString::RenderString(Font* font, const unsigned int& size, const std::u16s
 		
 		float fontSize = static_cast<float>(mFont->GetFontSize()); // get the size of the font
 		mTextScale = glm::vec2(mSize / fontSize, mSize / fontSize); // calculate the scale factor for the render string
+		
+		mFontType = mFont->GetType();
 	}
 	
 	UpdateRenderString(); // ensure all characters are ready to be rendered
@@ -71,7 +75,7 @@ std::string RenderString::GetTag() const {
 	return "RenderString";
 }
 
-void RenderString::SetFont(ResourcePtr<Font> font) {
+void RenderString::SetFont(ResourcePtr<FontBase> font) {
 	mFont = font; // update the renderstring's font
 	
 	if (mFont) { // if we have a valid font...
@@ -79,6 +83,8 @@ void RenderString::SetFont(ResourcePtr<Font> font) {
 		
 		float fontSize = static_cast<float>(mFont->GetFontSize()); // get the size of the font
 		mTextScale = glm::vec2(mSize / fontSize, mSize / fontSize); // calculate the scale factor for the render string
+		
+		mFontType = mFont->GetType();
 	}
 	
 	// set the entire string as the string to be appended (to ensure all render characters are recreated)
@@ -101,7 +107,7 @@ void RenderString::SetFont(ResourcePtr<Font> font) {
 	mRBDData.mIndexData.clear();
 }
 
-void RenderString::SetFont(Font* font) {
+void RenderString::SetFont(FontBase* font) {
 	mFont.Set(font); // update the renderstring's font
 	
 	if (mFont) { // if we have a valid font...
@@ -109,6 +115,8 @@ void RenderString::SetFont(Font* font) {
 		
 		float fontSize = static_cast<float>(mFont->GetFontSize()); // get the size of the font
 		mTextScale = glm::vec2(mSize / fontSize, mSize / fontSize); // calculate the scale factor for the render string
+		
+		mFontType = mFont->GetType();
 	}
 	
 	// set the entire string as the string to be appended (to ensure all render characters are recreated)
@@ -342,7 +350,7 @@ std::list<RenderBatchData> RenderString::Upload() {
 				
 				vert.mLWTT = 0u;
 				vert.mLWTT = vert.mLWTT | (1u << 30); // "is textured" flag
-				vert.mLWTT = vert.mLWTT | (1u << 20); // render type (shape)
+				vert.mLWTT = vert.mLWTT | (mFontType << 20); // render type (based on font type)
 				vert.mLWTT = vert.mLWTT | (0u << 10); // wrap mode bit mask
 				vert.mLWTT = vert.mLWTT | (frame.mLayer << 0); // layer (z coordinate of texture coordinates)
 				
@@ -364,7 +372,7 @@ std::list<RenderBatchData> RenderString::Upload() {
 				
 				vert.mLWTT = 0u;
 				vert.mLWTT = vert.mLWTT | (1u << 30); // "is textured" flag
-				vert.mLWTT = vert.mLWTT | (1u << 20); // render type (shape)
+				vert.mLWTT = vert.mLWTT | (mFontType << 20); // render type (based on font type)
 				vert.mLWTT = vert.mLWTT | (0u << 10); // wrap mode bit mask
 				vert.mLWTT = vert.mLWTT | (0u << 0); // layer (z coordinate of texture coordinates)
 				
@@ -463,7 +471,7 @@ void RenderString::CreateRenderCharacters(const std::u16string& newString) {
 			}
 			
 			try {
-				const Font::Glyph& glyph = mFont->GetGlyph(codePoint); // get the glyph object for the current character
+				const FontBase::Glyph& glyph = mFont->GetGlyph(codePoint); // get the glyph object for the current character
 				Shape shape = glyph.mBaseShape; // get the glyph shape from the glyph object
 				float height = 0.0f; // the height of the glyph shape used for positional offsetting
 				

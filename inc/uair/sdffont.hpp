@@ -25,22 +25,22 @@
 **		   source distribution.
 ** **************************************************************** */
 
-#ifndef UAIRFONT_HPP
-#define UAIRFONT_HPP
+#ifndef UAIRSDFFONT_HPP
+#define UAIRSDFFONT_HPP
 
 #include "fontbase.hpp"
 
 namespace uair {
-class EXPORTDLL Font : public FontBase {
+class EXPORTDLL SDFFont : public FontBase {
 	public :
-		Font();
-		Font(const unsigned int& textureSize);
-		Font(const Font& other) = delete;
-		Font(Font&& other);
+		SDFFont();
+		SDFFont(const unsigned int& textureSize);
+		SDFFont(const SDFFont& other) = delete;
+		SDFFont(SDFFont&& other);
 		
-		Font& operator=(Font other);
+		SDFFont& operator=(SDFFont other);
 		
-		friend void swap(Font& first, Font& second);
+		friend void swap(SDFFont& first, SDFFont& second);
 		
 		static unsigned int GetTypeID();
 		

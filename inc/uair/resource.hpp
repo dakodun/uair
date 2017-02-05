@@ -74,6 +74,7 @@ class EXPORTDLL Resource {
 typedef Manager<Resource>::Handle ResourceHandle;
 enum class Resources : unsigned int {
 	Texture = 1u,
+	SDFFont,
 	Font,
 	RenderBuffer,
 	Shader,

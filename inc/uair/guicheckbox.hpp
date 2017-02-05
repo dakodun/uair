@@ -61,7 +61,7 @@ class EXPORTDLL GUICheckBox : public GUIButtonBase {
 			unsigned int mSize;
 			glm::vec3 mInputColour;
 			
-			ResourcePtr<Font> mFont;
+			ResourcePtr<FontBase> mFont;
 			unsigned int mTextSize;
 			std::u16string mLabelText;
 			

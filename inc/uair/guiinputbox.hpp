@@ -63,7 +63,7 @@ class EXPORTDLL GUIInputBox : public GUIInputBoxBase {
 			unsigned int mHeight; // the height of the input box
 			glm::vec3 mInputColour; // the colour of the input box's base
 			
-			ResourcePtr<Font> mFont; // a pointer to the font used to draw the text in the input box
+			ResourcePtr<FontBase> mFont; // a pointer to the font used to draw the text in the input box
 			unsigned int mTextSize; // the size of the text in the input box
 			std::u16string mDefaultText; // the starting text in the input box
 			

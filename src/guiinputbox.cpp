@@ -27,7 +27,7 @@
 
 #include "guiinputbox.hpp"
 
-#include "font.hpp"
+#include "fontbase.hpp"
 #include "openglstates.hpp"
 #include "renderbatch.hpp"
 #include "windowmessages.hpp"

@@ -32,8 +32,6 @@
 #include "gui.hpp"
 
 namespace uair {
-class Font;
-
 class EXPORTDLL GUIButtonBase : public GUIElement {
 	public :
 		void HandleMessageQueue(const MessageQueue::Entry& e, GUI* caller = nullptr);
