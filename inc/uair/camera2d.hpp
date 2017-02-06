@@ -45,18 +45,21 @@ class EXPORTDLL Camera2D {
 		float GetRotation() const;
 		void SetScale(const float& scale);
 		float GetScale() const;
+		void SetOrigin(const glm::vec2& origin);
+		glm::vec2 GetOrigin() const;
 		
-		glm::mat4 GetMatrix(const unsigned int& width, const unsigned int& height);
+		glm::mat4 GetMatrix();
 	
 	public :
 		bool mUpdate = true;
-		unsigned int mWidth = 0u;
-		unsigned int mHeight = 0u;
+		unsigned int mHalfWidth = 0u;
+		unsigned int mHalfHeight = 0u;
 		glm::mat4 mView;
 		
 		glm::vec2 mPosition;
 		float mRotation = 0.0f;
 		float mScale = 1.0f;
+		glm::vec2 mOrigin;
 };
 }
 

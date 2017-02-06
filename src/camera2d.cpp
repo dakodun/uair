@@ -71,7 +71,10 @@ glm::vec2 Camera2D::GetPosition() const {
 }
 
 void Camera2D::SetRotation(const float& rotation) {
-	mRotation = rotation;
+	if (!util::CompareFloats(mRotation, util::Equals, rotation)) { // if the new rotation differs from the old...
+		mRotation = rotation;
+		mUpdate = true; // indicate a view matrix update is required
+	}
 }
 
 float Camera2D::GetRotation() const {
@@ -79,26 +82,40 @@ float Camera2D::GetRotation() const {
 }
 
 void Camera2D::SetScale(const float& scale) {
-	mScale = scale;
+	if (!util::CompareFloats(mScale, util::Equals, scale)) { // if the new scale differs from the old...
+		mScale = scale;
+		mUpdate = true; // indicate a view matrix update is required
+	}
 }
 
 float Camera2D::GetScale() const {
 	return mScale;
 }
 
-glm::mat4 Camera2D::GetMatrix(const unsigned int& width, const unsigned int& height) {
-	if (mUpdate || (width != mWidth || height != mHeight)) {
-		mWidth = width;
-		mHeight = height;
+void Camera2D::SetOrigin(const glm::vec2& origin) {
+	// if the new origin differs from the old...
+	if (!util::CompareFloats(mOrigin.x, util::Equals, origin.x) &&
+			!util::CompareFloats(mOrigin.y, util::Equals, origin.y)) {
 		
+		mOrigin = origin;
+		mUpdate = true; // indicate a view matrix update is required
+	}
+}
+
+glm::vec2 Camera2D::GetOrigin() const {
+	return mOrigin;
+}
+
+glm::mat4 Camera2D::GetMatrix() {
+	if (mUpdate) {
 		glm::mat3 mat(1.0f,        0.0f, 0.0f,
 					  0.0f,        1.0f, 0.0f,
 			   mPosition.x, mPosition.y, 1.0f);
 		
-		mat *= util::GetTranslationMatrix(glm::vec2(mWidth - mPosition.x, mHeight - mPosition.y));
+		mat *= util::GetTranslationMatrix(glm::vec2(mOrigin.x - mPosition.x, mOrigin.y - mPosition.y));
 		mat *= util::GetRotationMatrix(mRotation);
 		mat *= util::GetScalingMatrix(glm::vec2(mScale, mScale));
-		mat *= util::GetTranslationMatrix(glm::vec2(-(mWidth - mPosition.x), -(mHeight - mPosition.y)));
+		mat *= util::GetTranslationMatrix(glm::vec2(-(mOrigin.x - mPosition.x), -(mOrigin.y - mPosition.y)));
 		
 		mView = glm::mat4(mat[0][0], mat[0][1], 0.0f, mat[0][2],
 						  mat[1][0], mat[1][1], 0.0f, mat[1][2],
