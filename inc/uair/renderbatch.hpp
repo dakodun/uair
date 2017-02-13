@@ -73,13 +73,17 @@ class EXPORTDLL RenderBatch {
 		void Upload(); // upload the batch to vbo
 		void Draw(const unsigned int& pass = 0u); // draw the specified pass to the default framebuffer
 		void Draw(const FBO& fbo, const unsigned int& pass); // draw the specified pass to the specified framebuffer
+		void Clear();
+		
+		unsigned int GetCount() const;
 	private :
 		static bool RenderDataSort(const RenderBatchData& first, const RenderBatchData& second);
 	
 	private :
 		std::vector<RenderBatchData> mRenderData; // holds the data to be rendered for each pass
-		
 		VBO mVBO; // vertex buffer object (vbo) used for rendering
+		
+		unsigned int mCount = 0u;
 };
 }
 

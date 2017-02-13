@@ -87,6 +87,16 @@ void swap(VBO& first, VBO& second) {
 	std::swap(first.mVAOStore, second.mVAOStore);
 }
 
+void VBO::Initialise() {
+	if (mVertVBOID == 0) {
+		glGenBuffers(1, &mVertVBOID);
+	}
+	
+	if (mIndVBOID == 0) {
+		glGenBuffers(1, &mIndVBOID);
+	}
+}
+
 void VBO::AddData(const std::vector<VBOVertex>& vertData, const std::vector<VBOIndex>& indData) {
 	VBOIndex min = std::numeric_limits<VBOIndex>::max();
 	VBOIndex max = 0u;
@@ -153,14 +163,17 @@ void VBO::Draw(const FBO& fbo, const unsigned int& pass) {
 	Draw(fbo.GetFBOID(), pass);
 }
 
-void VBO::Initialise() {
-	if (mVertVBOID == 0) {
-		glGenBuffers(1, &mVertVBOID);
-	}
+void VBO::Clear() {
+	Initialise(); // ensure buffers have been generated
 	
-	if (mIndVBOID == 0) {
-		glGenBuffers(1, &mIndVBOID);
-	}
+	OpenGLStates::BindVertexArray(0); // ensure no VAO is bound before we modify buffers
+	OpenGLStates::BindArrayBuffer(mVertVBOID); // bind the vertex buffer
+	glBufferData(GL_ARRAY_BUFFER, mMinimumSize * 1048576u, NULL, mType); // initialise the buffer's store
+	
+	OpenGLStates::BindElementArrayBuffer(mIndVBOID);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, mMinimumSize * 1048576u, NULL, mType);
+	
+	mSegmentInfo.clear(); // clear any existing segment info from previous data adds
 }
 
 void VBO::Draw(const unsigned int& targetID, const unsigned int& pass) {

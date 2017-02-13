@@ -44,6 +44,7 @@ void RenderBatch::Add(Renderable& renderable, const unsigned int& pass) {
 		
 		iter->mPass = pass; // set the pass that the data is to be rendered on
 		mRenderData.push_back(*iter); // add the data to the array
+		++mCount;
 	}
 }
 
@@ -55,6 +56,7 @@ void RenderBatch::Add(std::list<RenderBatchData> rbd, const unsigned int& pass) 
 		
 		iter->mPass = pass; // set the pass that the data is to be rendered on
 		mRenderData.push_back(*iter); // add the data to the array
+		++mCount;
 	}
 }
 
@@ -133,6 +135,7 @@ void RenderBatch::Upload() {
 		
 		mVBO.AddData(vertices, indices, segments); // add the vertices, indices and segment data to the vbo
 		mRenderData.clear(); // clear batch data containers
+		mCount = 0u;
 	}
 }
 
@@ -142,6 +145,14 @@ void RenderBatch::Draw(const unsigned int& pass) {
 
 void RenderBatch::Draw(const FBO& fbo, const unsigned int& pass) {
 	mVBO.Draw(fbo, pass); // draw the vbo
+}
+
+void RenderBatch::Clear() {
+	mVBO.Clear();
+}
+
+unsigned int RenderBatch::GetCount() const {
+	return mCount;
 }
 
 bool RenderBatch::RenderDataSort(const RenderBatchData& first, const RenderBatchData& second) {

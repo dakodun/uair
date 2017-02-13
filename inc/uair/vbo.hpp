@@ -69,6 +69,7 @@ class EXPORTDLL VBO {
 		void AddData(const std::vector<VBOVertex>& vertData, const std::vector<VBOIndex>& indData, const std::vector<Segment>& segments);
 		void Draw(const unsigned int& pass = 0u);
 		void Draw(const FBO& fbo, const unsigned int& pass = 0u);
+		void Clear();
 	private :
 		void Draw(const unsigned int& targetID, const unsigned int& pass);
 	
