@@ -64,6 +64,9 @@ FontBase::FontBase(const unsigned int& textureSize, const glm::uvec2& texColour)
 	mTexture.AddFromMemory(textureData, mTextureSize, mTextureSize); // add the new layer to the font's texture
 	mTexture.CreateTexture();
 	
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	
 	mRenderBuffer.CreateRenderBuffer(GL_DEPTH24_STENCIL8, mTextureSize, mTextureSize); // create the associated render buffer
 	
 	// bind the fbo, attach the render buffer and map the draw buffers
@@ -410,7 +413,6 @@ bool FontBase::LoadFromFile(const std::string& filename, const unsigned int& poi
 	}
 	
 	mFontSize = std::max(1u, pointSize); // ensure font size is at least 1
-	mLineHeight = mFTFace->size->metrics.height >> 9;
 	
 	return SetSize(mFontSize);
 }
@@ -442,7 +444,7 @@ void FontBase::LoadGlyphs(const std::vector<char16_t>& charCodes) {
 	}
 }
 
-FontBase::Glyph FontBase::GetGlyph(const char16_t& codePoint) {
+const FontBase::Glyph& FontBase::GetGlyph(const char16_t& codePoint) const {
 	auto result = mGlyphs.find(codePoint); // search the map for the character code
 	
 	if (result != mGlyphs.end()) { // if the character code exists in the map...

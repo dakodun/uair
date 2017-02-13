@@ -81,7 +81,7 @@ class EXPORTDLL FontBase : public Resource {
 		void LoadGlyph(const char16_t& charCode); // load a single glyph from the font file and add it to the store (and texture)
 		void LoadGlyphs(const std::vector<char16_t>& charCodes); // load a group of glyphs from the font file and add them to the store (and texture)
 		
-		Glyph GetGlyph(const char16_t& codePoint); // return the glyph object corresponding to a character
+		const Glyph& GetGlyph(const char16_t& codePoint) const; // return the glyph object corresponding to a character
 		int GetKerning(const char16_t& firstCodePoint, const char16_t& secondCodePoint); // return the kerning value between two characters
 		
 		unsigned int GetFontSize() const; // return the base size of the font

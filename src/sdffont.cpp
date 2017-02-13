@@ -110,6 +110,8 @@ bool SDFFont::SetSize(const unsigned int& fontSize) {
 		return false; // return failure
 	}
 	
+	mLineHeight = mFTFace->size->metrics.height >> 9;
+	
 	return true;
 }
 

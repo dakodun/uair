@@ -442,7 +442,7 @@ void RenderString::UpdateRenderString() {
 void RenderString::CreateRenderCharacters(const std::u16string& newString) {
 	if (!newString.empty() && mFont) {
 		int advanceAccum = 0; // the accumulated horizontal advance for the current line
-		int kemingAccum = 0; // the accumulated kerning offset for the current line
+		int kerningAccum = 0; // the accumulated kerning offset for the current line
 		int lineOffset = 0; // the vertical offset of the current line
 		int lineHeight = mFont->GetLineHeight(); // retrieve and store the new line offset
 		
@@ -453,10 +453,10 @@ void RenderString::CreateRenderCharacters(const std::u16string& newString) {
 			else {
 				// laod the states of the accumulators from the previous characters entered
 				advanceAccum = mRenderChars.back().mAdvanceAccum;
-				kemingAccum = mRenderChars.back().mKemingAccum;
+				kerningAccum = mRenderChars.back().mKerningAccum;
 				lineOffset = mRenderChars.back().mLineHeight;
 				
-				kemingAccum += mFont->GetKerning(mString.back(), newString.front()); // adjust the kerning offset for the new character
+				kerningAccum += mFont->GetKerning(mString.back(), newString.front()); // adjust the kerning offset for the new character
 			}
 		}
 		
@@ -465,7 +465,7 @@ void RenderString::CreateRenderCharacters(const std::u16string& newString) {
 			
 			if (codePoint == u'\n') { // if the current character is a new line...
 				advanceAccum = 0; // reset the horizontal advance
-				kemingAccum = 0; // reset the kerning offset
+				kerningAccum = 0; // reset the kerning offset
 				lineOffset += lineHeight; // increment the vertical offset by the new line height
 				continue; // go to the next character
 			}
@@ -482,7 +482,7 @@ void RenderString::CreateRenderCharacters(const std::u16string& newString) {
 					}
 				}
 				
-				shape.SetPosition(glm::vec2((advanceAccum + kemingAccum) + glyph.mBearing.x,
+				shape.SetPosition(glm::vec2((advanceAccum + kerningAccum) + glyph.mBearing.x,
 						(mFont->GetBearingMax().y - glyph.mBearing.y) - mFont->GetBearingMax().y)); // position the glyph shape
 				
 				{ // update the local bounding box
@@ -500,10 +500,10 @@ void RenderString::CreateRenderCharacters(const std::u16string& newString) {
 				
 				advanceAccum += glyph.mAdvance; // increment the horizontal advance accumulator by the current glyph's advance metric
 				if (i != newString.size() - 1) { // if this is not the final character in the string...
-					kemingAccum += mFont->GetKerning(codePoint, newString.at(i + 1)); // increment the kerning offset by the kerning value of this and the next character
+					kerningAccum += mFont->GetKerning(codePoint, newString.at(i + 1)); // increment the kerning offset by the kerning value of this and the next character
 				}
 				
-				mRenderChars.push_back({std::move(shape), advanceAccum, kemingAccum, lineOffset,
+				mRenderChars.push_back({std::move(shape), advanceAccum, kerningAccum, lineOffset,
 						mTopLeft, mBottomRight});
 			} catch(std::exception& e) {
 				std::cout << "unknown codepoint: " << codePoint << std::endl;

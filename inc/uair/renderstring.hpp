@@ -46,7 +46,7 @@ class EXPORTDLL RenderString : public Transformable2D, public Renderable {
 			
 			// store the state of the accumulators so we can work backwards through the string
 			int mAdvanceAccum;
-			int mKemingAccum;
+			int mKerningAccum;
 			int mLineHeight;
 			
 			// store the current bounds so we can recreate bounding boxes quickly

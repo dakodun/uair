@@ -109,6 +109,8 @@ bool Font::SetSize(const unsigned int& fontSize) {
 		return false; // return failure
 	}
 	
+	mLineHeight = mFTFace->size->metrics.height >> 6;
+	
 	return true;
 }
 
