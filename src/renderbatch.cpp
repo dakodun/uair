@@ -71,7 +71,7 @@ void RenderBatch::Upload() {
 		unsigned int min = std::numeric_limits<unsigned int>::max();
 		unsigned int max = 0u;
 		
-		std::sort(mRenderData.begin(), mRenderData.end(), RenderDataSort); // sort the data first by pass, then by shader id and finally by texture id
+		std::stable_sort(mRenderData.begin(), mRenderData.end(), RenderDataSort); // sort the data first by pass, then by shader id and finally by texture id
 		
 		unsigned int currentPass = mRenderData.at(0).mPass;
 		ResourcePtr<Shader> currentShader = mRenderData.at(0).mShader;

@@ -546,21 +546,27 @@ unsigned int Game::GetDeviceLinkID(const int& deviceID, const Device& control) c
 	return mInputManager->GetDeviceLinkID(deviceID, control);
 }
 
-void Game::RemoveResource(const ResourceHandle& handle) {
-	try {
-		mResourceManager.Remove(handle);
-	} catch (std::exception& e) {
-		throw;
+//
+	Manager<Resource>& Game::GetResourceManager() {
+		return mResourceManager;
 	}
-}
 
-void Game::RemoveResource(const std::string& name) {
-	try {
-		mResourceManager.Remove(name);
-	} catch (std::exception& e) {
-		throw;
+	void Game::RemoveResource(const ResourceHandle& handle) {
+		try {
+			mResourceManager.Remove(handle);
+		} catch (std::exception& e) {
+			throw;
+		}
 	}
-}
+
+	void Game::RemoveResource(const std::string& name) {
+		try {
+			mResourceManager.Remove(name);
+		} catch (std::exception& e) {
+			throw;
+		}
+	}
+//
 
 void Game::HandleMessageQueue(const MessageQueue::Entry& e) {
 	using namespace WindowMessage;

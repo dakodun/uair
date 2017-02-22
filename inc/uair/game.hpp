@@ -70,90 +70,96 @@ class EXPORTDLL Game {
 		void CreateDefaultShader();
 		
 		// scene manager related helper functions
-		SceneManagerPtr GetSceneManager();
-		bool RequestSceneChange(Scene* newScene, const bool & restore = true);
-		bool CurrentSceneExists();
-		bool NextSceneExists();
-		ScenePtr GetCurrentScene();
-		ScenePtr GetNextScene();
-		
-		template<typename T>
-		std::shared_ptr<T> GetCurrentSceneCast() {
-			try {
-				return CastScene<T>(GetCurrentScene());
-			} catch(...) {
-				throw;
+			SceneManagerPtr GetSceneManager();
+			bool RequestSceneChange(Scene* newScene, const bool & restore = true);
+			bool CurrentSceneExists();
+			bool NextSceneExists();
+			ScenePtr GetCurrentScene();
+			ScenePtr GetNextScene();
+			
+			template<typename T>
+			std::shared_ptr<T> GetCurrentSceneCast() {
+				try {
+					return CastScene<T>(GetCurrentScene());
+				} catch(...) {
+					throw;
+				}
 			}
-		}
-		
-		template<typename T>
-		std::shared_ptr<T> GetNextSceneCast() {
-			try {
-				return CastScene<T>(GetNextScene());
-			} catch(...) {
-				throw;
+			
+			template<typename T>
+			std::shared_ptr<T> GetNextSceneCast() {
+				try {
+					return CastScene<T>(GetNextScene());
+				} catch(...) {
+					throw;
+				}
 			}
-		}
-		
-		template<typename T>
-		std::shared_ptr<T> CastScene(ScenePtr scenePtr) {
-			try {
-				return mSceneManager->CastScene<T>(scenePtr);
-			} catch (...) {
-				throw;
+			
+			template<typename T>
+			std::shared_ptr<T> CastScene(ScenePtr scenePtr) {
+				try {
+					return mSceneManager->CastScene<T>(scenePtr);
+				} catch (...) {
+					throw;
+				}
 			}
-		}
+		//
 		
 		// input manager related helper functions
-		InputManagerPtr GetInputManager();
-		bool GetKeyboardDown(const Keyboard & key) const;
-		bool GetKeyboardPressed(const Keyboard & key) const;
-		bool GetKeyboardReleased(const Keyboard & key) const;
-		unsigned int GetKeyboardState(const Keyboard& key) const;
-		std::u16string GetInputString() const;
-		bool GetMouseDown(const Mouse & button) const;
-		bool GetMousePressed(const Mouse & button) const;
-		bool GetMouseReleased(const Mouse & button) const;
-		unsigned int GetMouseState(const Mouse& button) const;
-		int GetMouseWheel() const;
-		void SetMouseCoords(const glm::ivec2& newCoords, const CoordinateSpace& coordinateSpace = CoordinateSpace::Local);
-		glm::ivec2 GetMouseCoords(const CoordinateSpace& coordinateSpace = CoordinateSpace::Local) const;
-		bool DeviceExists(const int& deviceID) const;
-		const InputManager::InputDevice& GetDevice(const int& deviceID) const;
-		unsigned int GetDeviceButtonCount(const int& deviceID) const;
-		bool GetDeviceButtonDown(const int& deviceID, const unsigned int& button) const;
-		bool GetDeviceButtonPressed(const int& deviceID, const unsigned int& button) const;
-		bool GetDeviceButtonReleased(const int& deviceID, const unsigned int& button) const;
-		unsigned int GetDeviceButtonState(const int& deviceID, const unsigned int& button) const;
-		unsigned int GetDeviceControlCount(const int& deviceID) const;
-		bool DeviceHasControl(const int& deviceID, const Device& control) const;
-		int GetDeviceControl(const int& deviceID, const Device& control) const;
-		int GetDeviceControlScaled(const int& deviceID, const Device& control, std::pair<int, int> range = std::make_pair(0, 255)) const;
-		std::pair<int, int> GetDeviceControlRange(const int& deviceID, const Device& control) const;
-		std::vector<Device> GetDeviceLinkedDevices(const int& deviceID, const unsigned int& collectionID) const;
-		unsigned int GetDeviceLinkID(const int& deviceID, const Device& control) const;
+			InputManagerPtr GetInputManager();
+			bool GetKeyboardDown(const Keyboard & key) const;
+			bool GetKeyboardPressed(const Keyboard & key) const;
+			bool GetKeyboardReleased(const Keyboard & key) const;
+			unsigned int GetKeyboardState(const Keyboard& key) const;
+			std::u16string GetInputString() const;
+			bool GetMouseDown(const Mouse & button) const;
+			bool GetMousePressed(const Mouse & button) const;
+			bool GetMouseReleased(const Mouse & button) const;
+			unsigned int GetMouseState(const Mouse& button) const;
+			int GetMouseWheel() const;
+			void SetMouseCoords(const glm::ivec2& newCoords, const CoordinateSpace& coordinateSpace = CoordinateSpace::Local);
+			glm::ivec2 GetMouseCoords(const CoordinateSpace& coordinateSpace = CoordinateSpace::Local) const;
+			bool DeviceExists(const int& deviceID) const;
+			const InputManager::InputDevice& GetDevice(const int& deviceID) const;
+			unsigned int GetDeviceButtonCount(const int& deviceID) const;
+			bool GetDeviceButtonDown(const int& deviceID, const unsigned int& button) const;
+			bool GetDeviceButtonPressed(const int& deviceID, const unsigned int& button) const;
+			bool GetDeviceButtonReleased(const int& deviceID, const unsigned int& button) const;
+			unsigned int GetDeviceButtonState(const int& deviceID, const unsigned int& button) const;
+			unsigned int GetDeviceControlCount(const int& deviceID) const;
+			bool DeviceHasControl(const int& deviceID, const Device& control) const;
+			int GetDeviceControl(const int& deviceID, const Device& control) const;
+			int GetDeviceControlScaled(const int& deviceID, const Device& control, std::pair<int, int> range = std::make_pair(0, 255)) const;
+			std::pair<int, int> GetDeviceControlRange(const int& deviceID, const Device& control) const;
+			std::vector<Device> GetDeviceLinkedDevices(const int& deviceID, const unsigned int& collectionID) const;
+			unsigned int GetDeviceLinkID(const int& deviceID, const Device& control) const;
+		//
 		
 		// resource manager related helper functions
-		template <typename T>
-		void RegisterResourceType();
-		
-		template <typename T, typename ...Ps>
-		ResourceHandle AddResource(const std::string& name, const Ps&... params);
-		
-		template <typename T>
-		void RemoveResource(const ResourceHandle& handle);
-		
-		template <typename T>
-		void RemoveResource(const std::string& name);
-		
-		void RemoveResource(const ResourceHandle& handle);
-		void RemoveResource(const std::string& name);
-		
-		template <typename T>
-		T& GetResource(const ResourceHandle& handle);
-		
-		template <typename T>
-		std::list< std::reference_wrapper<T> > GetResource(const std::string& name);
+			// [todo] add more helpers
+			Manager<Resource>& GetResourceManager();
+			
+			template <typename T>
+			void RegisterResourceType();
+			
+			template <typename T, typename ...Ps>
+			ResourceHandle AddResource(const std::string& name, const Ps&... params);
+			
+			template <typename T>
+			void RemoveResource(const ResourceHandle& handle);
+			
+			template <typename T>
+			void RemoveResource(const std::string& name);
+			
+			void RemoveResource(const ResourceHandle& handle);
+			void RemoveResource(const std::string& name);
+			
+			template <typename T>
+			T& GetResource(const ResourceHandle& handle);
+			
+			template <typename T>
+			std::list< std::reference_wrapper<T> > GetResource(const std::string& name);
+		//
 		
 		// begin entity system helpers...
 			EntityManager::Handle AddEntity(const std::string& name);

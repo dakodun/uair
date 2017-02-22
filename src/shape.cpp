@@ -198,10 +198,14 @@ std::string Shape::GetTag() const {
 }
 
 void Shape::Process(float deltaTime) {
-	if (mIsAnimated) { // if shape is animated...
+	if (mIsAnimated && !mFrames.empty()) { // if shape is animated and has animation frames...
+		mAnimationTimer += deltaTime; // increment animation timer
+		
 		int currentFrame = mCurrentFrame; // get current animation frame
-		while (mAnimationTimer >= mAnimationLimit) { // while the animation timer eclipses the limit (speed)...
-			mAnimationTimer -= mAnimationLimit; // remove the limit (speed) from the timer
+		float limit = mFrames.at(currentFrame).mAnimationSpeed;
+		
+		while (mAnimationTimer >= limit) { // while the animation timer eclipses the limit (speed)...
+			mAnimationTimer -= limit; // remove the limit (speed) from the timer
 			currentFrame += mAnimationDirection; // move the current frame one in the animation direction
 			
 			// if current frame is outwith defined bounds...
@@ -216,14 +220,14 @@ void Shape::Process(float deltaTime) {
 				else { // otherwise if animation is finished...
 					currentFrame = mAnimationEndFrame; // set frame back to end frame
 					mIsAnimated = false; // set shape as static
-					mAnimationLimit = 0.0f; // unset animation limit (speed)
 					break;
 				}
 			}
+			
+			limit = mFrames.at(currentFrame).mAnimationSpeed;
 		}
 		
 		mCurrentFrame = currentFrame; // set current animation frame
-		mAnimationTimer += deltaTime; // increment animation timer
 	}
 }
 
@@ -346,7 +350,7 @@ void Shape::AddFrameRect(ResourcePtr<Texture> texture, const unsigned int& layer
 }
 
 void Shape::AddFrameStrip(ResourcePtr<Texture> texture, const unsigned int& layer, const unsigned int& numFrames, const unsigned int& numPerRow,
-		const unsigned int& numPerCol, const glm::ivec2& offset) {
+		const unsigned int& numPerCol, const unsigned int& start, const glm::ivec2& spacing) {
 	
 	Texture* tex = texture.Get();
 	
@@ -358,17 +362,17 @@ void Shape::AddFrameStrip(ResourcePtr<Texture> texture, const unsigned int& laye
 			float frameWidth = texData.mWidth / static_cast<float>(numPerRow);
 			float frameHeight = texData.mHeight / static_cast<float>(numPerCol);
 			
-			// calculate the dimensions of a single frame in texture coordinates, including the offset between frames
-			glm::vec2 increment = glm::vec2((frameWidth - offset.x) / tex->GetWidth(), (frameHeight - offset.y) / tex->GetHeight());
-			glm::vec2 offsetIncrement = glm::vec2(static_cast<float>(offset.x) / tex->GetWidth(), static_cast<float>(offset.y) / tex->GetHeight());
+			// calculate the dimensions of a single frame in texture coordinates, including the spacing between frames
+			glm::vec2 increment = glm::vec2((frameWidth - spacing.x) / tex->GetWidth(), (frameHeight - spacing.y) / tex->GetHeight());
+			glm::vec2 spacingIncrement = glm::vec2(static_cast<float>(spacing.x) / tex->GetWidth(), static_cast<float>(spacing.y) / tex->GetHeight());
 			
-			for (unsigned int i = 0; i < numFrames; ++i) {
+			for (unsigned int i = start; i < numFrames + start; ++i) {
 				unsigned int t = i / numPerRow; // the current row in the sheet
 				unsigned int s = i % numPerRow; // the current column in the sheet
 				
 				// calculate the min and max (top-left and bottom-right) ST coordinates of the required portion of the texture
-				glm::vec2 min = glm::vec2((s * increment.x) + (s * offsetIncrement.x), (t * increment.y) + (t * offsetIncrement.y)); // top-left of texture
-				glm::vec2 max = glm::vec2(((s + 1) * increment.x) + (s * offsetIncrement.x), ((t + 1) * increment.y) + (t * offsetIncrement.y)); // bottom-right of texture
+				glm::vec2 min = glm::vec2((s * increment.x) + (s * spacingIncrement.x), (t * increment.y) + (t * spacingIncrement.y)); // top-left of texture
+				glm::vec2 max = glm::vec2(((s + 1) * increment.x) + (s * spacingIncrement.x), ((t + 1) * increment.y) + (t * spacingIncrement.y)); // bottom-right of texture
 				
 				AnimationFrame frame; // create a new frame
 				frame.mTexture = texture; // set the texture pointer of the frame
@@ -399,9 +403,9 @@ void Shape::AddFrameRect(Texture* texture, const unsigned int& layer, const std:
 }
 
 void Shape::AddFrameStrip(Texture* texture, const unsigned int& layer, const unsigned int& numFrames, const unsigned int& numPerRow,
-		const unsigned int& numPerCol, const glm::ivec2& offset) {
+		const unsigned int& numPerCol, const unsigned int& start, const glm::ivec2& spacing) {
 	
-	AddFrameStrip(ResourcePtr<Texture>(texture), layer, numFrames, numPerRow, numPerCol, offset); // add naked pointer to resource pointer and call parent function
+	AddFrameStrip(ResourcePtr<Texture>(texture), layer, numFrames, numPerRow, numPerCol, start, spacing); // add naked pointer to resource pointer and call parent function
 }
 
 AnimationFrame Shape::GetFrame() const {
@@ -420,29 +424,63 @@ AnimationFrame Shape::GetFrame(const unsigned int& frame) const {
 	throw std::runtime_error("requested frame is invalid");
 }
 
-void Shape::SetAnimation(const float& speed, const unsigned int& start, const unsigned int& end, const int& loops) {
-	size_t frameCount = mFrames.size(); // get the frame count
+void Shape::SetAnimation() {
+	mIsAnimated = false; // set shape as static
+	mAnimationDirection = 0;
 	
-	if (frameCount > 0) { // if shape has any animation frames...
-		if (std::abs(speed) <= util::EPSILON) { // if the animation speed is zero...
-			mIsAnimated = false; // set shape as static
-			mAnimationLimit = 0.0f; // unset animation limit (speed)
-		}
-		else { // otherwise shape animation speed is non-zero...
-			mIsAnimated = true; // set shape as animated
-			mAnimationLimit = (1 / std::abs(speed)); // set animation limit (speed)
-		}
-		
-		mAnimationDirection = util::SignOf(speed); // set direction of animation
-		
-		mAnimationStartFrame = std::min(frameCount - 1, static_cast<size_t>(start)); // set the start frame
-		mAnimationEndFrame = std::min(frameCount - 1, static_cast<size_t>(end)); // set the end frame
-		
-		mAnimationLoopCount = loops; // set the number of loops
-		
-		mAnimationTimer = 0.0f; // reset the current animation timer
-		mCurrentFrame = mAnimationStartFrame; // set the current frame to the initial frame
+	mAnimationStartFrame = 0u;
+	mAnimationEndFrame = 0u;
+	
+	mAnimationLoopCount = 0;
+	
+	mAnimationTimer = 0.0f;
+	
+	for (auto frameIter = mFrames.begin(); frameIter != mFrames.end(); ++frameIter) {
+		frameIter->mAnimationSpeed = 0.0167f;
 	}
+}
+
+void Shape::SetAnimation(std::vector<float> speeds, const unsigned int& start, const unsigned int& end,
+		const int& direction, const int& loops) {
+	
+	//
+		float speedPad = 0.0167f;
+		if (!speeds.empty()) {
+			speedPad = speeds.back();
+		}
+		
+		speeds.resize(mFrames.size(), speedPad);
+	//
+	
+	mIsAnimated = true; // set shape as animated
+	mAnimationDirection = util::SignOf(direction); // set direction of animation
+	
+	if (!mFrames.empty()) {
+		mAnimationStartFrame = std::min(static_cast<unsigned int>(mFrames.size() - 1u), start); // set the start frame
+		mAnimationEndFrame = std::min(static_cast<unsigned int>(mFrames.size() - 1u), end); // set the end frame
+		
+		for (unsigned int i = mAnimationStartFrame; ; i += mAnimationDirection) {
+			i = i % mFrames.size();
+			
+			mFrames.at(i).mAnimationSpeed = speeds.at(i);
+			
+			if (i == mAnimationEndFrame) {
+				break;
+			}
+			else if (i == 0u && mAnimationDirection < 0) {
+				i = mFrames.size();
+			}
+		}
+	}
+	else {
+		mAnimationStartFrame = 0u;
+		mAnimationEndFrame = 0u;
+	}
+	
+	mAnimationLoopCount = loops; // set the number of loops
+	
+	mAnimationTimer = 0.0f; // reset the current animation timer
+	mCurrentFrame = mAnimationStartFrame; // set the current frame to the initial frame
 }
 
 bool Shape::IsAnimated() const {

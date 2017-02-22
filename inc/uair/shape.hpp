@@ -48,6 +48,8 @@ struct EXPORTDLL AnimationFrame {
 	unsigned int mLayer; // the layer of the source texture
 	glm::vec2 mMinST; // the top-left-most texture coord
 	glm::vec2 mMaxST; // the bottom-right-most texture coord
+	
+	float mAnimationSpeed = 0.0167f; // how long to remain on this frame before switching to the next (default 60 fps)
 };
 
 class EXPORTDLL Shape : public Polygon, public Renderable {
@@ -95,19 +97,21 @@ class EXPORTDLL Shape : public Polygon, public Renderable {
 		void AddFrameCoords(ResourcePtr<Texture> texture, const unsigned int& layer, std::vector<glm::vec2> textureCoords);
 		void AddFrameRect(ResourcePtr<Texture> texture, const unsigned int& layer, const std::vector<glm::vec2>& textureRect);
 		void AddFrameStrip(ResourcePtr<Texture> texture, const unsigned int& layer, const unsigned int& numFrames, const unsigned int& numPerRow,
-				const unsigned int& numPerCol, const glm::ivec2& offset = glm::ivec2(0, 0));
+				const unsigned int& numPerCol, const unsigned int& start, const glm::ivec2& spacing = glm::ivec2(0, 0));
 		
 		void AddFrame(Texture* texture, const unsigned int& layer);
 		void AddFrameCoords(Texture* texture, const unsigned int& layer, std::vector<glm::vec2> textureCoords);
 		void AddFrameRect(Texture* texture, const unsigned int& layer, const std::vector<glm::vec2>& textureRect);
 		void AddFrameStrip(Texture* texture, const unsigned int& layer, const unsigned int& numFrames, const unsigned int& numPerRow,
-				const unsigned int& numPerCol, const glm::ivec2& offset = glm::ivec2(0, 0));
+				const unsigned int& numPerCol, const unsigned int& start, const glm::ivec2& spacing = glm::ivec2(0, 0));
 		
 		AnimationFrame GetFrame() const;
 		AnimationFrame GetFrame(const unsigned int& frame) const;
 		
 		// set the animation attributes
-		void SetAnimation(const float& speed, const unsigned int& start, const unsigned int& end, const int& loops = -1);
+		void SetAnimation();
+		void SetAnimation(std::vector<float> speeds, const unsigned int& start, const unsigned int& end,
+				const int& direction, const int& loops = -1);
 		bool IsAnimated() const;
 		void SetCurrentFrame(const unsigned int& frame);
 		unsigned int GetCurrentFrame() const;
@@ -142,13 +146,14 @@ class EXPORTDLL Shape : public Polygon, public Renderable {
 		
 		std::vector<AnimationFrame> mFrames; // animation frame data
 		unsigned int mCurrentFrame = 0u; // index of the current animation frame (if any)
+		
 		bool mIsAnimated = false; // is shape animated
-		int mAnimationDirection = 1; // direction of animation (forward (1) or reverse (-1))
-		float mAnimationLimit = 0.0f; // limit of animation (essentially it's speed)
-		float mAnimationTimer = 0.0f; // timer before switching to next frame
-		int mAnimationLoopCount = 0; // how many times to loop the animation (-1 implies infinitely)
 		unsigned int mAnimationStartFrame = 0u; // frame to begin the animation on
 		unsigned int mAnimationEndFrame = 0u; // frame to end the animation on
+		int mAnimationDirection = 1; // direction of animation (forward (1) or reverse (-1))
+		int mAnimationLoopCount = 0; // how many times to loop the animation (-1 implies infinitely)
+		float mAnimationTimer = 0.0f; // timer before switching to next frame
+		
 		std::vector<WrapMode> mWrapModes = {WrapMode::Stretch, WrapMode::Stretch};
 		unsigned int mWrapModeBitmask = 0u;
 };
