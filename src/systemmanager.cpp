@@ -27,8 +27,6 @@
 
 #include "systemmanager.hpp"
 
-#include "messagesystem.hpp"
-
 namespace uair {
 System::System(System&& other) : System() {
 	swap(*this, other);

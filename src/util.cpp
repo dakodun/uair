@@ -249,5 +249,15 @@ extern std::vector<std::string> SplitString(const std::string& string, const cha
 	
 	return strParts;
 }
+
+extern std::u16string UTF8toUTF16(const std::string& input) {
+	std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+	return convert.from_bytes(input);
+}
+
+extern std::string UTF16toUTF8(const std::u16string& input) {
+	std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+	return convert.to_bytes(input);
+}
 }
 }

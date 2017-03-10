@@ -32,15 +32,16 @@
 
 #include <vector>
 #include <string>
+#include <fstream>
 
 namespace uair {
 class EXPORTDLL File {
 	public :
 		File() = default;
-		File(const std::string & filename);
+		File(const std::string& filename);
 		
-		void LoadFromFile(const std::string & filename);
-		void SaveToFile(const std::string & filename);
+		void LoadFromFile(const std::string& filename, const std::ios_base::openmode& mode = std::ios_base::in);
+		void SaveToFile(const std::string& filename, const std::ios_base::openmode& mode = std::ios_base::out);
 	public :
 		std::vector<std::string> mBuffer;
 };

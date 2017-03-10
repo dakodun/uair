@@ -42,7 +42,7 @@ void swap(EntitySystem& first, EntitySystem& second) {
 	std::swap(first.mEntityManager, second.mEntityManager);
 	std::swap(first.mSystemManager, second.mSystemManager);
 	
-	// std::swap(first.mMessageSystem, second.mMessageSystem);
+	std::swap(first.mMessageQueue, second.mMessageQueue);
 }
 
 // begin entity manager helpers...
@@ -120,40 +120,28 @@ void swap(EntitySystem& first, EntitySystem& second) {
 // ...end entity manager helpers
 
 // begin message system helpers...
-	/* void EntitySystem::PushMessageString(const unsigned int& systemTypeID, const unsigned int& messageTypeID, const std::string& messageString) {
-		mMessageSystem.PushMessageString(systemTypeID, messageTypeID, messageString);
+	void EntitySystem::PushMessageString(const unsigned int& messageTypeID, const std::string& messageString) {
+		mMessageQueue.PushMessageString(messageTypeID, messageString);
 	}
 
-	unsigned int EntitySystem::GetMessageCount() {
-		return mMessageSystem.GetMessageCount();
+	MessageQueue::Entry EntitySystem::GetMessage() const {
+		return mMessageQueue.GetMessage();
 	}
 
-	unsigned int EntitySystem::GetSystemType(const unsigned int& index) {
-		try {
-			return mMessageSystem.GetSystemType(index);
-		} catch (std::exception& e) {
-			throw;
-		}
+	void EntitySystem::PopMessage() {
+		mMessageQueue.PopMessage();
 	}
 
-	unsigned int EntitySystem::GetMessageType(const unsigned int& index) {
-		try {
-			return mMessageSystem.GetMessageType(index);
-		} catch (std::exception& e) {
-			throw;
-		}
+	void EntitySystem::ClearQueue() {
+		mMessageQueue.ClearQueue();
 	}
 
-	int EntitySystem::GetMessageState(const unsigned int& index) {
-		try {
-			return mMessageSystem.GetMessageState(index);
-		} catch (std::exception& e) {
-			throw;
-		}
+	bool EntitySystem::IsEmpty() const {
+		return mMessageQueue.IsEmpty();
 	}
 
-	void EntitySystem::PopMessage(const unsigned int& index) {
-		mMessageSystem.PopMessage(index);
-	} */
+	unsigned int EntitySystem::GetMessageCount() const {
+		return mMessageQueue.GetMessageCount();
+	}
 // ...end message system helpers
 }

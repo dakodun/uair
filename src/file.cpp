@@ -28,17 +28,16 @@
 #include "file.hpp"
 
 #include <iostream>
-#include <fstream>
 
 namespace uair {
-File::File(const std::string & filename) {
+File::File(const std::string& filename) {
 	LoadFromFile(filename); // load the specified file
 }
 
-void File::LoadFromFile(const std::string & filename) {
+void File::LoadFromFile(const std::string& filename, const std::ios_base::openmode& mode) {
 	// open the file for reading
 	std::ifstream file;
-	file.open(filename.c_str(), std::ios::in);
+	file.open(filename.c_str(), mode);
 	
 	try {
 		std::string line;
@@ -64,15 +63,15 @@ void File::LoadFromFile(const std::string & filename) {
 	}
 }
 
-void File::SaveToFile(const std::string & filename) {
+void File::SaveToFile(const std::string& filename, const std::ios_base::openmode& mode) {
 	// open the file for writing
 	std::ofstream file;
-	file.open(filename.c_str(), std::ios::out);
+	file.open(filename.c_str(), mode);
 	
 	try {
 		if (file.is_open()) { // if we opened the file successfully
 			for (auto iter = mBuffer.begin(); iter < mBuffer.end(); ++iter) { // for all lines in the buffer
-				file << *iter << std::endl;; // write the current line to the file
+				file << *iter << std::endl; // write the current line to the file
 			}
 			
 			file.close(); // clean up after ourselves

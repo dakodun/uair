@@ -84,7 +84,7 @@ class EXPORTDLL Shape : public Polygon, public Renderable {
 		std::string GetTag() const;
 		
 		// process the shape's animation
-		void Process(float deltaTime);
+		bool Process(float deltaTime);
 		
 		// set the winding rule for filled drawing (forces retriangulation)
 		void SetWindingRule(const WindingRule& windingRule);
@@ -112,6 +112,7 @@ class EXPORTDLL Shape : public Polygon, public Renderable {
 		void SetAnimation();
 		void SetAnimation(std::vector<float> speeds, const unsigned int& start, const unsigned int& end,
 				const int& direction, const int& loops = -1);
+		void ResetAnimation();
 		bool IsAnimated() const;
 		void SetCurrentFrame(const unsigned int& frame);
 		unsigned int GetCurrentFrame() const;
@@ -151,7 +152,8 @@ class EXPORTDLL Shape : public Polygon, public Renderable {
 		unsigned int mAnimationStartFrame = 0u; // frame to begin the animation on
 		unsigned int mAnimationEndFrame = 0u; // frame to end the animation on
 		int mAnimationDirection = 1; // direction of animation (forward (1) or reverse (-1))
-		int mAnimationLoopCount = 0; // how many times to loop the animation (-1 implies infinitely)
+		int mAnimationLoopCount = 0; // loops remaining
+		int mAnimationLoopMax = 0; // how many times to loop the animation (-1 implies infinitely)
 		float mAnimationTimer = 0.0f; // timer before switching to next frame
 		
 		std::vector<WrapMode> mWrapModes = {WrapMode::Stretch, WrapMode::Stretch};

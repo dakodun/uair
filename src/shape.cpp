@@ -197,7 +197,7 @@ std::string Shape::GetTag() const {
 	return "Shape";
 }
 
-void Shape::Process(float deltaTime) {
+bool Shape::Process(float deltaTime) {
 	if (mIsAnimated && !mFrames.empty()) { // if shape is animated and has animation frames...
 		mAnimationTimer += deltaTime; // increment animation timer
 		
@@ -206,29 +206,37 @@ void Shape::Process(float deltaTime) {
 		
 		while (mAnimationTimer >= limit) { // while the animation timer eclipses the limit (speed)...
 			mAnimationTimer -= limit; // remove the limit (speed) from the timer
-			currentFrame += mAnimationDirection; // move the current frame one in the animation direction
 			
-			// if current frame is outwith defined bounds...
-			if (currentFrame < 0 || currentFrame >= static_cast<int>(mFrames.size()) || currentFrame == static_cast<int>(mAnimationEndFrame) + mAnimationDirection) {
+			if (currentFrame == static_cast<int>(mAnimationEndFrame)) {
 				if (mAnimationLoopCount != 0) { // if animation hasn't finished looping...
 					if (mAnimationLoopCount > 0) { // if animation isn't looping indefinitely...
 						--mAnimationLoopCount; // decrease loop counter by one
 					}
 					
-					currentFrame = mAnimationStartFrame; // reset to initial frame
+					// reset to initial frame (we subtract one to account for the change that occurs later)
+					currentFrame = mAnimationStartFrame - mAnimationDirection;
 				}
 				else { // otherwise if animation is finished...
-					currentFrame = mAnimationEndFrame; // set frame back to end frame
 					mIsAnimated = false; // set shape as static
 					break;
 				}
 			}
 			
+			currentFrame = (currentFrame + mAnimationDirection) % mFrames.size(); // move the current frame one in the animation direction
+			if (currentFrame < 0) {
+				currentFrame = mFrames.size() - 1;
+			}
+			
 			limit = mFrames.at(currentFrame).mAnimationSpeed;
 		}
 		
-		mCurrentFrame = currentFrame; // set current animation frame
+		if (mCurrentFrame != static_cast<unsigned int>(currentFrame)) {
+			mCurrentFrame = currentFrame; // set current animation frame
+			return true;
+		}
 	}
+	
+	return false;
 }
 
 void Shape::SetWindingRule(const WindingRule& windingRule) {
@@ -432,6 +440,7 @@ void Shape::SetAnimation() {
 	mAnimationEndFrame = 0u;
 	
 	mAnimationLoopCount = 0;
+	mAnimationLoopMax = 0;
 	
 	mAnimationTimer = 0.0f;
 	
@@ -443,41 +452,62 @@ void Shape::SetAnimation() {
 void Shape::SetAnimation(std::vector<float> speeds, const unsigned int& start, const unsigned int& end,
 		const int& direction, const int& loops) {
 	
-	//
-		float speedPad = 0.0167f;
-		if (!speeds.empty()) {
-			speedPad = speeds.back();
-		}
-		
-		speeds.resize(mFrames.size(), speedPad);
-	//
-	
-	mIsAnimated = true; // set shape as animated
-	mAnimationDirection = util::SignOf(direction); // set direction of animation
-	
 	if (!mFrames.empty()) {
 		mAnimationStartFrame = std::min(static_cast<unsigned int>(mFrames.size() - 1u), start); // set the start frame
 		mAnimationEndFrame = std::min(static_cast<unsigned int>(mFrames.size() - 1u), end); // set the end frame
-		
-		for (unsigned int i = mAnimationStartFrame; ; i += mAnimationDirection) {
-			i = i % mFrames.size();
-			
-			mFrames.at(i).mAnimationSpeed = speeds.at(i);
-			
-			if (i == mAnimationEndFrame) {
-				break;
-			}
-			else if (i == 0u && mAnimationDirection < 0) {
-				i = mFrames.size();
-			}
-		}
 	}
 	else {
 		mAnimationStartFrame = 0u;
 		mAnimationEndFrame = 0u;
 	}
 	
-	mAnimationLoopCount = loops; // set the number of loops
+	if (mAnimationStartFrame != mAnimationEndFrame) {
+		mIsAnimated = true; // set shape as animated
+		mAnimationDirection = util::SignOf(direction); // set direction of animation
+		
+		//
+			unsigned int frameCount = 0u;
+			if (mAnimationStartFrame < mAnimationEndFrame) {
+				frameCount = (mAnimationEndFrame + 1u) - mAnimationStartFrame;
+			}
+			else {
+				frameCount = (mFrames.size() - mAnimationStartFrame) + (mAnimationEndFrame + 1u);
+			}
+			
+			float speedPad = 0.0167f;
+			if (!speeds.empty()) {
+				speedPad = speeds.back();
+			}
+			
+			speeds.resize(frameCount, speedPad);
+			
+			for (unsigned int i = mAnimationStartFrame, j = 0u; ; i += mAnimationDirection, ++j) {
+				i = i % mFrames.size();
+				
+				mFrames.at(i).mAnimationSpeed = speeds.at(j);
+				
+				if (i == mAnimationEndFrame) {
+					break;
+				}
+				else if (i == 0u && mAnimationDirection < 0) {
+					i = mFrames.size();
+				}
+			}
+		//
+		
+		mAnimationLoopMax = loops; // set the number of loops
+		mAnimationLoopCount = mAnimationLoopMax;
+		
+		mAnimationTimer = 0.0f; // reset the current animation timer
+		mCurrentFrame = mAnimationStartFrame; // set the current frame to the initial frame
+	}
+	else {
+		mIsAnimated = false;
+	}
+}
+
+void Shape::ResetAnimation() {
+	mAnimationLoopCount = mAnimationLoopMax;
 	
 	mAnimationTimer = 0.0f; // reset the current animation timer
 	mCurrentFrame = mAnimationStartFrame; // set the current frame to the initial frame

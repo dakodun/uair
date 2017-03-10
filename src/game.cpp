@@ -81,6 +81,12 @@ void Game::Run() {
 			mMessageQueue.PopMessage(); // remove the message from the front of the queue
 		}
 		
+		while (!mEntitySystem.mMessageQueue.IsEmpty()) {
+			MessageQueue::Entry e = mEntitySystem.mMessageQueue.GetMessage();
+			HandleMessageQueue(e);
+			mEntitySystem.mMessageQueue.PopMessage();
+		}
+		
 		for (unsigned int i = 0u; i < mRenderPasses; ++i) {
 			Render(i); // handle rendering for the current pass
 		}
@@ -152,30 +158,18 @@ void Game::Input() {
 	if (mSceneManager->mCurrScene) {
 		mSceneManager->mCurrScene->Input();
 	}
-	
-	/* for (unsigned int i = 0u; i < mEntitySystem.mMessageSystem.mMessageQueue.size(); ++i) {
-		mEntitySystem.mMessageSystem.mMessageQueue.at(i).mMessageStatus |= MessageSystem::MessageState::Input;
-	} */
 }
 
 void Game::Process(float deltaTime) {
 	if (mSceneManager->mCurrScene) {
 		mSceneManager->mCurrScene->Process(deltaTime);
 	}
-	
-	/* for (unsigned int i = 0u; i < mEntitySystem.mMessageSystem.mMessageQueue.size(); ++i) {
-		mEntitySystem.mMessageSystem.mMessageQueue.at(i).mMessageStatus |= MessageSystem::MessageState::Process;
-	} */
 }
 
 void Game::PostProcess(const unsigned int & processed, float deltaTime) {
 	if (mSceneManager->mCurrScene) {
 		mSceneManager->mCurrScene->PostProcess(processed, deltaTime);
 	}
-	
-	/* for (unsigned int i = 0u; i < mEntitySystem.mMessageSystem.mMessageQueue.size(); ++i) {
-		mEntitySystem.mMessageSystem.mMessageQueue.at(i).mMessageStatus |= MessageSystem::MessageState::PostProcess;
-	} */
 }
 
 void Game::Render(const unsigned int & pass) {
@@ -184,10 +178,6 @@ void Game::Render(const unsigned int & pass) {
 	}
 	
 	glFlush();
-	
-	/* for (unsigned int i = 0u; i < mEntitySystem.mMessageSystem.mMessageQueue.size(); ++i) {
-		mEntitySystem.mMessageSystem.mMessageQueue.at(i).mMessageStatus |= MessageSystem::MessageState::Render;
-	} */
 }
 
 void Game::Init() {
@@ -707,40 +697,28 @@ void Game::HandleMessageQueue(const MessageQueue::Entry& e) {
 		}
 	}
 	
-	/* void Game::PushMessageString(const unsigned int& systemTypeID, const unsigned int& messageTypeID, const std::string& messageString) {
-		mEntitySystem.PushMessageString(systemTypeID, messageTypeID, messageString);
+	void Game::PushMessageString(const unsigned int& messageTypeID, const std::string& messageString) {
+		mEntitySystem.PushMessageString(messageTypeID, messageString);
 	}
-	
-	unsigned int Game::GetMessageCount() {
+
+	MessageQueue::Entry Game::GetMessage() const {
+		return mEntitySystem.GetMessage();
+	}
+
+	void Game::PopMessage() {
+		mEntitySystem.PopMessage();
+	}
+
+	void Game::ClearQueue() {
+		mEntitySystem.ClearQueue();
+	}
+
+	bool Game::IsEmpty() const {
+		return mEntitySystem.IsEmpty();
+	}
+
+	unsigned int Game::GetMessageCount() const {
 		return mEntitySystem.GetMessageCount();
 	}
-	
-	unsigned int Game::GetSystemType(const unsigned int& index) {
-		try {
-			return mEntitySystem.GetSystemType(index);
-		} catch (std::exception& e) {
-			throw;
-		}
-	}
-	
-	unsigned int Game::GetMessageType(const unsigned int& index) {
-		try {
-			return mEntitySystem.GetMessageType(index);
-		} catch (std::exception& e) {
-			throw;
-		}
-	}
-	
-	int Game::GetMessageState(const unsigned int& index) {
-		try {
-			return mEntitySystem.GetMessageState(index);
-		} catch (std::exception& e) {
-			throw;
-		}
-	}
-	
-	void Game::PopMessage(const unsigned int& index) {
-		mEntitySystem.PopMessage(index);
-	} */
 // ...end entity system helpers
 }

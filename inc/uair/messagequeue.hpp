@@ -41,7 +41,7 @@
 namespace uair {
 // base class for all messages allowing interaction with a message system
 // derived classes should implement a static function that returns an unsigned integer (representing a unique typeid)
-// (static unsigned int GetTypeID()) user implemented typeids should start at 1000
+// (static unsigned int GetTypeID()) user implemented typeids should start at 1000 if used with main queue (game.hpp)
 class EXPORTDLL Message {
 	public :
 		virtual ~Message();

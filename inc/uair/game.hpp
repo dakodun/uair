@@ -184,22 +184,15 @@ class EXPORTDLL Game {
 			template <typename T>
 			T& GetSystem();
 			
-			/* template <class T>
-			void PushMessage(const unsigned int& systemTypeID, const T& messageIn);
-			void PushMessageString(const unsigned int& systemTypeID, const unsigned int& messageTypeID, const std::string& messageString);
-			
-			unsigned int GetMessageCount();
-			unsigned int GetSystemType(const unsigned int& index);
-			unsigned int GetMessageType(const unsigned int& index);
-			int GetMessageState(const unsigned int& index);
-			
 			template <class T>
-			T PeekMessage(const unsigned int& index);
+			void PushMessage(const T& messageIn);
+			void PushMessageString(const unsigned int& messageTypeID, const std::string& messageString);
 			
-			template <class T>
-			T GetMessage(const unsigned int& index);
-			
-			void PopMessage(const unsigned int& index); */
+			MessageQueue::Entry GetMessage() const;
+			void PopMessage();
+			void ClearQueue();
+			bool IsEmpty() const;
+			unsigned int GetMessageCount() const;
 		// ...end entity system helpers
 	private :
 		void HandleMessageQueue(const MessageQueue::Entry& e);
@@ -322,32 +315,14 @@ std::list< std::reference_wrapper<T> > Game::GetResource(const std::string& name
 		}
 	}
 	
-	/* template <class T>
-	void Game::PushMessage(const unsigned int& systemTypeID, const T& messageIn) {
+	template <class T>
+	void Game::PushMessage(const T& messageIn) {
 		try {
-			mEntitySystem.PushMessage<T>(systemTypeID, messageIn);
+			return mEntitySystem.PushMessage<T>(messageIn);
 		} catch (std::exception& e) {
 			throw;
 		}
 	}
-	
-	template <class T>
-	T Game::PeekMessage(const unsigned int& index) {
-		try {
-			return mEntitySystem.PeekMessage<T>(index);
-		} catch (std::exception& e) {
-			throw;
-		}
-	}
-	
-	template <class T>
-	T Game::GetMessage(const unsigned int& index) {
-		try {
-			return mEntitySystem.GetMessage<T>(index);
-		} catch (std::exception& e) {
-			throw;
-		}
-	} */
 // ...end entity system helpers
 }
 

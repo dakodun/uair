@@ -33,7 +33,7 @@
 #include "manager.hpp"
 #include "entitymanager.hpp"
 #include "systemmanager.hpp"
-// #include "messagesystem.hpp"
+#include "messagequeue.hpp"
 
 namespace uair {
 // the main class of the ECS architecture that pulls the three concepts (of entity, component and system) together into one package
@@ -81,28 +81,21 @@ class EXPORTDLL EntitySystem {
 		// ...end system manager helpers
 		
 		// begin message system helpers...
-			/* template <class T>
-			void PushMessage(const unsigned int& systemTypeID, const T& messageIn);
-			void PushMessageString(const unsigned int& systemTypeID, const unsigned int& messageTypeID, const std::string& messageString);
-			
-			unsigned int GetMessageCount();
-			unsigned int GetSystemType(const unsigned int& index);
-			unsigned int GetMessageType(const unsigned int& index);
-			int GetMessageState(const unsigned int& index);
-			
 			template <class T>
-			T PeekMessage(const unsigned int& index);
+			void PushMessage(const T& messageIn);
+			void PushMessageString(const unsigned int& messageTypeID, const std::string& messageString);
 			
-			template <class T>
-			T GetMessage(const unsigned int& index);
-			
-			void PopMessage(const unsigned int& index); */
+			MessageQueue::Entry GetMessage() const;
+			void PopMessage();
+			void ClearQueue();
+			bool IsEmpty() const;
+			unsigned int GetMessageCount() const;
 		// ...end message system helpers
 	private :
 		EntityManager mEntityManager;
 		SystemManager mSystemManager;
 		
-		// MessageSystem mMessageSystem;
+		MessageQueue mMessageQueue;
 };
 
 // begin system manager helpers...
@@ -135,32 +128,14 @@ class EXPORTDLL EntitySystem {
 // ...end system manager helpers
 
 // begin message system helpers...
-	/* template <class T>
-	void EntitySystem::PushMessage(const unsigned int& systemTypeID, const T& messageIn) {
+	template <class T>
+	void EntitySystem::PushMessage(const T& messageIn) {
 		try {
-			mMessageSystem.PushMessage<T>(systemTypeID, messageIn);
+			return mMessageQueue.PushMessage<T>(messageIn);
 		} catch (std::exception& e) {
 			throw;
 		}
 	}
-
-	template <class T>
-	T EntitySystem::PeekMessage(const unsigned int& index) {
-		try {
-			return mMessageSystem.PeekMessage<T>(index);
-		} catch (std::exception& e) {
-			throw;
-		}
-	}
-
-	template <class T>
-	T EntitySystem::GetMessage(const unsigned int& index) {
-		try {
-			return mMessageSystem.GetMessage<T>(index);
-		} catch (std::exception& e) {
-			throw;
-		}
-	} */
 // ...end message system helpers
 }
 

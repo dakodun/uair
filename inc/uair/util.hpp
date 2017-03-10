@@ -31,6 +31,8 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <locale>
+#include <codecvt>
 
 #include "init.hpp"
 
@@ -75,6 +77,8 @@ EXPORTDLL extern void LogMessage(const unsigned int& level, const std::string& m
 EXPORTDLL extern void LogMessage(const unsigned int& level, const std::string& message, const std::string& filename);
 
 EXPORTDLL extern std::vector<std::string> SplitString(const std::string& string, const char& delimiter);
+EXPORTDLL extern std::u16string UTF8toUTF16(const std::string& input);
+EXPORTDLL extern std::string UTF16toUTF8(const std::u16string& input);
 
 template<typename T>
 extern int SignOf(const T& input) {

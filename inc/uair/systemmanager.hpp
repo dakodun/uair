@@ -32,7 +32,6 @@
 #include "manager.hpp"
 #include "component.hpp"
 #include "entitymanager.hpp"
-// #include "messagesystem.hpp"
 
 namespace uair {
 class SystemManager;
