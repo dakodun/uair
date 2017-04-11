@@ -45,6 +45,10 @@
 #include "manager.hpp"
 #include "entitysystem.hpp"
 
+#ifndef UAIRNOLUA
+#include "luaapi.hpp"
+#endif
+
 namespace uair {
 class EXPORTDLL Game {
 	public :
@@ -162,6 +166,8 @@ class EXPORTDLL Game {
 		//
 		
 		// begin entity system helpers...
+			EntitySystem& GetEntitySystem();
+			
 			EntityManager::Handle AddEntity(const std::string& name);
 			
 			void RemoveEntity(const EntityManager::Handle& handle);
@@ -194,6 +200,12 @@ class EXPORTDLL Game {
 			bool IsEmpty() const;
 			unsigned int GetMessageCount() const;
 		// ...end entity system helpers
+		
+		//
+			#ifndef UAIRNOLUA
+			LuaAPI& GetLuaAPI();
+			#endif
+		//
 	private :
 		void HandleMessageQueue(const MessageQueue::Entry& e);
 		
@@ -231,6 +243,10 @@ class EXPORTDLL Game {
 		EntitySystem mEntitySystem;
 		
 		FT_Library mFTLibrary;
+		
+		#ifndef UAIRNOLUA
+		LuaAPI mLuaAPI;
+		#endif
 };
 
 template <typename T>

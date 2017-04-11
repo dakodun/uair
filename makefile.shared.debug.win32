@@ -1,22 +1,23 @@
 # makefile for Windows
 
 CXX=g++
-CXXFLAGS=-Wall -Wno-unused -std=c++11 -ggdb -pipe
+CXXFLAGS=-Wall -Wno-unused -std=c++17 -ggdb -pipe
 PRJPATHS=-I inc -I inc/uair -I inc/freetype
 EXTPATHS=-L lib
 PRJFLAGS=-DGLEW_STATIC=1 -DGLEW_MX=1 -D_GLIBCXX_DEBUG -DGLM_FORCE_RADIANS -DHAVE_GETTIMEOFDAY -D__WINDOWS_WASAPI__ -DUAIRDYNAMIC -DUAIREXPORTDLL
 
-CXXLIBS=-lhid -lfreetype -ltess -lglu32 -lopengl32 -lgdi32 -lole32 -lwinmm -lksuser -luuid -lvorbis -logg
+LIBSHARED=-llua51
+LIBSTATIC=-lhid -lfreetype -ltess -lglu32 -lopengl32 -lgdi32 -lole32 -lwinmm -lksuser -luuid -lvorbis -logg
 
 SOURCES=$(wildcard src/*.cpp) $(wildcard src/*.c)
 OBJECTS=$(patsubst src/%.cpp, obj/%.o, $(patsubst src/%.c, obj/%.o, $(SOURCES)))
 OBJECTS:=$(strip $(patsubst %linux.o, , $(OBJECTS)))
 
 TARGET=bin\uair.dll
-TARGETIMPLIB=bin\libuair.lib
+TARGETIMPLIB=bin\uair.lib
 
 $(TARGET): $(OBJECTS)
-	$(CXX) $(EXTPATHS) -shared -o $(TARGET) $(OBJECTS) -Wl,--out-implib,$(TARGETIMPLIB) $(CXXLIBS)
+	$(CXX) $(EXTPATHS) -shared -o $(TARGET) $(OBJECTS) -Wl,--out-implib,$(TARGETIMPLIB) -Wl,-Bstatic $(LIBSTATIC) -Wl,-Bdynamic $(LIBSHARED)
 
 obj/%.o: src/%.cpp
 	$(CXX) $(CXXFLAGS) $(PRJPATHS) $(EXTPATHS) $(PRJFLAGS) -o $@ -c $<

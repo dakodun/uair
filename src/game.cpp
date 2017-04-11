@@ -625,6 +625,10 @@ void Game::HandleMessageQueue(const MessageQueue::Entry& e) {
 }
 
 // begin entity system helpers...
+	EntitySystem& Game::GetEntitySystem() {
+		return mEntitySystem;
+	}
+	
 	EntitySystem::EntityHandle Game::AddEntity(const std::string& name) {
 		try {
 			return mEntitySystem.AddEntity(name);
@@ -721,4 +725,12 @@ void Game::HandleMessageQueue(const MessageQueue::Entry& e) {
 		return mEntitySystem.GetMessageCount();
 	}
 // ...end entity system helpers
+
+//
+	#ifndef UAIRNOLUA
+	LuaAPI& Game::GetLuaAPI() {
+		return mLuaAPI;
+	}
+	#endif
+//
 }

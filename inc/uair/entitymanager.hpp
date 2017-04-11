@@ -28,6 +28,10 @@
 #ifndef UAIRENTITYMANAGER_HPP
 #define UAIRENTITYMANAGER_HPP
 
+#define CEREAL_SERIALIZE_FUNCTION_NAME Serialise
+#include "cereal/archives/binary.hpp"
+#include "cereal/types/string.hpp"
+
 #include "init.hpp"
 #include "manager.hpp"
 #include "component.hpp"
@@ -113,6 +117,10 @@ class EXPORTDLL EntityManager {
 		// a handle that is used to refer to resources handled instead of a pointer
 		class Handle {
 			public :
+				Handle() {
+					
+				}
+				
 				Handle(const unsigned int& index, const unsigned int& counter, const std::string& name = "") : 
 						mIndex(index), mCounter(counter), mName(name) {
 					
@@ -122,6 +130,14 @@ class EXPORTDLL EntityManager {
 				bool operator ==(const Handle &other) const {
 					return (mIndex == other.mIndex && mCounter == other.mCounter &&
 							mName == other.mName);
+				}
+				
+				void Serialise(cereal::BinaryOutputArchive& archive) const {
+					archive(mIndex, mCounter, mName);
+				}
+				
+				void Serialise(cereal::BinaryInputArchive& archive) {
+					archive(mIndex, mCounter, mName);
 				}
 			public :
 				unsigned int mIndex = 0u; // the index of the resource in the store

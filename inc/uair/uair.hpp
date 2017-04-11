@@ -80,6 +80,10 @@
 
 #include "sound.hpp"
 
+#ifndef UAIRNOLUA
+#include "luaapi.hpp"
+#endif
+
 #include "game.hpp"
 
 #endif

@@ -248,6 +248,10 @@ class Manager {
 		// a handle that is used to refer to resources handled instead of a pointer
 		class Handle {
 			public :
+				Handle() {
+					
+				}
+				
 				Handle(const unsigned int& typeID, const unsigned int& index, const unsigned int& counter, const std::string& name = "") : mTypeID(typeID), 
 						mIndex(index), mCounter(counter), mName(name) {
 					
