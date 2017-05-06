@@ -87,4 +87,19 @@ void File::SaveToFile(const std::string& filename, const std::ios_base::openmode
 		throw e;
 	}
 }
+
+std::string File::ToString() const {
+	std::string result = "";
+	
+	if (!mBuffer.empty()) {
+		result += *mBuffer.begin();
+		
+		for (auto lineIter = mBuffer.begin() + 1; lineIter != mBuffer.end(); ++lineIter) {
+			result += '\n';
+			result += *lineIter;
+		}
+	}
+	
+	return result;
+}
 }

@@ -42,6 +42,8 @@ class EXPORTDLL File {
 		
 		void LoadFromFile(const std::string& filename, const std::ios_base::openmode& mode = std::ios_base::in);
 		void SaveToFile(const std::string& filename, const std::ios_base::openmode& mode = std::ios_base::out);
+		
+		std::string ToString() const;
 	public :
 		std::vector<std::string> mBuffer;
 };

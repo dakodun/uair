@@ -114,6 +114,19 @@ extern T FromString(const std::string& s, std::ios_base& (*f)(std::ios_base&) = 
 	
 	return t;
 }
+
+template<typename F, typename... Ps, std::size_t... Is>
+void IterateTuple(F func, std::tuple<Ps...>& tuple, std::index_sequence<Is...>) {
+	using expander = int[]; // an alias allowing us to use brace list expansion
+	
+	// expand the tuple inside a brace list in order to iterate through its elements
+	(void)expander{0, ((void)func(std::get<Is>(tuple)), 0)...};
+}
+
+template<typename F, typename... Ps, std::size_t... Is>
+auto ExpandTuple(F func, std::tuple<Ps...>& tuple, std::index_sequence<Is...>) {
+	return func(std::get<Is>(tuple)...); // pass the expanded tuple elements as arguments to the function
+}
 }
 }
 
