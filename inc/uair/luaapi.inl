@@ -252,6 +252,49 @@ namespace uair {
 		
 		return util::ExpandTuple(call, args, std::make_index_sequence<std::tuple_size<decltype(args)>::value>());
 	}
+	
+	
+	template <class T, class R>
+	LuaAPI::RegisteredGetFunc<T, R>::RegisteredGetFunc(R T::*var) : mVarPtr(var) {
+		
+	}
+	
+	template <class T, class R>
+	int LuaAPI::RegisteredGetFunc<T, R>::Call(lua_State* l, const unsigned int& counter, const std::string& name) {
+		void* userdata = luaL_checkudata(l, 1, (name + ".mt").c_str());
+		if (userdata != nullptr) {
+			T** data = static_cast<T**>(userdata);
+			
+			PushStack(counter, (*data)->*mVarPtr);
+			
+			return 1;
+		}
+		
+		return 0;
+	}
+	
+	
+	template <class T, class R>
+	LuaAPI::RegisteredSetFunc<T, R>::RegisteredSetFunc(R T::*var) : mVarPtr(var) {
+		
+	}
+	
+	template <class T, class R>
+	int LuaAPI::RegisteredSetFunc<T, R>::Call(lua_State* l, const unsigned int& counter, const std::string& name) {
+		int stackSize = lua_gettop(l);
+		void* userdata = luaL_checkudata(l, 1, (name + ".mt").c_str());
+		
+		if (userdata != nullptr) {
+			T** data = static_cast<T**>(userdata);
+			
+			auto arg = ReadStack<R>(counter, stackSize);
+			(*data)->*mVarPtr = arg;
+			
+			return 0;
+		}
+		
+		return 0;
+	}
 //
 
 
@@ -364,6 +407,70 @@ void LuaAPI::RegisteredType::AddFunction(lua_State* l, const std::string& funcNa
 		lua_pushnil(l);
 		lua_setfield(l, LUA_REGISTRYINDEX, (mName + ".mt").c_str());
 		std::cout << "(LuaAPI) Function Registration Error: metatable with name " << mName << ".mt doesn't exist in current Lua State." << std::endl;
+	}
+	
+	lua_settop(l, stackSize);
+}
+
+template <typename T, typename R>
+void LuaAPI::RegisteredType::AddGetter(lua_State* l, const std::string& funcName, R T::*var) {
+	int stackSize = lua_gettop(l);
+	
+	if (!luaL_newmetatable(l, (mName + ".mt").c_str())) {
+		std::unique_ptr<RegisteredFuncBase> funcPtr = std::make_unique< RegisteredGetFunc<T, R> >(var);
+		auto res = mFunctions.insert(std::make_pair(funcName, std::move(funcPtr)));
+		
+		if (res.second) {
+			lua_pushinteger(l, mCounter);
+			lua_pushstring(l, mName.c_str());
+			lua_pushstring(l, funcName.c_str());
+			static const struct luaL_Reg funcReg[] = {
+				{funcName.c_str(), LuaAPI::OnFunction},
+				{nullptr, nullptr}
+			};
+			
+			luaL_openlib(l, NULL, funcReg, 3);
+		}
+		else {
+			std::cout << "(LuaAPI) Getter Registration Error: function with name " << funcName << " is already registered." << std::endl;
+		}
+	}
+	else {
+		lua_pushnil(l);
+		lua_setfield(l, LUA_REGISTRYINDEX, (mName + ".mt").c_str());
+		std::cout << "(LuaAPI) Getter Registration Error: metatable with name " << mName << ".mt doesn't exist in current Lua State." << std::endl;
+	}
+	
+	lua_settop(l, stackSize);
+}
+
+template <typename T, typename R>
+void LuaAPI::RegisteredType::AddSetter(lua_State* l, const std::string& funcName, R T::*var) {
+	int stackSize = lua_gettop(l);
+	
+	if (!luaL_newmetatable(l, (mName + ".mt").c_str())) {
+		std::unique_ptr<RegisteredFuncBase> funcPtr = std::make_unique< RegisteredSetFunc<T, R> >(var);
+		auto res = mFunctions.insert(std::make_pair(funcName, std::move(funcPtr)));
+		
+		if (res.second) {
+			lua_pushinteger(l, mCounter);
+			lua_pushstring(l, mName.c_str());
+			lua_pushstring(l, funcName.c_str());
+			static const struct luaL_Reg funcReg[] = {
+				{funcName.c_str(), LuaAPI::OnFunction},
+				{nullptr, nullptr}
+			};
+			
+			luaL_openlib(l, NULL, funcReg, 3);
+		}
+		else {
+			std::cout << "(LuaAPI) Setter Registration Error: function with name " << funcName << " is already registered." << std::endl;
+		}
+	}
+	else {
+		lua_pushnil(l);
+		lua_setfield(l, LUA_REGISTRYINDEX, (mName + ".mt").c_str());
+		std::cout << "(LuaAPI) Setter Registration Error: metatable with name " << mName << ".mt doesn't exist in current Lua State." << std::endl;
 	}
 	
 	lua_settop(l, stackSize);
@@ -795,6 +902,48 @@ bool LuaAPI::RegisterFunction(const std::string& funcName, R(T::*func)(Ps...)) {
 	}
 	
 	(indexType->second).AddFunction<T, R, Ps...>(mState, funcName, func);
+	
+	return true;
+}
+
+template <typename T, typename R>
+bool LuaAPI::RegisterGetter(const std::string& funcName, R T::*var) {
+	auto indexType = mIndexTypeMap.find(std::type_index(typeid(T)));
+	if (indexType == mIndexTypeMap.end()) {
+		std::cout << "(LuaAPI) Getter Registration Error: type not registered." << std::endl;
+		return false;
+	}
+	
+	if (luaL_newmetatable(mState, ((indexType->second).GetName() + ".mt").c_str())) {
+		lua_pushnil(mState);
+		lua_setfield(mState, LUA_REGISTRYINDEX, ((indexType->second).GetName() + ".mt").c_str());
+		
+		std::cout << "(LuaAPI) Getter Registration Error: metatable with name " << (indexType->second).GetName() << ".mt doesn't exist in current Lua State." << std::endl;
+		return false;
+	}
+	
+	(indexType->second).AddGetter<T, R>(mState, funcName, var);
+	
+	return true;
+}
+
+template <typename T, typename R>
+bool LuaAPI::RegisterSetter(const std::string& funcName, R T::*var) {
+	auto indexType = mIndexTypeMap.find(std::type_index(typeid(T)));
+	if (indexType == mIndexTypeMap.end()) {
+		std::cout << "(LuaAPI) Getter Registration Error: type not registered." << std::endl;
+		return false;
+	}
+	
+	if (luaL_newmetatable(mState, ((indexType->second).GetName() + ".mt").c_str())) {
+		lua_pushnil(mState);
+		lua_setfield(mState, LUA_REGISTRYINDEX, ((indexType->second).GetName() + ".mt").c_str());
+		
+		std::cout << "(LuaAPI) Getter Registration Error: metatable with name " << (indexType->second).GetName() << ".mt doesn't exist in current Lua State." << std::endl;
+		return false;
+	}
+	
+	(indexType->second).AddSetter<T, R>(mState, funcName, var);
 	
 	return true;
 }

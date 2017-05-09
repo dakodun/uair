@@ -121,6 +121,30 @@ class EXPORTDLL LuaAPI {
 				private :
 					std::function<void(T&, Ps...)> mFunctionPtr;
 			};
+			
+			// stores a member variable (R T::*var) and performs a get function on it
+			template <class T, class R>
+			class RegisteredGetFunc : public RegisteredFuncBase {
+				public :
+					RegisteredGetFunc(R T::*var);
+					
+					int Call(lua_State* l, const unsigned int& counter, const std::string& name);
+				
+				private :
+					R T::*mVarPtr;
+			};
+			
+			// stores a member variable (R T::*var) and performs a set function on it
+			template <class T, class R>
+			class RegisteredSetFunc : public RegisteredFuncBase {
+				public :
+					RegisteredSetFunc(R T::*var);
+					
+					int Call(lua_State* l, const unsigned int& counter, const std::string& name);
+				
+				private :
+					R T::*mVarPtr;
+			};
 		//
 		
 		// holds the constructor, destructor and functions for a type registered with lua
@@ -142,6 +166,12 @@ class EXPORTDLL LuaAPI {
 				
 				template <typename T, typename R, typename... Ps>
 				void AddFunction(lua_State* l, const std::string& funcName, R(T::*func)(Ps...));
+				
+				template <typename T, typename R>
+				void AddGetter(lua_State* l, const std::string& funcName, R T::*var);
+				
+				template <typename T, typename R>
+				void AddSetter(lua_State* l, const std::string& funcName, R T::*var);
 			
 			private :
 				std::unique_ptr<RegisteredFuncBase> mConstructor;
@@ -234,6 +264,14 @@ class EXPORTDLL LuaAPI {
 			// register a function (R T::Func(Ps...)) to type (T)
 			template <typename T, typename R, typename... Ps>
 			bool RegisterFunction(const std::string& funcName, R(T::*func)(Ps...));
+			
+			// register a simple getter to retrieve the value of var (return var)
+			template <typename T, typename R>
+			bool RegisterGetter(const std::string& funcName, R T::*var);
+			
+			// register a simple setter to assign a value to var (var = value)
+			template <typename T, typename R>
+			bool RegisterSetter(const std::string& funcName, R T::*var);
 		//
 		
 		// static callbacks that maps from lua to a luaapi(via upvalues)
