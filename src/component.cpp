@@ -32,6 +32,10 @@ Component::Component(const std::string& componentName) : mName(componentName) {
 	
 }
 
+Component::Component(const Component& other) : mName(other.mName) {
+	
+}
+
 Component::Component(Component&& other) : Component() {
 	swap(*this, other);
 }

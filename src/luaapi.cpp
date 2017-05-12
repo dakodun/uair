@@ -75,6 +75,10 @@ LuaAPI::LuaAPI() {
 	}
 }
 
+LuaAPI::LuaAPI(LuaAPI&& other) {
+	swap(*this, other);
+}
+
 LuaAPI::~LuaAPI() {
 	if (mState) { // if a lua state exists...
 		lua_close(mState); // clean it up (not strictly necessary)
@@ -83,6 +87,23 @@ LuaAPI::~LuaAPI() {
 	// remove the matching entry from the instance store after the state has been cleaned up
 	// to ensure things are cleaned up properly
 	mAPIInstances.erase(mCounter);
+}
+
+LuaAPI& LuaAPI::operator=(LuaAPI other) {
+	swap(*this, other);
+	
+	return *this;
+}
+
+void swap(LuaAPI& first, LuaAPI& second) {
+	std::swap(first.mState, second.mState);
+	std::swap(first.mSandbox, second.mSandbox);
+	std::swap(first.mCounter, second.mCounter);
+	
+	std::swap(first.mNameIndexMap, second.mNameIndexMap);
+	std::swap(first.mIndexTypeMap, second.mIndexTypeMap);
+	
+	std::swap(first.mWhitelist, second.mWhitelist);
 }
 
 void LuaAPI::PushStack(const Nil& value) {

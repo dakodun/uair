@@ -181,14 +181,24 @@ class EXPORTDLL LuaAPI {
 				unsigned int mCounter;
 				std::string mName;
 		};
+		
+		// wraps a type allowing additional information to be stored alongside it
+		template <class T>
+		class UserDataWrapper {
+			public :
+				T* mUserData = nullptr;
+				bool mShouldDelete = false; // is this object managed by lua?
+		};
 	public :
 		LuaAPI();
 		LuaAPI(const LuaAPI& other)  = delete;
-		LuaAPI(LuaAPI&& other) = delete;
+		LuaAPI(LuaAPI&& other);
 		
 		~LuaAPI();
 		
-		LuaAPI& operator=(LuaAPI other) = delete;
+		LuaAPI& operator=(LuaAPI other);
+		
+		friend void swap(LuaAPI& first, LuaAPI& second);
 		
 		// call a script as a string in the sandbox
 			// call a script with no return values
@@ -222,16 +232,23 @@ class EXPORTDLL LuaAPI {
 		
 		// using recursion, push multiple values to the stack
 			template <typename P>
-			void PushStack(const P& value);
-			
-			template <typename P, typename... Ps>
-			void PushStack(const P& value, const Ps&... values);
+			void PushStack(P value);
 			
 			template <typename P>
-			static void PushStack(const unsigned int& counter, const P& value);
+			void PushStack(P* value);
 			
 			template <typename P, typename... Ps>
-			static void PushStack(const unsigned int& counter, const P& value, const Ps&... values);
+			void PushStack(P value, Ps... values);
+			
+			
+			template <typename P>
+			static void PushStack(const unsigned int& counter, P value);
+			
+			template <typename P>
+			static void PushStack(const unsigned int& counter, P* value);
+			
+			template <typename P, typename... Ps>
+			static void PushStack(const unsigned int& counter, P value, Ps... values);
 		//
 		
 		// using template specialisation, read a single value from the stack

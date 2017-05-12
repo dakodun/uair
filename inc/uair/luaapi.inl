@@ -35,11 +35,16 @@ namespace uair {
 	template <class T, class ...Ps>
 	template <typename Ta>
 	int LuaAPI::RegisteredConstFunc<T, Ps...>::CallAlias(lua_State* l, const unsigned int& counter, const std::string& name) {
-		void* userdata = lua_newuserdata(l, sizeof(Ta*)); // create a new block of memory to hold registered type
+		typedef UserDataWrapper<Ta> WrappedType;
+		
+		void* userdata = lua_newuserdata(l, sizeof(WrappedType*)); // create a new block of memory to hold registered type
 		
 		if (!luaL_newmetatable(l, (name + ".mt").c_str())) { // attempt to retrieve the metatable associated with registered type...
-			Ta** data = static_cast<Ta**>(userdata);
-			*data = new Ta(); // create a new instance of registered type
+			WrappedType** data = static_cast<WrappedType**>(userdata);
+			*data = new WrappedType();
+			
+			(*data)->mUserData = new Ta;
+			(*data)->mShouldDelete = true;
 			
 			lua_setmetatable(l, -2); // assign the metatable to the new userdata
 			return 1;
@@ -57,14 +62,19 @@ namespace uair {
 	template <class T, class ...Ps>
 	template <typename Ta, typename Pa>
 	int LuaAPI::RegisteredConstFunc<T, Ps...>::CallAlias(lua_State* l, const unsigned int& counter, const std::string& name) {
+		typedef UserDataWrapper<Ta> WrappedType;
+		
 		int stackSize = lua_gettop(l);
 		auto arg = ReadStack<Pa>(counter, stackSize); // read the single parameter (Pa) from the stack
 		
-		void* userdata = lua_newuserdata(l, sizeof(Ta*));
+		void* userdata = lua_newuserdata(l, sizeof(WrappedType*));
 		
 		if (!luaL_newmetatable(l, (name + ".mt").c_str())) {
-			Ta** data = static_cast<Ta**>(userdata);
-			*data = new Ta(arg);
+			WrappedType** data = static_cast<WrappedType**>(userdata);
+			*data = new WrappedType();
+			
+			(*data)->mUserData = new Ta;
+			(*data)->mShouldDelete = true;
 			
 			lua_setmetatable(l, -2);
 			return 1;
@@ -81,16 +91,21 @@ namespace uair {
 	template <class T, class ...Ps>
 	template <typename Ta, typename P1a, typename P2a, typename ...Psa>
 	int LuaAPI::RegisteredConstFunc<T, Ps...>::CallAlias(lua_State* l, const unsigned int& counter, const std::string& name) {
+		typedef UserDataWrapper<Ta> WrappedType;
+		
 		int stackSize = lua_gettop(l);
 		auto args = ReadStack<P1a, P2a, Psa...>(counter, stackSize - (1 + sizeof...(Psa))); // read the parameters (P1a, P2a, Psa...) from the stack into a tuple
 		
-		// lambda function that creates a new type (T) using an expanded tuple (std::get<0>(tuple), std::get<1>(tuple), etc)
+		// lambda function that creates a new type (Ta) using an expanded tuple (std::get<0>(tuple), std::get<1>(tuple), etc)
 		auto construct = [l, &name](auto&... tupleElements)->int {
-			void* userdata = lua_newuserdata(l, sizeof(Ta*));
+			void* userdata = lua_newuserdata(l, sizeof(WrappedType*));
 			
 			if (!luaL_newmetatable(l, (name + ".mt").c_str())) {
-				Ta** data = static_cast<Ta**>(userdata);
-				*data = new Ta(tupleElements...);
+				WrappedType** data = static_cast<WrappedType**>(userdata);
+				*data = new WrappedType();
+				
+				(*data)->mUserData = new Ta;
+				(*data)->mShouldDelete = true;
 				
 				lua_setmetatable(l, -2);
 				return 1;
@@ -111,10 +126,17 @@ namespace uair {
 	
 	template <class T>
 	int LuaAPI::RegisteredDestFunc<T>::Call(lua_State* l, const unsigned int& counter, const std::string& name) {
+		typedef UserDataWrapper<T> WrappedType;
+		
 		void* userdata = luaL_checkudata(l, 1, (name + ".mt").c_str()); // check that the userdata is the correct type
 		if (userdata != nullptr) { // if the userdata is valid...
-			T** data = static_cast<T**>(userdata);
-			delete *data;
+			WrappedType** data = static_cast<WrappedType**>(userdata);
+			
+			if ((*data)->mShouldDelete) { // if the userdata's lifetime should be manage by lua...
+				delete (*data)->mUserData; // delete the userdata
+			}
+			
+			delete *data; // delete the wrapper object
 		}
 		
 		return 0;
@@ -134,11 +156,13 @@ namespace uair {
 	template <class T, class R, class... Ps>
 	template <typename Ta, typename Ra>
 	int LuaAPI::RegisteredFunc<T, R, Ps...>::CallAlias(lua_State* l, const unsigned int& counter, const std::string& name) {
+		typedef UserDataWrapper<Ta> WrappedType;
+		
 		void* userdata = luaL_checkudata(l, 1, (name + ".mt").c_str());
 		if (userdata != nullptr) {
-			Ta** data = static_cast<Ta**>(userdata);
+			WrappedType** data = static_cast<WrappedType**>(userdata);
 			
-			auto res = mFunctionPtr(**data);
+			auto res = mFunctionPtr(*((*data)->mUserData));
 			PushStack(counter, res); // add the return value to the stack
 			
 			return 1;
@@ -150,14 +174,16 @@ namespace uair {
 	template <class T, class R, class... Ps>
 	template <typename Ta, typename Ra, typename Pa>
 	int LuaAPI::RegisteredFunc<T, R, Ps...>::CallAlias(lua_State* l, const unsigned int& counter, const std::string& name) {
+		typedef UserDataWrapper<Ta> WrappedType;
+		
 		int stackSize = lua_gettop(l);
 		void* userdata = luaL_checkudata(l, 1, (name + ".mt").c_str());
 		
 		if (userdata != nullptr) {
-			Ta** data = static_cast<Ta**>(userdata);
+			WrappedType** data = static_cast<WrappedType**>(userdata);
 			
 			auto arg = ReadStack<Pa>(counter, stackSize);
-			auto res = mFunctionPtr(**data, arg);
+			auto res = mFunctionPtr(*((*data)->mUserData), arg);
 			PushStack(counter, res);
 			
 			return 1;
@@ -169,15 +195,17 @@ namespace uair {
 	template <class T, class R, class... Ps>
 	template <typename Ta, typename Ra, typename P1a, typename P2a, typename ...Psa>
 	int LuaAPI::RegisteredFunc<T, R, Ps...>::CallAlias(lua_State* l, const unsigned int& counter, const std::string& name) {
+		typedef UserDataWrapper<Ta> WrappedType;
+		
 		int stackSize = lua_gettop(l);
 		auto args = ReadStack<P1a, P2a, Psa...>(counter, stackSize - (1 + sizeof...(Psa)));
 		
 		auto call = [this, l, &counter, &name](auto&... tupleElements)->int {
 			void* userdata = luaL_checkudata(l, 1, (name + ".mt").c_str());
 			if (userdata != nullptr) {
-				Ta** data = static_cast<Ta**>(userdata);
+				WrappedType** data = static_cast<WrappedType**>(userdata);
 				
-				auto res = mFunctionPtr(**data, tupleElements...);
+				auto res = mFunctionPtr(*((*data)->mUserData), tupleElements...);
 				PushStack(counter, res);
 				
 				return 1;
@@ -203,11 +231,13 @@ namespace uair {
 	template <class T, class... Ps>
 	template <typename Ta>
 	int LuaAPI::RegisteredFunc<T, void, Ps...>::CallAlias(lua_State* l, const unsigned int& counter, const std::string& name) {
+		typedef UserDataWrapper<Ta> WrappedType;
+		
 		void* userdata = luaL_checkudata(l, 1, (name + ".mt").c_str());
 		if (userdata != nullptr) {
-			Ta** data = static_cast<Ta**>(userdata);
+			WrappedType** data = static_cast<WrappedType**>(userdata);
 			
-			mFunctionPtr(**data);
+			mFunctionPtr(*((*data)->mUserData));
 			
 			return 0;
 		}
@@ -218,14 +248,16 @@ namespace uair {
 	template <class T, class... Ps>
 	template <typename Ta, typename Pa>
 	int LuaAPI::RegisteredFunc<T, void, Ps...>::CallAlias(lua_State* l, const unsigned int& counter, const std::string& name) {
+		typedef UserDataWrapper<Ta> WrappedType;
+		
 		int stackSize = lua_gettop(l);
 		void* userdata = luaL_checkudata(l, 1, (name + ".mt").c_str());
 		
 		if (userdata != nullptr) {
-			Ta** data = static_cast<Ta**>(userdata);
+			WrappedType** data = static_cast<WrappedType**>(userdata);
 			
 			auto arg = ReadStack<Pa>(counter, stackSize);
-			mFunctionPtr(**data, arg);
+			mFunctionPtr(*((*data)->mUserData), arg);
 			
 			return 0;
 		}
@@ -236,15 +268,17 @@ namespace uair {
 	template <class T, class... Ps>
 	template <typename Ta, typename P1a, typename P2a, typename ...Psa>
 	int LuaAPI::RegisteredFunc<T, void, Ps...>::CallAlias(lua_State* l, const unsigned int& counter, const std::string& name) {
+		typedef UserDataWrapper<Ta> WrappedType;
+		
 		int stackSize = lua_gettop(l);
 		auto args = ReadStack<P1a, P2a, Psa...>(counter, stackSize - (1 + sizeof...(Psa)));
 		
 		auto call = [this, l, &counter, &name](auto&... tupleElements)->int {
 			void* userdata = luaL_checkudata(l, 1, (name + ".mt").c_str());
 			if (userdata != nullptr) {
-				Ta** data = static_cast<Ta**>(userdata);
+				WrappedType** data = static_cast<WrappedType**>(userdata);
 				
-				mFunctionPtr(**data, tupleElements...);
+				mFunctionPtr(*((*data)->mUserData), tupleElements...);
 			}
 			
 			return 0;
@@ -261,11 +295,13 @@ namespace uair {
 	
 	template <class T, class R>
 	int LuaAPI::RegisteredGetFunc<T, R>::Call(lua_State* l, const unsigned int& counter, const std::string& name) {
+		typedef UserDataWrapper<T> WrappedType;
+		
 		void* userdata = luaL_checkudata(l, 1, (name + ".mt").c_str());
 		if (userdata != nullptr) {
-			T** data = static_cast<T**>(userdata);
+			WrappedType** data = static_cast<WrappedType**>(userdata);
 			
-			PushStack(counter, (*data)->*mVarPtr);
+			PushStack(counter, (*data)->mUserData->*mVarPtr);
 			
 			return 1;
 		}
@@ -281,14 +317,16 @@ namespace uair {
 	
 	template <class T, class R>
 	int LuaAPI::RegisteredSetFunc<T, R>::Call(lua_State* l, const unsigned int& counter, const std::string& name) {
+		typedef UserDataWrapper<T> WrappedType;
+		
 		int stackSize = lua_gettop(l);
 		void* userdata = luaL_checkudata(l, 1, (name + ".mt").c_str());
 		
 		if (userdata != nullptr) {
-			T** data = static_cast<T**>(userdata);
+			WrappedType** data = static_cast<WrappedType**>(userdata);
 			
 			auto arg = ReadStack<R>(counter, stackSize);
-			(*data)->*mVarPtr = arg;
+			(*data)->mUserData->*mVarPtr = arg;
 			
 			return 0;
 		}
@@ -574,19 +612,55 @@ void LuaAPI::RegisteredType::AddSetter(lua_State* l, const std::string& funcName
 
 //
 	template <typename P>
-	void LuaAPI::PushStack(const P& value) {
+	void LuaAPI::PushStack(P value) {
 		auto indexType = mIndexTypeMap.find(std::type_index(typeid(P)));
 		if (indexType != mIndexTypeMap.end()) { // if the type we're pushing has been registered...
-			void* userdata = lua_newuserdata(mState, sizeof(P*));
+			typedef UserDataWrapper<P> WrappedType;
+			
+			void* userdata = lua_newuserdata(mState, sizeof(WrappedType*));
 			
 			// attempt to retrieve the metatable associated with registered type...
 			if (!luaL_newmetatable(mState, ((indexType->second).GetName() + ".mt").c_str())) {
-				// create a new instance of type (P) and assign the passed in value to it
+				WrappedType** data = static_cast<WrappedType**>(userdata);
+				*data = new WrappedType();
+				
+				// create a new instance of type (P), assign a copy of the passed in value to it and indicate
+				// that lua is to manage the lifetime of this new object
 				// if special attention is needed (such as no default constructor, move semantics, etc)
 				// then the template should be specialised for the type (P) instead
-				P** data = static_cast<P**>(userdata);
-				*data = new P();
-				**data = value;
+				(*data)->mUserData = new P; *((*data)->mUserData) = value;
+				(*data)->mShouldDelete = true;
+				
+				lua_setmetatable(mState, -2);
+			}
+			else { // if the metatable didn't exist (i.e., was just created)...
+				// clean up the newly created metatable
+				lua_pushnil(mState);
+				lua_setfield(mState, LUA_REGISTRYINDEX, ((indexType->second).GetName() + ".mt").c_str());
+				std::cout << "(LuaAPI) Stack Error (Push): metatable with name " << (indexType->second).GetName() << ".mt doesn't exist in current Lua State." << std::endl;
+			}
+		}
+		else { // if the type wasn't registered...
+			std::cout << "(LuaAPI) Stack Error (Push): unregistered type (pushing nil value instead)." << std::endl;
+			lua_pushnil(mState);
+		}
+	}
+	
+	template <typename P>
+	void LuaAPI::PushStack(P* value) {
+		auto indexType = mIndexTypeMap.find(std::type_index(typeid(typename std::remove_pointer<P>::type)));
+		if (indexType != mIndexTypeMap.end()) { // if the type we're pushing has been registered...
+			typedef UserDataWrapper<P> WrappedType;
+			
+			void* userdata = lua_newuserdata(mState, sizeof(WrappedType*));
+			
+			// attempt to retrieve the metatable associated with registered type...
+			if (!luaL_newmetatable(mState, ((indexType->second).GetName() + ".mt").c_str())) {
+				WrappedType** data = static_cast<WrappedType**>(userdata);
+				*data = new WrappedType();
+				
+				(*data)->mUserData = value;
+				(*data)->mShouldDelete = false;
 				
 				lua_setmetatable(mState, -2);
 			}
@@ -604,13 +678,14 @@ void LuaAPI::RegisteredType::AddSetter(lua_State* l, const std::string& funcName
 	}
 	
 	template <typename P, typename... Ps>
-	void LuaAPI::PushStack(const P& value, const Ps&... values) {
+	void LuaAPI::PushStack(P value, Ps... values) {
 		PushStack(value); // call the matching specialisation of Push for T
 		PushStack(values...); // recursive call placing the first of the remaining arguments Ps as T, and the rest as Ps (if any)
 	}
 	
+	
 	template <typename P>
-	void LuaAPI::PushStack(const unsigned int& counter, const P& value) {
+	void LuaAPI::PushStack(const unsigned int& counter, P value) {
 		auto apiInstance = mAPIInstances.find(counter); // retrieve the instance matching counter
 		if (apiInstance != mAPIInstances.end()) { // if a matching instance was found...
 			(apiInstance->second)->PushStack(value); // call that instance's matching push function
@@ -620,8 +695,19 @@ void LuaAPI::RegisteredType::AddSetter(lua_State* l, const std::string& funcName
 		}
 	}
 	
+	template <typename P>
+	void LuaAPI::PushStack(const unsigned int& counter, P* value) {
+		auto apiInstance = mAPIInstances.find(counter);
+		if (apiInstance != mAPIInstances.end()) {
+			(apiInstance->second)->PushStack(value);
+		}
+		else {
+			std::cout << "(LuaAPI) Stack Error (Push): invalid LuaAPI instance counter." << std::endl;
+		}
+	}
+	
 	template <typename P, typename... Ps>
-	void LuaAPI::PushStack(const unsigned int& counter, const P& value, const Ps&... values) {
+	void LuaAPI::PushStack(const unsigned int& counter, P value, Ps... values) {
 		auto apiInstance = mAPIInstances.find(counter);
 		if (apiInstance != mAPIInstances.end()) {
 			(apiInstance->second)->PushStack(value, values...);
@@ -635,6 +721,8 @@ void LuaAPI::RegisteredType::AddSetter(lua_State* l, const std::string& funcName
 //
 	template <typename R>
 	R LuaAPI::ReadStack(const int& index) {
+		typedef UserDataWrapper<R> WrappedType;
+		
 		// create a new instance of type (R) to be used as the return value
 		// if special attention is needed (such as no default constructor, move semantics, etc)
 		// then the template should be specialised for the type (R) instead
@@ -652,8 +740,8 @@ void LuaAPI::RegisteredType::AddSetter(lua_State* l, const std::string& funcName
 			return result;
 		}
 		
-		R** data = static_cast<R**>(userdata);
-		result = **data;
+		WrappedType** data = static_cast<WrappedType**>(userdata);
+		result = *((*data)->mUserData);
 		return result;
 	}
 

@@ -37,7 +37,7 @@ namespace uair {
 class EXPORTDLL Component {
 	public :
 		Component(const std::string& componentName = "");
-		Component(const Component& other) = delete;
+		Component(const Component& other);
 		Component(Component&& other);
 		
 		virtual ~Component();
