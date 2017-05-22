@@ -36,6 +36,7 @@ namespace util {
 const float EPSILON = 1e-6f;
 const double PI = 3.1415926535897;
 const double PIOVER180 = PI / 180;
+const double C180OVERPI = 180 / PI;
 unsigned int LOGLEVEL = 0u;
 std::string LOGLOCATION = "";
 
@@ -198,6 +199,13 @@ extern glm::vec3 RotatePointAroundAxis(const glm::vec3& pointA, const glm::vec3&
 	return glm::normalize(rotation * pointA);
 }
 
+extern float AngleBetweenVectors(const glm::vec2& vecA, const glm::vec2& vecB) {
+	float dot = (vecA.x * vecB.x) + (vecA.y * vecB.y);
+	float det = (vecA.x * vecB.y) - (vecA.y * vecB.x);
+	
+	return (std::atan2(-det, -dot) + PI) * C180OVERPI;
+}
+
 extern std::string GetGLErrorStatus() {
 	GLenum err = glGetError();
 	switch (err) {
@@ -210,7 +218,7 @@ extern std::string GetGLErrorStatus() {
 		case GL_INVALID_FRAMEBUFFER_OPERATION :
 			return "invalid framebuffer operation";
 		case GL_OUT_OF_MEMORY :
-			return "our of memory";
+			return "out of memory";
 		default :
 			return "no error";
 	}

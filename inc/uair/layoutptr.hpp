@@ -85,8 +85,10 @@ class EXPORTDLL LayoutPtr : public LayoutPtrBase {
 		}
 		
 		friend void swap(LayoutPtr<T>& first, LayoutPtr<T>& second) {
-			std::swap(first.mPtr, second.mPtr);
-			std::swap(first.mID, second.mID);
+			using std::swap;
+			
+			swap(first.mPtr, second.mPtr);
+			swap(first.mID, second.mID);
 			
 			first.AddReference(first.mID);
 			second.AddReference(second.mID);

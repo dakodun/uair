@@ -43,8 +43,10 @@ SoundBuffer& SoundBuffer::operator=(SoundBuffer other) {
 }
 
 void swap(SoundBuffer& first, SoundBuffer& second) {
-	std::swap(first.mSampleData, second.mSampleData);
-	std::swap(first.mNumChannels, second.mNumChannels);
+	using std::swap;
+	
+	swap(first.mSampleData, second.mSampleData);
+	swap(first.mNumChannels, second.mNumChannels);
 }
 
 void SoundBuffer::LoadFromFile(const std::string& filename) {

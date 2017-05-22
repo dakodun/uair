@@ -57,6 +57,8 @@ Sound& Sound::operator=(Sound other) {
 }
 
 void swap(Sound& first, Sound& second) {
+	using std::swap;
+	
 	second.mLoops.store(first.mLoops.exchange(second.mLoops.load())); // swap the atomic loop counts
 	
 	// store the state of the sound's rtaudio stream
@@ -67,13 +69,13 @@ void swap(Sound& first, Sound& second) {
 	first.CloseRtAudioStream();
 	second.CloseRtAudioStream();
 	
-	std::swap(first.mSampleRate, second.mSampleRate);
-	std::swap(first.mBufferFrames, second.mBufferFrames);
-	std::swap(first.mNumChannels, second.mNumChannels);
+	swap(first.mSampleRate, second.mSampleRate);
+	swap(first.mBufferFrames, second.mBufferFrames);
+	swap(first.mNumChannels, second.mNumChannels);
 	
-	std::swap(first.mSamplePosition, second.mSamplePosition);
-	std::swap(first.mSampleDataPtr, second.mSampleDataPtr);
-	std::swap(first.mSoundBuffer, second.mSoundBuffer);
+	swap(first.mSamplePosition, second.mSamplePosition);
+	swap(first.mSampleDataPtr, second.mSampleDataPtr);
+	swap(first.mSoundBuffer, second.mSoundBuffer);
 	
 	if (secondSetUp) { // if the second sound's rtaudio stream was initialised...
 		first.OpenRtAudioStream(first.mNumChannels); // initialise the first sound's rtaudio stream

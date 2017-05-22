@@ -85,8 +85,10 @@ class EXPORTDLL ResourcePtr : public ResourcePtrBase {
 		}
 		
 		friend void swap(ResourcePtr<T>& first, ResourcePtr<T>& second) {
-			std::swap(first.mPtr, second.mPtr);
-			std::swap(first.mID, second.mID);
+			using std::swap;
+			
+			swap(first.mPtr, second.mPtr);
+			swap(first.mID, second.mID);
 			
 			first.AddReference(first.mID);
 			second.AddReference(second.mID);

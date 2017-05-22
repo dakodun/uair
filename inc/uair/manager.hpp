@@ -238,7 +238,7 @@ class Store : public StoreBase<B> {
 		std::vector<StoreEntry> mStore; // the resources handled by this store
 		
 		// a sequential list (ascending) of indices that were previously occupied but are now freed and available for re-use
-		std::priority_queue<unsigned int> mFreeIndices;
+		std::priority_queue<unsigned int, std::vector<unsigned int>, std::greater<unsigned int>> mFreeIndices;
 };
 
 // templated manager class that handles resources registered to it that derive from a common base
@@ -288,7 +288,9 @@ class Manager {
 		}
 		
 		friend void swap(Manager& first, Manager& second) {
-			std::swap(first.mLookup, second.mLookup);
+			using std::swap;
+			
+			swap(first.mLookup, second.mLookup);
 		}
 		
 		// register a derived resource type with the manager

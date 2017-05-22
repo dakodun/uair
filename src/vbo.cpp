@@ -77,14 +77,16 @@ VBO& VBO::operator=(VBO other) {
 }
 
 void swap(VBO& first, VBO& second) {
-	std::swap(first.mType, second.mType);
-	std::swap(first.mMinimumSize, second.mMinimumSize);
+	using std::swap;
 	
-	std::swap(first.mVertVBOID, second.mVertVBOID);
-	std::swap(first.mIndVBOID, second.mIndVBOID);
+	swap(first.mType, second.mType);
+	swap(first.mMinimumSize, second.mMinimumSize);
 	
-	std::swap(first.mSegmentInfo, second.mSegmentInfo);
-	std::swap(first.mVAOStore, second.mVAOStore);
+	swap(first.mVertVBOID, second.mVertVBOID);
+	swap(first.mIndVBOID, second.mIndVBOID);
+	
+	swap(first.mSegmentInfo, second.mSegmentInfo);
+	swap(first.mVAOStore, second.mVAOStore);
 }
 
 void VBO::Initialise() {

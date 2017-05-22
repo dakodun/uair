@@ -87,24 +87,26 @@ WindowWin32& WindowWin32::operator=(WindowWin32 other) {
 }
 
 void swap(WindowWin32& first, WindowWin32& second) {
-	std::swap(first.mWindowHandle, second.mWindowHandle);
-	std::swap(first.mDeviceContext, second.mDeviceContext);
+	using std::swap;
 	
-	std::swap(first.mMessageQueue, second.mMessageQueue);
+	swap(first.mWindowHandle, second.mWindowHandle);
+	swap(first.mDeviceContext, second.mDeviceContext);
 	
-	std::swap(first.mOpen, second.mOpen);
-	std::swap(first.mWinTitle, second.mWinTitle);
-	std::swap(first.mWinDS, second.mWinDS);
-	std::swap(first.mWinSize, second.mWinSize);
-	std::swap(first.mActualSize, second.mActualSize);
-	std::swap(first.mWinPos, second.mWinPos);
-	std::swap(first.mWinStyle, second.mWinStyle);
+	swap(first.mMessageQueue, second.mMessageQueue);
 	
-	std::swap(first.mHasFocus, second.mHasFocus);
-	std::swap(first.mCaptureCount, second.mCaptureCount);
+	swap(first.mOpen, second.mOpen);
+	swap(first.mWinTitle, second.mWinTitle);
+	swap(first.mWinDS, second.mWinDS);
+	swap(first.mWinSize, second.mWinSize);
+	swap(first.mActualSize, second.mActualSize);
+	swap(first.mWinPos, second.mWinPos);
+	swap(first.mWinStyle, second.mWinStyle);
 	
-	std::swap(first.mGlobalMouse, second.mGlobalMouse);
-	std::swap(first.mLocalMouse, second.mLocalMouse);
+	swap(first.mHasFocus, second.mHasFocus);
+	swap(first.mCaptureCount, second.mCaptureCount);
+	
+	swap(first.mGlobalMouse, second.mGlobalMouse);
+	swap(first.mLocalMouse, second.mLocalMouse);
 }
 
 void WindowWin32::Process() {

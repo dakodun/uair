@@ -48,7 +48,9 @@ FBO& FBO::operator=(FBO other) {
 }
 
 void swap(FBO& first, FBO& second) {
-	std::swap(first.mFBOID, second.mFBOID);
+	using std::swap;
+	
+	swap(first.mFBOID, second.mFBOID);
 }
 
 bool FBO::AttachTexture(ResourcePtr<Texture> texture, const GLenum& attachmentPoint, const GLint& textureLayer, const GLint& mipmapLevel) {

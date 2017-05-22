@@ -250,6 +250,8 @@ const std::vector<Contour>& Polygon::GetContours() const {
 }
 
 void Polygon::Offset(float distance, const ClipperLib::JoinType& miterType, const double& miterLimit) {
+	using std::swap;
+	
 	ClipperLib::ClipperOffset clipperOffset;
 	ClipperLib::Paths outPaths;
 	clipperOffset.MiterLimit = miterLimit;
@@ -269,8 +271,8 @@ void Polygon::Offset(float distance, const ClipperLib::JoinType& miterType, cons
 		std::vector<Contour> contours;
 		std::vector<glm::vec2> bounds;
 		
-		std::swap(mContours, contours);
-		std::swap(mBounds, bounds);
+		swap(mContours, contours);
+		swap(mBounds, bounds);
 	}
 	
 	AddContours(outContours); // add new offset contours to shape
@@ -283,6 +285,8 @@ void Polygon::ReverseWinding() {
 }
 
 void Polygon::PositionContoursAtOrigin() {
+	using std::swap;
+	
 	if (!mBounds.empty()) {
 		glm::vec2 lowest = mBounds.at(0);
 		
@@ -302,8 +306,8 @@ void Polygon::PositionContoursAtOrigin() {
 				std::vector<Contour> contours;
 				std::vector<glm::vec2> bounds;
 				
-				std::swap(mContours, contours);
-				std::swap(mBounds, bounds);
+				swap(mContours, contours);
+				swap(mBounds, bounds);
 			}
 			
 			AddContours(newContours); // add new offset contours to shape

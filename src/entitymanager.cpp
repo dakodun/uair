@@ -43,10 +43,12 @@ Entity& Entity::operator=(Entity other) {
 }
 
 void swap(Entity& first, Entity& second) {
-	std::swap(first.mComponentManager, second.mComponentManager);
+	using std::swap;
 	
-	std::swap(first.mEntityID, second.mEntityID);
-	std::swap(first.mName, second.mName);
+	swap(first.mComponentManager, second.mComponentManager);
+	
+	swap(first.mEntityID, second.mEntityID);
+	swap(first.mName, second.mName);
 }
 
 void Entity::RemoveComponent(const Manager<Component>::Handle& handle) {
@@ -109,9 +111,11 @@ EntityManager& EntityManager::operator=(EntityManager other) {
 }
 
 void swap(EntityManager& first, EntityManager& second) {
-	std::swap(first.mStore, second.mStore);
+	using std::swap;
 	
-	std::swap(first.mEntityCount, second.mEntityCount);
+	swap(first.mStore, second.mStore);
+	
+	swap(first.mEntityCount, second.mEntityCount);
 }
 
 EntityManager::Handle EntityManager::Add(const std::string& name) {

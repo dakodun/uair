@@ -96,14 +96,16 @@ LuaAPI& LuaAPI::operator=(LuaAPI other) {
 }
 
 void swap(LuaAPI& first, LuaAPI& second) {
-	std::swap(first.mState, second.mState);
-	std::swap(first.mSandbox, second.mSandbox);
-	std::swap(first.mCounter, second.mCounter);
+	using std::swap;
 	
-	std::swap(first.mNameIndexMap, second.mNameIndexMap);
-	std::swap(first.mIndexTypeMap, second.mIndexTypeMap);
+	swap(first.mState, second.mState);
+	swap(first.mSandbox, second.mSandbox);
+	swap(first.mCounter, second.mCounter);
 	
-	std::swap(first.mWhitelist, second.mWhitelist);
+	swap(first.mNameIndexMap, second.mNameIndexMap);
+	swap(first.mIndexTypeMap, second.mIndexTypeMap);
+	
+	swap(first.mWhitelist, second.mWhitelist);
 }
 
 void LuaAPI::PushStack(const Nil& value) {

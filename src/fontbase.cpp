@@ -90,25 +90,27 @@ FontBase::~FontBase() {
 }
 
 void swap(FontBase& first, FontBase& second) {
-	std::swap(first.mFTFace, second.mFTFace);
-	std::swap(first.mFontSize, second.mFontSize);
-	std::swap(first.mLineHeight, second.mLineHeight);
+	using std::swap;
 	
-	std::swap(first.mAdvanceMax, second.mAdvanceMax);
-	std::swap(first.mDropMax, second.mDropMax);
-	std::swap(first.mBearingMax, second.mBearingMax);
+	swap(first.mFTFace, second.mFTFace);
+	swap(first.mFontSize, second.mFontSize);
+	swap(first.mLineHeight, second.mLineHeight);
 	
-	std::swap(first.mGlyphs, second.mGlyphs);
-	std::swap(first.mKernMap, second.mKernMap);
+	swap(first.mAdvanceMax, second.mAdvanceMax);
+	swap(first.mDropMax, second.mDropMax);
+	swap(first.mBearingMax, second.mBearingMax);
 	
-	std::swap(first.mTextureSize, second.mTextureSize);
-	std::swap(first.mFBO, second.mFBO);
-	std::swap(first.mTexture, second.mTexture);
-	std::swap(first.mRenderBuffer, second.mRenderBuffer);
+	swap(first.mGlyphs, second.mGlyphs);
+	swap(first.mKernMap, second.mKernMap);
 	
-	std::swap(first.mRectangles, second.mRectangles);
+	swap(first.mTextureSize, second.mTextureSize);
+	swap(first.mFBO, second.mFBO);
+	swap(first.mTexture, second.mTexture);
+	swap(first.mRenderBuffer, second.mRenderBuffer);
 	
-	std::swap(first.mCacheTag, second.mCacheTag);
+	swap(first.mRectangles, second.mRectangles);
+	
+	swap(first.mCacheTag, second.mCacheTag);
 	
 	// ensure glyph shapes point to the correct font texture
 		for (auto glyph = first.mGlyphs.begin(); glyph != first.mGlyphs.end(); ++glyph) {
@@ -220,6 +222,8 @@ void FontBase::CreateCache(const std::string& cacheFilename) {
 }
 
 bool FontBase::LoadFromCache(const std::string& cacheFilename) {
+	using std::swap;
+	
 	if (mFTFace) { // if we already have a font face...
 		FT_Done_Face(mFTFace); // clean it up
 		mFTFace = nullptr; // reset the pointer
@@ -378,12 +382,12 @@ bool FontBase::LoadFromCache(const std::string& cacheFilename) {
 					glm::vec2(glyphRef.mDimensions.x, glyphRef.mDimensions.y), glm::vec2(0.0f, glyphRef.mDimensions.y)}));
 			shape.AddFrameCoords(&mTexture, glyphRef.mLayer, glyphRef.mTexCoords);
 			
-			std::swap(glyphRef.mBaseShape, shape);
+			swap(glyphRef.mBaseShape, shape);
 		}
 	}
 	
-	std::swap(mKernMap, kerningData); // set the kerning data
-	std::swap(mRectangles, packingRects); // set the packing data
+	swap(mKernMap, kerningData); // set the kerning data
+	swap(mRectangles, packingRects); // set the packing data
 	mFontSize   = std::max(1u, fontSize); // set the font size (and ensure it's valid)
 	mLineHeight = lineHeight; // set the new line vertical offset
 	

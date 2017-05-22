@@ -51,25 +51,27 @@ Font& Font::operator=(Font other) {
 }
 
 void swap(Font& first, Font& second) {
-	std::swap(first.mFTFace, second.mFTFace);
-	std::swap(first.mFontSize, second.mFontSize);
-	std::swap(first.mLineHeight, second.mLineHeight);
+	using std::swap;
 	
-	std::swap(first.mAdvanceMax, second.mAdvanceMax);
-	std::swap(first.mDropMax, second.mDropMax);
-	std::swap(first.mBearingMax, second.mBearingMax);
+	swap(first.mFTFace, second.mFTFace);
+	swap(first.mFontSize, second.mFontSize);
+	swap(first.mLineHeight, second.mLineHeight);
 	
-	std::swap(first.mGlyphs, second.mGlyphs);
-	std::swap(first.mKernMap, second.mKernMap);
+	swap(first.mAdvanceMax, second.mAdvanceMax);
+	swap(first.mDropMax, second.mDropMax);
+	swap(first.mBearingMax, second.mBearingMax);
 	
-	std::swap(first.mTextureSize, second.mTextureSize);
-	std::swap(first.mFBO, second.mFBO);
-	std::swap(first.mTexture, second.mTexture);
-	std::swap(first.mRenderBuffer, second.mRenderBuffer);
+	swap(first.mGlyphs, second.mGlyphs);
+	swap(first.mKernMap, second.mKernMap);
 	
-	std::swap(first.mRectangles, second.mRectangles);
+	swap(first.mTextureSize, second.mTextureSize);
+	swap(first.mFBO, second.mFBO);
+	swap(first.mTexture, second.mTexture);
+	swap(first.mRenderBuffer, second.mRenderBuffer);
 	
-	std::swap(first.mCacheTag, second.mCacheTag);
+	swap(first.mRectangles, second.mRectangles);
+	
+	swap(first.mCacheTag, second.mCacheTag);
 	
 	// ensure glyph shapes point to the correct font texture
 		for (auto glyph = first.mGlyphs.begin(); glyph != first.mGlyphs.end(); ++glyph) {

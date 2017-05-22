@@ -48,7 +48,9 @@ PBO& PBO::operator=(PBO other) {
 }
 
 void swap(PBO& first, PBO& second) {
-	std::swap(first.mPBOID, second.mPBOID);
+	using std::swap;
+	
+	swap(first.mPBOID, second.mPBOID);
 }
 
 void PBO::BufferData(const GLenum& target, const GLsizeiptr& size, const GLenum& usage) {

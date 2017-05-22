@@ -43,7 +43,9 @@ System& System::operator=(System other) {
 }
 
 void swap(System& first, System& second) {
-	std::swap(first.mRegisteredEntities, second.mRegisteredEntities);
+	using std::swap;
+	
+	swap(first.mRegisteredEntities, second.mRegisteredEntities);
 }
 
 void System::RegisterEntity(EntityManager::Handle handle) {
@@ -78,6 +80,8 @@ SystemManager& SystemManager::operator=(SystemManager other) {
 }
 
 void swap(SystemManager& first, SystemManager& second) {
-	std::swap(first.mStore, second.mStore);
+	using std::swap;
+	
+	swap(first.mStore, second.mStore);
 }
 }

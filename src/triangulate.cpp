@@ -72,14 +72,16 @@ Triangulate& Triangulate::operator=(Triangulate other) {
 }
 
 void swap(Triangulate& first, Triangulate& second) {
-	std::swap(first.mTesselator, second.mTesselator);
+	using std::swap;
 	
-	std::swap(first.mContours, second.mContours);
-	std::swap(first.mVertexCount, second.mVertexCount);
+	swap(first.mTesselator, second.mTesselator);
 	
-	std::swap(first.mVertices, second.mVertices);
-	std::swap(first.mIndices, second.mIndices);
-	std::swap(first.mNewVertices, second.mNewVertices);
+	swap(first.mContours, second.mContours);
+	swap(first.mVertexCount, second.mVertexCount);
+	
+	swap(first.mVertices, second.mVertices);
+	swap(first.mIndices, second.mIndices);
+	swap(first.mNewVertices, second.mNewVertices);
 }
 
 Triangulate::~Triangulate() {

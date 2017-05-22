@@ -51,7 +51,9 @@ Component& Component::operator=(Component other) {
 }
 
 void swap(Component& first, Component& second) {
-	std::swap(first.mName, second.mName);
+	using std::swap;
+	
+	swap(first.mName, second.mName);
 }
 
 std::string Component::GetName() const {

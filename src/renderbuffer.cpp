@@ -48,10 +48,12 @@ RenderBuffer& RenderBuffer::operator=(RenderBuffer other) {
 }
 
 void swap(RenderBuffer& first, RenderBuffer& second) {
-	std::swap(first.mRenderBufferID, second.mRenderBufferID);
+	using std::swap;
 	
-	std::swap(first.mWidth, second.mWidth);
-	std::swap(first.mHeight, second.mHeight);
+	swap(first.mRenderBufferID, second.mRenderBufferID);
+	
+	swap(first.mWidth, second.mWidth);
+	swap(first.mHeight, second.mHeight);
 }
 
 bool RenderBuffer::CreateRenderBuffer(const GLenum& internalformat, const unsigned int& width, const unsigned int& height) {

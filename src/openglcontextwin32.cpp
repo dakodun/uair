@@ -83,10 +83,12 @@ OpenGLContextWin32& OpenGLContextWin32::operator=(OpenGLContextWin32 other) {
 }
 
 void swap(OpenGLContextWin32& first, OpenGLContextWin32& second) {
-	std::swap(first.mRenderContext, second.mRenderContext);
-	std::swap(first.mGlewContext, second.mGlewContext);
-	std::swap(first.mGlewContextWin32, second.mGlewContextWin32);
-	// std::swap(first.mWindowPtr, second.mWindowPtr);
+	using std::swap;
+	
+	swap(first.mRenderContext, second.mRenderContext);
+	swap(first.mGlewContext, second.mGlewContext);
+	swap(first.mGlewContextWin32, second.mGlewContextWin32);
+	// swap(first.mWindowPtr, second.mWindowPtr);
 }
 
 void OpenGLContextWin32::MakeCurrent(Window& window) {

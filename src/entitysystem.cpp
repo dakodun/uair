@@ -39,10 +39,12 @@ EntitySystem& EntitySystem::operator=(EntitySystem other) {
 }
 
 void swap(EntitySystem& first, EntitySystem& second) {
-	std::swap(first.mEntityManager, second.mEntityManager);
-	std::swap(first.mSystemManager, second.mSystemManager);
+	using std::swap;
 	
-	std::swap(first.mMessageQueue, second.mMessageQueue);
+	swap(first.mEntityManager, second.mEntityManager);
+	swap(first.mSystemManager, second.mSystemManager);
+	
+	swap(first.mMessageQueue, second.mMessageQueue);
 }
 
 // begin entity manager helpers...

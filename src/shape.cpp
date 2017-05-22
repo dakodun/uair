@@ -45,6 +45,8 @@ Shape::Shape(const ClipperLib::Paths& clipperPaths) {
 }
 
 void Shape::AddContour(const Contour& contour, const CoordinateSpace& coordinateSpace) {
+	using std::swap;
+	
 	Polygon::AddContour(contour, coordinateSpace); // add contour to shape using parent function
 	
 	// reset invalid indices, extra triangulation vertices, colours and tex coords
@@ -52,17 +54,19 @@ void Shape::AddContour(const Contour& contour, const CoordinateSpace& coordinate
 	std::vector<Triangulate::Vertex> vertices;
 	std::vector<glm::vec4> colourArrayExtra;
 	
-	std::swap(mIndices, indices);
-	std::swap(mVertices, vertices);
-	std::swap(mColourArrayExtra, colourArrayExtra);
+	swap(mIndices, indices);
+	swap(mVertices, vertices);
+	swap(mColourArrayExtra, colourArrayExtra);
 	
 	for (auto frame = mFrames.begin(); frame < mFrames.end(); ++frame) {
 		std::vector<glm::vec2> texCoordsExtra;
-		std::swap(frame->mTexCoordsExtra, texCoordsExtra);
+		swap(frame->mTexCoordsExtra, texCoordsExtra);
 	}
 }
 
 void Shape::AddContours(const std::vector<Contour>& contours, const CoordinateSpace& coordinateSpace) {
+	using std::swap;
+	
 	Polygon::AddContours(contours, coordinateSpace); // add contours to shape using parent function
 	
 	// reset invalid indices, extra triangulation vertices, colours and tex coords
@@ -70,17 +74,19 @@ void Shape::AddContours(const std::vector<Contour>& contours, const CoordinateSp
 	std::vector<Triangulate::Vertex> vertices;
 	std::vector<glm::vec4> colourArrayExtra;
 	
-	std::swap(mIndices, indices);
-	std::swap(mVertices, vertices);
-	std::swap(mColourArrayExtra, colourArrayExtra);
+	swap(mIndices, indices);
+	swap(mVertices, vertices);
+	swap(mColourArrayExtra, colourArrayExtra);
 	
 	for (auto frame = mFrames.begin(); frame < mFrames.end(); ++frame) {
 		std::vector<glm::vec2> texCoordsExtra;
-		std::swap(frame->mTexCoordsExtra, texCoordsExtra);
+		swap(frame->mTexCoordsExtra, texCoordsExtra);
 	}
 }
 
 void Shape::Offset(float distance, const ClipperLib::JoinType& miterType, const double& miterLimit) {
+	using std::swap;
+	
 	ClipperLib::ClipperOffset clipperOffset;
 	ClipperLib::Paths outPaths;
 	clipperOffset.MiterLimit = miterLimit;
@@ -100,14 +106,16 @@ void Shape::Offset(float distance, const ClipperLib::JoinType& miterType, const 
 		std::vector<Contour> contours;
 		std::vector<glm::vec2> bounds;
 		
-		std::swap(mContours, contours);
-		std::swap(mBounds, bounds);
+		swap(mContours, contours);
+		swap(mBounds, bounds);
 	}
 	
 	AddContours(outContours); // add new offset contours to shape
 }
 
 void Shape::PositionContoursAtOrigin() {
+	using std::swap;
+	
 	if (!mBounds.empty()) {
 		glm::vec2 lowest = mBounds.at(0);
 		
@@ -127,8 +135,8 @@ void Shape::PositionContoursAtOrigin() {
 				std::vector<Contour> contours;
 				std::vector<glm::vec2> bounds;
 				
-				std::swap(mContours, contours);
-				std::swap(mBounds, bounds);
+				swap(mContours, contours);
+				swap(mBounds, bounds);
 			}
 			
 			AddContours(newContours); // add new offset contours to shape
@@ -137,12 +145,14 @@ void Shape::PositionContoursAtOrigin() {
 }
 
 void Shape::FromClipperPaths(const ClipperLib::Paths& clipperPaths) {
+	using std::swap;
+	
 	{ // clear invalid contours and bounds
 		std::vector<Contour> contours;
 		std::vector<glm::vec2> bounds;
 		
-		std::swap(mContours, contours);
-		std::swap(mBounds, bounds);
+		swap(mContours, contours);
+		swap(mBounds, bounds);
 	}
 	
 	std::vector<Contour> contours;
@@ -240,6 +250,8 @@ bool Shape::Process(float deltaTime) {
 }
 
 void Shape::SetWindingRule(const WindingRule& windingRule) {
+	using std::swap;
+	
 	if (mWindingRule != windingRule) { // if winding rule is not already set (prevents unneccesary retriangulation)...
 		mWindingRule = windingRule; // set the winding rule
 		
@@ -248,13 +260,13 @@ void Shape::SetWindingRule(const WindingRule& windingRule) {
 		std::vector<Triangulate::Vertex> vertices;
 		std::vector<glm::vec4> colourArrayExtra;
 		
-		std::swap(mIndices[4], indices);
-		std::swap(mVertices, vertices);
-		std::swap(mColourArrayExtra, colourArrayExtra);
+		swap(mIndices[4], indices);
+		swap(mVertices, vertices);
+		swap(mColourArrayExtra, colourArrayExtra);
 		
 		for (auto frame = mFrames.begin(); frame < mFrames.end(); ++frame) {
 			std::vector<glm::vec2> texCoordsExtra;
-			std::swap(frame->mTexCoordsExtra, texCoordsExtra);
+			swap(frame->mTexCoordsExtra, texCoordsExtra);
 		}
 	}
 }

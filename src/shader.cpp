@@ -50,9 +50,11 @@ Shader& Shader::operator=(Shader other) {
 }
 
 void swap(Shader& first, Shader& second) {
-	std::swap(first.mProgramID, second.mProgramID);
-	std::swap(first.mVertShaderString, second.mVertShaderString);
-	std::swap(first.mFragShaderString, second.mFragShaderString);
+	using std::swap;
+	
+	swap(first.mProgramID, second.mProgramID);
+	swap(first.mVertShaderString, second.mVertShaderString);
+	swap(first.mFragShaderString, second.mFragShaderString);
 }
 
 void Shader::LinkProgram() {

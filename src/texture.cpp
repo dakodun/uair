@@ -49,16 +49,20 @@ Texture& Texture::operator=(Texture other) {
 }
 
 void swap(Texture& first, Texture& second) {
-	std::swap(first.mTextureID, second.mTextureID);
+	using std::swap;
 	
-	std::swap(first.mData, second.mData);
-	std::swap(first.mLayerData, second.mLayerData);
-	std::swap(first.mWidth, second.mWidth);
-	std::swap(first.mHeight, second.mHeight);
-	std::swap(first.mIsTextureNull, second.mIsTextureNull);
+	swap(first.mTextureID, second.mTextureID);
+	
+	swap(first.mData, second.mData);
+	swap(first.mLayerData, second.mLayerData);
+	swap(first.mWidth, second.mWidth);
+	swap(first.mHeight, second.mHeight);
+	swap(first.mIsTextureNull, second.mIsTextureNull);
 }
 
 bool Texture::AddFromFile(const std::string & fileName, const bool& flip) {
+	using std::swap;
+	
 	TexelLayerPair tempData;
 	std::vector<unsigned char> buffer; // create a buffer for the texture data from the image file
 	
@@ -81,7 +85,7 @@ bool Texture::AddFromFile(const std::string & fileName, const bool& flip) {
 			newData.insert(newData.begin(), tempData.first.begin() + (increment * i), tempData.first.begin() + (increment * (i + 1)));
 		}
 		
-		std::swap(tempData.first, newData);
+		swap(tempData.first, newData);
 	}
 	
 	mData.push_back(std::move(tempData)); // move the temporary into the store
@@ -89,6 +93,8 @@ bool Texture::AddFromFile(const std::string & fileName, const bool& flip) {
 }
 
 bool Texture::AddFromMemory(std::vector<unsigned char> data, const unsigned int& width, const unsigned int& height, const bool& flip) {
+	using std::swap;
+	
 	unsigned int layerCount = width * height * 4u; // the count of data (texels) in each layer
 	
 	if (layerCount > 0u) { // if there is any layer data (both width and height > 0)...
@@ -115,7 +121,7 @@ bool Texture::AddFromMemory(std::vector<unsigned char> data, const unsigned int&
 					newData.insert(newData.begin(), dataLayer.begin() + (increment * i), dataLayer.begin() + (increment * (i + 1)));
 				}
 				
-				std::swap(dataLayer, newData);
+				swap(dataLayer, newData);
 			}
 			
 			if (!dataLayer.empty() && mIsTextureNull) { // if there is data in the temporary and the texture is currently null...

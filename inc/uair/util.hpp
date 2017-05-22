@@ -33,6 +33,7 @@
 #include <vector>
 #include <locale>
 #include <codecvt>
+#include <queue>
 
 #include "init.hpp"
 
@@ -50,6 +51,7 @@ namespace util {
 EXPORTDLL extern const float EPSILON;
 EXPORTDLL extern const double PI;
 EXPORTDLL extern const double PIOVER180;
+EXPORTDLL extern const double C180OVERPI;
 EXPORTDLL extern unsigned int LOGLEVEL;
 EXPORTDLL extern std::string LOGLOCATION;
 
@@ -71,6 +73,8 @@ EXPORTDLL extern unsigned int NextPowerOf2(const unsigned int& input);
 EXPORTDLL extern int IsConvex(const glm::vec2& pointA, const glm::vec2& pointB, const glm::vec2& pointC);
 EXPORTDLL extern glm::vec2 ReflectPointByLine(const glm::vec2& pointA, const glm::vec2& pointB, const glm::vec2& pointC);
 EXPORTDLL extern glm::vec3 RotatePointAroundAxis(const glm::vec3& pointA, const glm::vec3& axis, const float& angle);
+
+EXPORTDLL extern float AngleBetweenVectors(const glm::vec2& vecA, const glm::vec2& vecB);
 
 EXPORTDLL extern std::string GetGLErrorStatus();
 EXPORTDLL extern void LogMessage(const unsigned int& level, const std::string& message);
@@ -127,7 +131,90 @@ template<typename F, typename... Ps, std::size_t... Is>
 auto ExpandTuple(F func, std::tuple<Ps...>& tuple, std::index_sequence<Is...>) {
 	return func(std::get<Is>(tuple)...); // pass the expanded tuple elements as arguments to the function
 }
+
+template <class T>
+class HandleStore {
+	public :
+		// an entry into the store that holds the object as well as data to ensure validity
+		class Entry {
+			public :
+				// create an entry (T) by copying or moving an exisiting object
+				explicit Entry(const T& value);
+				
+				// create an entry (T) in place using constructor parameters
+				template <typename ...Ps>
+				explicit Entry(Ps&&... params);
+				
+				Entry(const Entry& other) = delete; // std::unique_ptr can't be copied
+				Entry(Entry&& other); // std::unique_ptr can be moved
+				
+				Entry& operator=(Entry other);
+				
+				friend void swap(Entry& first, Entry& second) {
+					using std::swap;
+					
+					swap(first.mActive, second.mActive);
+					swap(first.mCounter, second.mCounter);
+					swap(first.mData, second.mData);
+				}
+			
+			public :
+				bool mActive = true; // is the entry active (i.e., has it been removed)
+				unsigned int mCounter = 0u; // the counter that ensures handles are still valid (i.e., its resource hasn't been removed and replaced)
+				std::unique_ptr<T> mData; // a pointer to an object of the type that this store handles
+		};
+		
+		// a handle that is used to refer to resources handled instead of a pointer
+		class Handle {
+			public :
+				Handle() = default;
+				
+				explicit Handle(const unsigned int& index, const unsigned int& counter) : mIndex(index), mCounter(counter) {
+					
+				}
+			public :
+				unsigned int mIndex = 0u; // the index of the resource in the store
+				unsigned int mCounter = 0u; // the counter value of the index used to validate the handle
+		};
+	
+	public :
+		HandleStore();
+		explicit HandleStore(const unsigned int& reserveCap);
+		HandleStore(const HandleStore& other) = delete; // std::unique_ptr can't be copied
+		HandleStore(HandleStore&& other); // std::unique_ptr can be moved
+		
+		HandleStore& operator=(HandleStore other);
+		
+		friend void swap(HandleStore& first, HandleStore& second) {
+			using std::swap;
+			
+			swap(first.mReserveCap, second.mReserveCap);
+			
+			swap(first.mStore, second.mStore);
+			swap(first.mFreeIndices, second.mFreeIndices);
+		}
+		
+		Handle Push(const T& value); // add an entry to the store via copying
+		Handle Push(T&& value); // add an entry to the store using move semantics
+		
+		template <typename ...Ps>
+		Handle Emplace(Ps&&... params); // construct an entry in the store
+		
+		void Pop(const Handle& handle); // remove an entry from the store
+		T& Get(const Handle& handle); // return a reference to an entry in the store
+		
+		unsigned int Size() const;
+	
+	public :
+		unsigned int mReserveCap = 100u; // how many slots to reserve in the store
+	private :
+		std::vector<Entry> mStore; // the resources handled by this store
+		
+		// a sequential list (ascending) of indices that were previously occupied but are now freed and available for re-use
+		std::priority_queue<unsigned int, std::vector<unsigned int>, std::greater<unsigned int>> mFreeIndices;
+};
 }
 }
 
+#include "util.inl"
 #endif
