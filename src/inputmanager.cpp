@@ -504,11 +504,7 @@ void InputManager::Reset() {
 		}
 	}
 	
-	for (auto iter = mMouseStates.begin(); iter != mMouseStates.end(); ++iter) { // update all mouse states
-		if (iter->second == 1u) { // if state is down
-			iter->second = 3u; // it is now released
-		}
-	}
+	ResetMouse();
 	
 	mMouseWheel = 0;
 	
@@ -521,6 +517,14 @@ void InputManager::Reset() {
 	}
 	
 	mInputString = u"";
+}
+
+void InputManager::ResetMouse() {
+	for (auto iter = mMouseStates.begin(); iter != mMouseStates.end(); ++iter) { // update all mouse states
+		if (iter->second == 1u) { // if state is down
+			iter->second = 3u; // it is now released
+		}
+	}
 }
 
 void InputManager::HandleKeyboardKeys(const Keyboard & key, const unsigned int & type) {

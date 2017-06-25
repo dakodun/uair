@@ -522,6 +522,8 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND& hWnd, const UINT& message
 			WindowMessage::LostCaptureMessage msg;
 			mMessageQueue.PushMessage<WindowMessage::LostCaptureMessage>(msg);
 			
+			mCaptureCount = 0;
+			
 			return 0;
 		}
 	}
@@ -564,7 +566,10 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND& hWnd, const UINT& message
 			WindowMessage::MouseButtonMessage msg(Mouse::Left, 0u);
 			mMessageQueue.PushMessage<WindowMessage::MouseButtonMessage>(msg);
 			
-			SetCapture(mWindowHandle); // capture the mouse input whilst the button is held down
+			if (mCaptureCount == 0) {
+				SetCapture(mWindowHandle); // capture the mouse input whilst the button is held down
+			}
+			
 			++mCaptureCount; // increment the capture count (to handle multiple buttons down)
 			
 			return 0;
@@ -586,7 +591,10 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND& hWnd, const UINT& message
 			WindowMessage::MouseButtonMessage msg(Mouse::Left, 2u);
 			mMessageQueue.PushMessage<WindowMessage::MouseButtonMessage>(msg);
 			
-			SetCapture(mWindowHandle);
+			if (mCaptureCount == 0) {
+				SetCapture(mWindowHandle);
+			}
+			
 			++mCaptureCount;
 			
 			return 0;
@@ -595,7 +603,10 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND& hWnd, const UINT& message
 			WindowMessage::MouseButtonMessage msg(Mouse::Middle, 0u);
 			mMessageQueue.PushMessage<WindowMessage::MouseButtonMessage>(msg);
 			
-			SetCapture(mWindowHandle);
+			if (mCaptureCount == 0) {
+				SetCapture(mWindowHandle);
+			}
+			
 			++mCaptureCount;
 			
 			return 0;
@@ -615,7 +626,10 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND& hWnd, const UINT& message
 			WindowMessage::MouseButtonMessage msg(Mouse::Middle, 2u);
 			mMessageQueue.PushMessage<WindowMessage::MouseButtonMessage>(msg);
 			
-			SetCapture(mWindowHandle);
+			if (mCaptureCount == 0) {
+				SetCapture(mWindowHandle);
+			}
+			
 			++mCaptureCount;
 			
 			return 0;
@@ -624,7 +638,10 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND& hWnd, const UINT& message
 			WindowMessage::MouseButtonMessage msg(Mouse::Right, 0u);
 			mMessageQueue.PushMessage<WindowMessage::MouseButtonMessage>(msg);
 			
-			SetCapture(mWindowHandle);
+			if (mCaptureCount == 0) {
+				SetCapture(mWindowHandle);
+			}
+			
 			++mCaptureCount;
 			
 			return 0;
@@ -644,7 +661,10 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND& hWnd, const UINT& message
 			WindowMessage::MouseButtonMessage msg(Mouse::Right, 2u);
 			mMessageQueue.PushMessage<WindowMessage::MouseButtonMessage>(msg);
 			
-			SetCapture(mWindowHandle);
+			if (mCaptureCount == 0) {
+				SetCapture(mWindowHandle);
+			}
+			
 			++mCaptureCount;
 			
 			return 0;
@@ -659,7 +679,10 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND& hWnd, const UINT& message
 				mMessageQueue.PushMessage<WindowMessage::MouseButtonMessage>(msg);
 			}
 			
-			SetCapture(mWindowHandle);
+			if (mCaptureCount == 0) {
+				SetCapture(mWindowHandle);
+			}
+			
 			++mCaptureCount;
 			
 			return 0;
@@ -691,7 +714,10 @@ LRESULT CALLBACK WindowWin32::HandleEvents(const HWND& hWnd, const UINT& message
 				mMessageQueue.PushMessage<WindowMessage::MouseButtonMessage>(msg);
 			}
 			
-			SetCapture(mWindowHandle);
+			if (mCaptureCount == 0) {
+				SetCapture(mWindowHandle);
+			}
+			
 			++mCaptureCount;
 			
 			return 0;

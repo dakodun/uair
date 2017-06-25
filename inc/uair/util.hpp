@@ -57,7 +57,9 @@ EXPORTDLL extern std::string LOGLOCATION;
 
 enum {
 	LessThan = 0u,
+	LessThanEquals,
 	Equals,
+	GreaterThanEquals,
 	GreaterThan
 };
 
@@ -104,7 +106,7 @@ extern std::string ToString(const T& t, int precision = -1) {
 		ss.precision(precision);
 	}
 	
-	ss << t;
+	ss << std::fixed << t;
 	
 	return ss.str();
 }
@@ -133,7 +135,7 @@ auto ExpandTuple(F func, std::tuple<Ps...>& tuple, std::index_sequence<Is...>) {
 }
 
 template <class T>
-class HandleStore {
+class HVector {
 	public :
 		// an entry into the store that holds the object as well as data to ensure validity
 		class Entry {
@@ -178,14 +180,14 @@ class HandleStore {
 		};
 	
 	public :
-		HandleStore();
-		explicit HandleStore(const unsigned int& reserveCap);
-		HandleStore(const HandleStore& other) = delete; // std::unique_ptr can't be copied
-		HandleStore(HandleStore&& other); // std::unique_ptr can be moved
+		HVector();
+		explicit HVector(const unsigned int& reserveCap);
+		HVector(const HVector& other) = delete; // std::unique_ptr can't be copied
+		HVector(HVector&& other); // std::unique_ptr can be moved
 		
-		HandleStore& operator=(HandleStore other);
+		HVector& operator=(HVector other);
 		
-		friend void swap(HandleStore& first, HandleStore& second) {
+		friend void swap(HVector& first, HVector& second) {
 			using std::swap;
 			
 			swap(first.mReserveCap, second.mReserveCap);

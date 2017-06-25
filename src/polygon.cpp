@@ -315,6 +315,27 @@ void Polygon::PositionContoursAtOrigin() {
 	}
 }
 
+glm::vec2 Polygon::GetProjection(const glm::vec2& projAxis) const {
+	// set the initial projection so it will always be overwritten by the point
+	glm::vec2 result(std::numeric_limits<float>::max(), std::numeric_limits<float>::lowest());
+	
+	for (const Contour& contour: mContours) { // for all contours in polygon...
+		// get the points that constitute the contour
+		std::vector<glm::vec2> points = contour.GetPoints();
+		
+		for (const glm::vec2& point: points) { // for all points in contour...
+			// get the dot product between the projection axis and the current point
+			float dot = (projAxis.x * (point.x + mPosition.x)) + (projAxis.y * (point.y + mPosition.y));
+			
+			// update the lower and upper bounds of the projection
+			result.x = std::min(result.x, dot);
+			result.y = std::max(result.y, dot);
+		}
+	}
+	
+	return result; // return the projection
+}
+
 Polygon::operator ClipperLib::Paths() const {
 	ClipperLib::Paths clipperPaths;
 	

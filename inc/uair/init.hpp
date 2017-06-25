@@ -56,8 +56,8 @@
 	extern WGLEWContext* wglewGetContext();
 	extern WGLEWContext* CURRENTCONTEXTWIN32;
 	
-	#ifdef UAIRDYNAMIC // if we're compiling a dynamic library...
-		#ifdef UAIREXPORTDLL
+	#ifdef _UAIR_DYNAMIC // if we're compiling a dynamic library...
+		#ifdef _UAIR_EXPORTDLL
 			#define EXPORTDLL __declspec(dllexport)
 		#else
 			#define EXPORTDLL __declspec(dllimport)

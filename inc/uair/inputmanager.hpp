@@ -137,6 +137,7 @@ class EXPORTDLL InputManager {
 		unsigned int GetDeviceLinkID(const int& deviceID, const Device& control) const; // helper function
 	private :
 		void Reset();
+		void ResetMouse();
 		
 		void HandleKeyboardKeys(const Keyboard& key, const unsigned int& type);
 		

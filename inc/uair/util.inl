@@ -28,23 +28,23 @@
 namespace uair {
 namespace util {
 template <class T>
-HandleStore<T>::Entry::Entry(const T& value) {
+HVector<T>::Entry::Entry(const T& value) {
 	mData = std::make_unique<T>(value);
 }
 
 template <class T>
 template <typename ...Ps>
-HandleStore<T>::Entry::Entry(Ps&&... params) {
+HVector<T>::Entry::Entry(Ps&&... params) {
 	mData = std::make_unique<T>(std::forward<Ps>(params)...);
 }
 
 template <class T>
-HandleStore<T>::Entry::Entry(Entry&& other) : Entry() {
+HVector<T>::Entry::Entry(Entry&& other) : Entry() {
 	swap(*this, other);
 }
 
 template <class T>
-typename HandleStore<T>::Entry& HandleStore<T>::Entry::operator=(Entry other) {
+typename HVector<T>::Entry& HVector<T>::Entry::operator=(Entry other) {
 	swap(*this, other);
 	
 	return *this;
@@ -52,29 +52,29 @@ typename HandleStore<T>::Entry& HandleStore<T>::Entry::operator=(Entry other) {
 
 
 template <class T>
-HandleStore<T>::HandleStore() {
+HVector<T>::HVector() {
 	mStore.reserve(mReserveCap); // reserve initial space to cut back on re-allocations
 }
 
 template <class T>
-HandleStore<T>::HandleStore(const unsigned int& reserveCap) : mReserveCap(reserveCap) {
+HVector<T>::HVector(const unsigned int& reserveCap) : mReserveCap(reserveCap) {
 	mStore.reserve(mReserveCap);
 }
 
 template <class T>
-HandleStore<T>::HandleStore(HandleStore&& other) : HandleStore() {
+HVector<T>::HVector(HVector&& other) : HVector() {
 	swap(*this, other);
 }
 
 template <class T>
-HandleStore<T>& HandleStore<T>::operator=(HandleStore other) {
+HVector<T>& HVector<T>::operator=(HVector other) {
 	swap(*this, other);
 	
 	return *this;
 }
 
 template <class T>
-typename HandleStore<T>::Handle HandleStore<T>::Push(const T& value) {
+typename HVector<T>::Handle HVector<T>::Push(const T& value) {
 	if (!mFreeIndices.empty()) { // if there exists a previously used index that is now free...
 		unsigned int freeIndex = mFreeIndices.top(); // get the lowest free index
 		
@@ -103,7 +103,7 @@ typename HandleStore<T>::Handle HandleStore<T>::Push(const T& value) {
 }
 
 template <class T>
-typename HandleStore<T>::Handle HandleStore<T>::Push(T&& value) {
+typename HVector<T>::Handle HVector<T>::Push(T&& value) {
 	if (!mFreeIndices.empty()) {
 		unsigned int freeIndex = mFreeIndices.top();
 		
@@ -130,7 +130,7 @@ typename HandleStore<T>::Handle HandleStore<T>::Push(T&& value) {
 
 template <class T>
 template <typename ...Ps>
-typename HandleStore<T>::Handle HandleStore<T>::Emplace(Ps&&... params) {
+typename HVector<T>::Handle HVector<T>::Emplace(Ps&&... params) {
 	if (!mFreeIndices.empty()) {
 		unsigned int freeIndex = mFreeIndices.top();
 		
@@ -156,7 +156,7 @@ typename HandleStore<T>::Handle HandleStore<T>::Emplace(Ps&&... params) {
 }
 
 template <class T>
-void HandleStore<T>::Pop(const Handle& handle) {
+void HVector<T>::Pop(const Handle& handle) {
 	// if the index is valid, the resource has not been removed already and the counters match...
 	if (handle.mIndex < mStore.size() && mStore.at(handle.mIndex).mActive &&
 			mStore.at(handle.mIndex).mCounter == handle.mCounter) {
@@ -172,7 +172,7 @@ void HandleStore<T>::Pop(const Handle& handle) {
 }
 
 template <class T>
-T& HandleStore<T>::Get(const Handle& handle) {
+T& HVector<T>::Get(const Handle& handle) {
 	if (handle.mIndex >= mStore.size()) { // if the index is out of bounds...
 		throw std::runtime_error("Store Error: handle index out of bounds.");
 	}
@@ -189,7 +189,7 @@ T& HandleStore<T>::Get(const Handle& handle) {
 }
 
 template <class T>
-unsigned int HandleStore<T>::Size() const {
+unsigned int HVector<T>::Size() const {
 	return mStore.size();
 }
 }

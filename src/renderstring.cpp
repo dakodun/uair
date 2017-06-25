@@ -483,7 +483,7 @@ void RenderString::CreateRenderCharacters(const std::u16string& newString) {
 				}
 				
 				shape.SetPosition(glm::vec2((advanceAccum + kerningAccum) + glyph.mBearing.x,
-						(mFont->GetBearingMax().y - glyph.mBearing.y) - mFont->GetBearingMax().y)); // position the glyph shape
+						((mFont->GetBearingMax().y - glyph.mBearing.y) - mFont->GetBearingMax().y) + lineOffset)); // position the glyph shape
 				
 				{ // update the local bounding box
 					// get the bounding box of the newly added character

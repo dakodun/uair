@@ -25,7 +25,7 @@
 **		   source distribution.
 ** **************************************************************** */
 
-#if !defined(UAIREXPORTDLL)
+#if !defined(_UAIR_EXPORTDLL)
 	#if defined(_WIN32) || defined(__WIN32__)
 		#include <windows.h>
 		

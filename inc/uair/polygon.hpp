@@ -97,6 +97,8 @@ class EXPORTDLL Polygon : public Transformable2D {
 		void ReverseWinding();
 		void PositionContoursAtOrigin();
 		
+		glm::vec2 GetProjection(const glm::vec2& projAxis) const;
+		
 		operator ClipperLib::Paths() const;
 		void FromClipperPaths(const ClipperLib::Paths& clipperPaths);
 		

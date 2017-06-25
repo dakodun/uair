@@ -63,8 +63,8 @@ class Test {
 
 int main(int argc, char* argv[]) {	
 	{
-		typedef uair::util::HandleStore<Test>::Handle TestHandle;
-		uair::util::HandleStore<Test> store(10);
+		typedef uair::util::HVector<Test>::Handle TestHandle;
+		uair::util::HVector<Test> store(10);
 		
 		// test the four methods of insertion (emplace (default/custom constructor) and push (copy/move))
 		// on a fresh store
@@ -309,8 +309,8 @@ int main(int argc, char* argv[]) {
 			
 			using std::swap;
 			
-			uair::util::HandleStore<Test> store2 = std::move(store);
-			uair::util::HandleStore<Test> store3;
+			uair::util::HVector<Test> store2 = std::move(store);
+			uair::util::HVector<Test> store3;
 			swap(store3, store2);
 			
 			Test& t = store3.Get(h3);

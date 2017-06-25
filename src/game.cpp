@@ -570,7 +570,7 @@ void Game::HandleMessageQueue(const MessageQueue::Entry& e) {
 			break;
 		}
 		case LostCaptureMessage::GetTypeID() : {
-			mInputManager->Reset();
+			mInputManager->ResetMouse();
 			break;
 		}
 		case KeyboardKeyMessage::GetTypeID() : {

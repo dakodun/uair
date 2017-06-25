@@ -41,33 +41,47 @@ unsigned int LOGLEVEL = 0u;
 std::string LOGLOCATION = "";
 
 extern bool CompareFloats(const float& first, const unsigned int& comparison, const float& second, const float& variance) {
+	float diff = first - second;
+	
 	switch (comparison) {
-		case 0 : { // less than
-			float diff = first - second;
+		case LessThan : { // less than
 			if (diff < -variance) {
 				return true;
 			}
 			
 			break;
 		}
-		case 1 : { // less than
-			float diff = first - second;
-			// std::cout << diff << " " << -variance << std::endl;
+		case LessThanEquals : { // less than or equals
+			if ((diff < -variance) || (diff > -variance && diff < variance)) {
+				
+				return true;
+			}
+			
+			break;
+		}
+		case Equals : { // equals
 			if (diff > -variance && diff < variance) {
 				return true;
 			}
 			
 			break;
 		}
-		case 2 : { // greater than
-			float diff = first - second;
-			// std::cout << diff << " " << -variance << std::endl;
+		case GreaterThanEquals : { // greater than or equals
+			if ((diff > variance) || (diff > -variance && diff < variance)) {
+				return true;
+			}
+			
+			break;
+		}
+		case GreaterThan : { // greater than
 			if (diff > variance) {
 				return true;
 			}
 			
 			break;
 		}
+		default :
+			break;
 	}
 	
 	return false;
