@@ -84,6 +84,9 @@
 #include "luaapi.hpp"
 #endif
 
+#include "body.hpp"
+#include "solver.hpp"
+
 #include "game.hpp"
 
 #endif

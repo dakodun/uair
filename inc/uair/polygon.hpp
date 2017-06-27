@@ -98,6 +98,7 @@ class EXPORTDLL Polygon : public Transformable2D {
 		void PositionContoursAtOrigin();
 		
 		glm::vec2 GetProjection(const glm::vec2& projAxis) const;
+		glm::vec2 GetCentroid();
 		
 		operator ClipperLib::Paths() const;
 		void FromClipperPaths(const ClipperLib::Paths& clipperPaths);
@@ -113,6 +114,9 @@ class EXPORTDLL Polygon : public Transformable2D {
 	protected :
 		std::vector<Contour> mContours;
 		std::vector<glm::vec2> mBounds;
+		
+		glm::vec2 mCentroid;
+		bool mCentroidUpdated = false;
 };
 }
 

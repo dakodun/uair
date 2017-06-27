@@ -95,6 +95,7 @@ void Game::Run() {
 		Input(); // handle all user input
 		mInputManager->Process(); // process the input manager (to update states)
 		
+		// [todo] handle a large dt by integrating it
 		// if we have a frame limit do the below
 		{ // handle process timing
 			double prevFrameTime = mTimer.GetElapsedTime(); // the time since the prvious frame

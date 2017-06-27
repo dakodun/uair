@@ -237,6 +237,7 @@ void Polygon::AddContour(const Contour& contour, const CoordinateSpace& coordina
 	}
 	
 	UpdateBounds(mContours.back()); // update bounds of polygon
+	mCentroidUpdated = true;
 }
 
 void Polygon::AddContours(const std::vector<Contour>& contours, const CoordinateSpace& coordinateSpace) {
@@ -334,6 +335,39 @@ glm::vec2 Polygon::GetProjection(const glm::vec2& projAxis) const {
 	}
 	
 	return result; // return the projection
+}
+
+glm::vec2 Polygon::GetCentroid() {
+	if (mCentroidUpdated) {
+		glm::vec2 centroidTotal;
+		
+		for (const Contour& contour: mContours) { // for all contours in polygon...
+			float signedArea = 0.0f; // the signed area of the current contour
+			glm::vec2 centroid; // the centroid for the current contour
+			
+			// get the points that constitute the contour
+			std::vector<glm::vec2> points = contour.GetPoints();
+			
+			for (unsigned int i = 0u; i < points.size(); ++i) {
+				unsigned int i2 = (i + 1) % points.size(); // calculate the (wrapped) index of the next point
+				
+				// calculate the partial signed area and add it to the total
+				float partialSA = (points.at(i).x * points.at(i2).y) - (points.at(i2).x * points.at(i).y);
+				signedArea += partialSA;
+				
+				centroid += (points.at(i) + points.at(i2)) * partialSA;
+			}
+			
+			signedArea *= 3; // (0.5 * 6)
+			centroidTotal += centroid / signedArea;
+		}
+		
+		// set the centroid as the average of all contours
+		mCentroid = centroidTotal / static_cast<float>(mContours.size());
+		mCentroidUpdated = false;
+	}
+	
+	return mCentroid;
 }
 
 Polygon::operator ClipperLib::Paths() const {
