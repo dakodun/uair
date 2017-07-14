@@ -46,6 +46,7 @@ class EXPORTDLL LayoutContainer : public LayoutBase {
 	public :
 		typedef std::tuple<unsigned int, unsigned int, unsigned int> Handle;
 		
+		LayoutContainer() = default;
 		LayoutContainer(const glm::vec2& position, const float& width, const float& height);
 		LayoutContainer(const glm::vec2& position, const float& width, const float& height,
 				LayoutContainer* parentContainer);

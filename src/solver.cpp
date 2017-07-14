@@ -245,18 +245,24 @@ bool Solver::HandleBodyCollision(Body& first, Body& second) {
 					glm::vec2 rPos = (secondPoly->GetCentroid() + secondPoly->GetPosition()) -
 							(firstPoly->GetCentroid() + firstPoly->GetPosition());
 					
-					// get the minimum translation normal (collision normal)
+					// get the minimum translation normal (collision normal) and distance
 					glm::vec2 mtNorm = std::get<1>(collisionResult);
+					float mtDist = std::get<2>(collisionResult);
 					
 					// if the mt normal points in the opposite direction...
 					if (util::CompareFloats((mtNorm.x * rPos.x) + (mtNorm.y * rPos.y), util::GreaterThanEquals, 0.0f)) {
 						mtNorm = -mtNorm; // reverse the direction of the mt normal
 					}
 					
-					glm::vec2 seperation = mtNorm * std::get<2>(collisionResult);
-					first.SetPosition(first.GetPosition() + seperation); // update the position of the first body
+					// store the current velocities before they are modified via impulse
+					glm::vec2 velFirst = first.GetVelocity();
+					glm::vec2 velSecond = second.GetVelocity();
 					
+					// resolve the collision by applying an impulse
 					ApplyImpulse(first, second, mtNorm);
+					
+					// seperate shapes along collision normal depending on mass, velocity and body type
+					PerformSeperation(first, second, mtNorm, mtDist, velFirst, velSecond);
 				}
 				
 				collision = true;
@@ -357,6 +363,49 @@ void Solver::ApplyImpulse(Body& first, Body& second, const glm::vec2& collNorm) 
 				second.SetVelocity(second.GetVelocity() + (second.GetInvMass() * impulseVec));
 			}
 		}
+	}
+}
+
+void Solver::PerformSeperation(Body& first, Body& second, const glm::vec2& collNorm, const float& collDist,
+		const glm::vec2& velocityFirst, const glm::vec2& velocitySecond) {
+	
+	float dist = std::max(collDist - 0.01f, 0.0f);
+	
+	// calculate the sum of both body's inverse mass
+	float sumInvMass = first.GetInvMass() + second.GetInvMass();
+	
+	if (util::CompareFloats(sumInvMass, util::Equals, 0.0f)) { // if both of the bodies have infinite mass...
+		glm::vec2 seperation = collNorm * (dist * 0.6f);
+		
+		if (second.IsStatic()) { // if the other body is static...
+			// seperate by moving the dynamic body the full seperation distance
+			first.SetPosition(first.GetPosition() + seperation);
+		}
+		else { // otherwise both bodies are dynamic...
+			// depending on which body (if any) is moving...
+			if (util::CompareFloats(velocityFirst.x, util::Equals, 0.0f) &&
+					util::CompareFloats(velocityFirst.y, util::Equals, 0.0f)) {
+				
+				second.SetPosition(second.GetPosition() - seperation); // adjust the body that is in motion
+			}
+			else if (util::CompareFloats(velocitySecond.x, util::Equals, 0.0f) &&
+					util::CompareFloats(velocitySecond.y, util::Equals, 0.0f)) {
+				
+				first.SetPosition(first.GetPosition() + seperation);
+			}
+			else {
+				// adjust both (in motion) bodies
+				first.SetPosition(first.GetPosition() + (seperation * 0.5f));
+				second.SetPosition(second.GetPosition() - (seperation * 0.5f));
+			}
+		}
+	}
+	else { // otherwise at least one of the bodies has a finite mass...
+		// seperate both bodies relative to their masses
+		glm::vec2 seperation = collNorm * ((dist / sumInvMass) * 0.6f);
+		
+		first.SetPosition(first.GetPosition() + (seperation * first.GetInvMass()));
+		second.SetPosition(second.GetPosition() - (seperation * second.GetInvMass()));
 	}
 }
 }

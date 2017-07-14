@@ -52,6 +52,9 @@
 #include "transformable3d.hpp"
 #include "triangulate.hpp"
 
+#include "hvector.hpp"
+#include "refptr.hpp"
+
 #include "sdffont.hpp"
 #include "font.hpp"
 #include "signeddistancefield.hpp"

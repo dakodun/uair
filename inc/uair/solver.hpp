@@ -89,6 +89,8 @@ class EXPORTDLL Solver {
 		bool HandleBodyCollision(Body& first, Body& second);
 		std::tuple<bool, glm::vec2, float> CheckPolygonCollision(const Polygon& first, const Polygon& second);
 		void ApplyImpulse(Body& first, Body& second, const glm::vec2& collNorm);
+		void PerformSeperation(Body& first, Body& second, const glm::vec2& collNorm, const float& collDist,
+				const glm::vec2& velocityFirst, const glm::vec2& velocitySecond);
 	
 	private :
 		std::list<Body> mStaticBodies;

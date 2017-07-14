@@ -63,6 +63,7 @@ class EXPORTDLL LayoutDivision : public LayoutBase {
 				LayoutDivision* mParentDivision = nullptr;
 		};
 		
+		LayoutDivision() = default;
 		LayoutDivision(const unsigned int& rows, const unsigned int& columns, LayoutContainer* parentContainer);
 		LayoutDivision(const unsigned int& rows, const unsigned int& columns, LayoutDivision* parentDivision,
 				const unsigned int& row, const unsigned int& column);

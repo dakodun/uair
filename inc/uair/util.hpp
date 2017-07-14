@@ -77,6 +77,8 @@ EXPORTDLL extern glm::vec2 ReflectPointByLine(const glm::vec2& pointA, const glm
 EXPORTDLL extern glm::vec3 RotatePointAroundAxis(const glm::vec3& pointA, const glm::vec3& axis, const float& angle);
 
 EXPORTDLL extern float AngleBetweenVectors(const glm::vec2& vecA, const glm::vec2& vecB);
+EXPORTDLL extern IsLeft(const glm::vec2& lineStart, const glm::vec2& lineEnd, const glm::vec2& point);
+EXPORTDLL extern PointInPolygon(const std::vector<glm::vec2>& polygon, const glm::vec2& point);
 
 EXPORTDLL extern std::string GetGLErrorStatus();
 EXPORTDLL extern void LogMessage(const unsigned int& level, const std::string& message);
@@ -133,88 +135,6 @@ template<typename F, typename... Ps, std::size_t... Is>
 auto ExpandTuple(F func, std::tuple<Ps...>& tuple, std::index_sequence<Is...>) {
 	return func(std::get<Is>(tuple)...); // pass the expanded tuple elements as arguments to the function
 }
-
-template <class T>
-class HVector {
-	public :
-		// an entry into the store that holds the object as well as data to ensure validity
-		class Entry {
-			public :
-				// create an entry (T) by copying or moving an exisiting object
-				explicit Entry(const T& value);
-				
-				// create an entry (T) in place using constructor parameters
-				template <typename ...Ps>
-				explicit Entry(Ps&&... params);
-				
-				Entry(const Entry& other) = delete; // std::unique_ptr can't be copied
-				Entry(Entry&& other); // std::unique_ptr can be moved
-				
-				Entry& operator=(Entry other);
-				
-				friend void swap(Entry& first, Entry& second) {
-					using std::swap;
-					
-					swap(first.mActive, second.mActive);
-					swap(first.mCounter, second.mCounter);
-					swap(first.mData, second.mData);
-				}
-			
-			public :
-				bool mActive = true; // is the entry active (i.e., has it been removed)
-				unsigned int mCounter = 0u; // the counter that ensures handles are still valid (i.e., its resource hasn't been removed and replaced)
-				std::unique_ptr<T> mData; // a pointer to an object of the type that this store handles
-		};
-		
-		// a handle that is used to refer to resources handled instead of a pointer
-		class Handle {
-			public :
-				Handle() = default;
-				
-				explicit Handle(const unsigned int& index, const unsigned int& counter) : mIndex(index), mCounter(counter) {
-					
-				}
-			public :
-				unsigned int mIndex = 0u; // the index of the resource in the store
-				unsigned int mCounter = 0u; // the counter value of the index used to validate the handle
-		};
-	
-	public :
-		HVector();
-		explicit HVector(const unsigned int& reserveCap);
-		HVector(const HVector& other) = delete; // std::unique_ptr can't be copied
-		HVector(HVector&& other); // std::unique_ptr can be moved
-		
-		HVector& operator=(HVector other);
-		
-		friend void swap(HVector& first, HVector& second) {
-			using std::swap;
-			
-			swap(first.mReserveCap, second.mReserveCap);
-			
-			swap(first.mStore, second.mStore);
-			swap(first.mFreeIndices, second.mFreeIndices);
-		}
-		
-		Handle Push(const T& value); // add an entry to the store via copying
-		Handle Push(T&& value); // add an entry to the store using move semantics
-		
-		template <typename ...Ps>
-		Handle Emplace(Ps&&... params); // construct an entry in the store
-		
-		void Pop(const Handle& handle); // remove an entry from the store
-		T& Get(const Handle& handle); // return a reference to an entry in the store
-		
-		unsigned int Size() const;
-	
-	public :
-		unsigned int mReserveCap = 100u; // how many slots to reserve in the store
-	private :
-		std::vector<Entry> mStore; // the resources handled by this store
-		
-		// a sequential list (ascending) of indices that were previously occupied but are now freed and available for re-use
-		std::priority_queue<unsigned int, std::vector<unsigned int>, std::greater<unsigned int>> mFreeIndices;
-};
 }
 }
 

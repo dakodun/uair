@@ -220,6 +220,42 @@ extern float AngleBetweenVectors(const glm::vec2& vecA, const glm::vec2& vecB) {
 	return (std::atan2(-det, -dot) + PI) * C180OVERPI;
 }
 
+EXPORTDLL extern IsLeft(const glm::vec2& lineStart, const glm::vec2& lineEnd, const glm::vec2& point) {
+	return ((lineEnd.x - lineStart.x) * (point.y - lineStart.y)) -
+			((point.x - lineStart.x) * (lineEnd.y - lineStart.y));
+}
+
+EXPORTDLL extern PointInPolygon(const std::vector<glm::vec2>& polygon, const glm::vec2& point) {
+	int windingNum = 0;
+	
+	for (unsigned int i = 0u; i < polygon.size(); ++i) {
+		unsigned int ii = 0u;
+		if (i + 1u < polygon.size()) {
+			ii = i + 1u;
+		}
+		
+		const glm::vec2& vertCurr = polygon.at(i);
+		const glm::vec2& vertNext = polygon.at(ii);
+		
+		if (vertCurr.y <= point.y) {
+			if (vertNext.y > point.y) {
+				if (IsLeft(vertCurr, vertNext, point) > 0) {
+                    ++windingNum;
+				}
+			}
+		}
+		else {
+			if (vertNext.y <= point.y) {
+				if (IsLeft(vertCurr, vertNext, point) < 0) {
+                    --windingNum;
+				}
+			}
+		}
+	}
+	
+	return windingNum;
+}
+
 extern std::string GetGLErrorStatus() {
 	GLenum err = glGetError();
 	switch (err) {
