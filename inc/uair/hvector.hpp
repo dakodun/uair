@@ -30,6 +30,8 @@
 
 #include <memory>
 
+#include "init.hpp"
+
 namespace uair {
 // from "aligned_buffer.h" from libstdc++
 // an aligned memory buffer for a data member object of type T
@@ -114,7 +116,7 @@ struct allocatedPtr {
 // namespace holding internal implementation details
 namespace impl {
 // base class for an entry in a hvector that contains non-throwing logic
-class hvectorEntryBase {
+class EXPORTDLL hvectorEntryBase {
 	public :
 		hvectorEntryBase();
 	
@@ -255,7 +257,7 @@ inline bool operator!=(const hvectorIterator<T>& iter,
 
 
 // 
-class hvectorHandle {
+class EXPORTDLL hvectorHandle {
 	public :
 		hvectorHandle() = default;
 		explicit hvectorHandle(const unsigned int& index,

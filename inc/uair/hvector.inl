@@ -111,13 +111,6 @@ auto allocatedPtr<A>::rawPtr(P ptr)->decltype(rawPtr(ptr.operator->())) {
 
 
 namespace impl {
-// hvectorEntryBase...
-hvectorEntryBase::hvectorEntryBase() : mPrev(this), mNext(this) {
-	
-}
-// ...
-
-
 // hvectorEntry...
 template <class T>
 hvectorEntry<T>::hvectorEntry() : hvectorEntryBase() {
@@ -293,23 +286,6 @@ bool hvectorConstIterator<T>::operator!=(const self& other)
 		const noexcept {
 	
 	return mEntry != other.mEntry;
-}
-// ...
-
-
-// hvectorHandle...
-hvectorHandle::hvectorHandle(const unsigned int& index,
-		const unsigned int& counter) noexcept : mIndex(index),
-		mCounter(counter) {
-	
-}
-
-unsigned int hvectorHandle::get_index() const noexcept {
-	return mIndex;
-}
-
-unsigned int hvectorHandle::get_counter() const noexcept {
-	return mCounter;
 }
 // ...
 
