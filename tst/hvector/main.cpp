@@ -29,347 +29,51 @@
 #include <string>
 
 #include "uair/uair.hpp"
+#include "init.hpp"
+#include "tester.hpp"
 
-class Test {
-	public :
-		Test() = default;
-		Test(const int& i) : mI(i) {
-			
-		}
-		
-		Test(const Test& other) : mI(other.mI) {
-			
-		}
-		
-		Test(Test&& other) : Test() {
-			swap(*this, other);
-		}
-		
-		Test& operator=(Test other) {
-			swap(*this, other);
-			
-			return *this;
-		}
-		
-		friend void swap(Test& first, Test& second) {
-			using std::swap;
-			
-			swap(first.mI, second.mI);
-		}
+#include "tests/functions.inl"
+#include "tests/iterators.inl"
+#include "tests/copyconstruct.inl"
+#include "tests/moveconstruct.inl"
+#include "tests/copyassign.inl"
+#include "tests/moveassign.inl"
+
+int main(int argc, char* argv[]) {
+	if (!gFAILED) {
+		std::cout << "testing functions..." << std::endl;
+		TestFunctions();
+		std::cout << std::endl;
+	}
 	
-	public :
-		int mI = 0;
-};
-
-int main(int argc, char* argv[]) {	
-	{
-		typedef uair::HVector<Test>::Handle TestHandle;
-		uair::HVector<Test> store(10);
-		
-		// test the four methods of insertion (emplace (default/custom
-		// constructor) and push (copy/move)) on a fresh store
-			// create a test resource in the store using the default
-			// constructor (no parameters) and store the handle
-			// then return a reference to it using the handle
-			TestHandle h1;
-			try {
-				std::cout << ".--- Emplace Default" << std::endl;
-				
-				h1 = store.Emplace();
-				Test& t = store.Get(h1);
-				
-				std::cout << "| " << "Test (" << t.mI << ")" << std::endl;
-				std::cout << "| " << "Handle (" << h1.mIndex << ", " <<
-						h1.mCounter << ")" << std::endl;
-				std::cout << "| " << "Store Size: " <<
-						store.Size() << std::endl;
-				std::cout << "'---------" << std::endl << std::endl;
-			} catch (std::exception& e) {
-				std::cout << e.what() << std::endl;
-			}
-			//
-			
-			// create a test resource in the store supplying
-			// an int and store the handle then return a reference
-			// to it using the handle 
-			TestHandle h2;
-			try {
-				std::cout << ".--- Emplace Custom" << std::endl;
-				
-				h2 = store.Emplace(4);
-				Test& t = store.Get(h2);
-				
-				std::cout << "| " << "Test (" << t.mI << ")" << std::endl;
-				std::cout << "| " << "Handle (" << h2.mIndex << ", " <<
-						h2.mCounter << ")" << std::endl;
-				std::cout << "| " << "Store Size: " <<
-						store.Size() << std::endl;
-				std::cout << "'---------" << std::endl << std::endl;
-			} catch (std::exception& e) {
-				std::cout << e.what() << std::endl;
-			}
-			//
-			
-			// create a test resource, add it to the store (copy)
-			// and store the handle then return a reference to it
-			// using the handle and change it
-			TestHandle h3;
-			try {
-				std::cout << ".--- Push Copy" << std::endl;
-				
-				Test t1(13);
-				h3 = store.Push(t1);
-				Test& t2 = store.Get(h3);
-				int temp = t2.mI;
-				t2.mI = 44;
-				Test& t3 = store.Get(h3);
-				
-				std::cout << "| " << "Test (" << t1.mI << " : " << temp <<
-						" -> " << t3.mI << ")" << std::endl;
-				std::cout << "| " << "Handle (" << h3.mIndex << ", " <<
-						h3.mCounter << ")" << std::endl;
-				std::cout << "| " << "Store Size: " <<
-						store.Size() << std::endl;
-				std::cout << "'---------" << std::endl << std::endl;
-			} catch (std::exception& e) {
-				std::cout << e.what() << std::endl;
-			}
-			//
-			
-			// create a test resource, add it to the store (move)
-			// and store the handle then return a reference to it
-			// using the handle and change it
-			TestHandle h4;
-			try {
-				std::cout << ".--- Push Move" << std::endl;
-				
-				Test t1(28);
-				h4 = store.Push(std::move(t1));
-				Test& t2 = store.Get(h4);
-				int temp = t2.mI;
-				t2.mI = 93;
-				Test& t3 = store.Get(h4);
-				
-				std::cout << "| " << "Test (" << t1.mI << " : " << temp <<
-						" -> " << t3.mI << ")" << std::endl;
-				std::cout << "| " << "Handle (" << h4.mIndex << ", " <<
-						h4.mCounter << ")" << std::endl;
-				std::cout << "| " << "Store Size: " <<
-						store.Size() << std::endl;
-				std::cout << "'---------" << std::endl << std::endl;
-			} catch (std::exception& e) {
-				std::cout << e.what() << std::endl;
-			}
-			//
-		//
-		
-		
-		// remove test resources via their handles
-		try {
-			std::cout << ".--- Pop" << std::endl;
-			
-			store.Pop(h1);
-			store.Pop(h2);
-			store.Pop(h3);
-			store.Pop(h4);
-			
-			std::cout << "| " << "Handle (" << h1.mIndex << ", " <<
-					h1.mCounter << ")" << std::endl;
-			std::cout << "| " << "Handle (" << h2.mIndex << ", " <<
-					h2.mCounter << ")" << std::endl;
-			std::cout << "| " << "Handle (" << h3.mIndex << ", " <<
-					h3.mCounter << ")" << std::endl;
-			std::cout << "| " << "Handle (" << h4.mIndex << ", " <<
-					h4.mCounter << ")" << std::endl;
-			std::cout << "| " << "Store Size: " <<
-					store.Size() << std::endl;
-			std::cout << "'---------" << std::endl << std::endl;
-		} catch (std::exception& e) {
-			std::cout << e.what() << std::endl;
-		}
-		//
-		
-		
-		// test the four methods of insertion (emplace (default/custom
-		// constructor) and push (copy/move)) on a fresh store
-			// create a test resource in the store using the default
-			// constructor (no parameters) and store the handle
-			// then return a reference to it using the handle
-			try {
-				std::cout << ".--- Emplace Default" << std::endl;
-				
-				TestHandle h = store.Emplace();
-				Test& t = store.Get(h);
-				
-				std::cout << "| " << "Test (" << t.mI << ")" << std::endl;
-				std::cout << "| " << "Handle (" << h.mIndex << ", " <<
-						h.mCounter << ")" << std::endl;
-				std::cout << "| " << "Store Size: " <<
-						store.Size() << std::endl;
-				std::cout << "'---------" << std::endl << std::endl;
-			} catch (std::exception& e) {
-				std::cout << e.what() << std::endl;
-			}
-			//
-			
-			// create a test resource in the store supplying an int
-			// and store the handle then return a reference to it
-			// using the handle 
-			try {
-				std::cout << ".--- Emplace Custom" << std::endl;
-				
-				h2 = store.Emplace(4);
-				Test& t = store.Get(h2);
-				
-				std::cout << "| " << "Test (" << t.mI << ")" << std::endl;
-				std::cout << "| " << "Handle (" << h2.mIndex << ", " <<
-						h2.mCounter << ")" << std::endl;
-				std::cout << "| " << "Store Size: " <<
-						store.Size() << std::endl;
-				std::cout << "'---------" << std::endl << std::endl;
-			} catch (std::exception& e) {
-				std::cout << e.what() << std::endl;
-			}
-			//
-			
-			// create a test resource, add it to the store (copy) and
-			// store the handle then return a reference to it using the
-			// handle and change it
-			try {
-				std::cout << ".--- Push Copy" << std::endl;
-				
-				Test t1(13);
-				h3 = store.Push(t1);
-				Test& t2 = store.Get(h3);
-				int temp = t2.mI;
-				t2.mI = 44;
-				Test& t3 = store.Get(h3);
-				
-				std::cout << "| " << "Test (" << t1.mI << " : " << temp <<
-						" -> " << t3.mI << ")" << std::endl;
-				std::cout << "| " << "Handle (" << h3.mIndex << ", " <<
-						h3.mCounter << ")" << std::endl;
-				std::cout << "| " << "Store Size: " <<
-						store.Size() << std::endl;
-				std::cout << "'---------" << std::endl << std::endl;
-			} catch (std::exception& e) {
-				std::cout << e.what() << std::endl;
-			}
-			//
-			
-			// create a test resource, add it to the store (move)
-			// and store the handle then return a reference to it
-			// using the handle and change it
-			try {
-				std::cout << ".--- Push Move" << std::endl;
-				
-				Test t1(28);
-				h4 = store.Push(std::move(t1));
-				Test& t2 = store.Get(h4);
-				int temp = t2.mI;
-				t2.mI = 93;
-				Test& t3 = store.Get(h4);
-				
-				std::cout << "| " << "Test (" << t1.mI << " : " << temp <<
-						" -> " << t3.mI << ")" << std::endl;
-				std::cout << "| " << "Handle (" << h4.mIndex << ", " <<
-						h4.mCounter << ")" << std::endl;
-				std::cout << "| " << "Store Size: " <<
-						store.Size() << std::endl;
-				std::cout << "'---------" << std::endl << std::endl;
-			} catch (std::exception& e) {
-				std::cout << e.what() << std::endl;
-			}
-			//
-		//
-		
-		
-		// remove a test resource via its handle
-		try {
-			std::cout << ".--- Pop" << std::endl;
-			
-			store.Pop(h2);
-			
-			std::cout << "| " << "Handle (" << h2.mIndex << ", " <<
-					h2.mCounter << ")" << std::endl;
-			std::cout << "| " << "Store Size: " <<
-					store.Size() << std::endl;
-			std::cout << "'---------" << std::endl << std::endl;
-		} catch (std::exception& e) {
-			std::cout << e.what() << std::endl;
-		}
-		//
-		
-		
-		// attempt to return a reference to a test resource
-		// via an invalid handle
-			try {
-				std::cout << ".--- Invalid Handle (Free Index)" <<
-						std::endl;
-				std::cout << "| " << "Handle (" << h2.mIndex << ", " <<
-						h2.mCounter << ")" << std::endl;
-				std::cout << "| " << "Store Size: " <<
-						store.Size() << std::endl;
-				
-				store.Get(h2);
-			} catch (std::exception& e) {
-				std::cout << "| E: " << e.what() << std::endl;
-				std::cout << "'---------" << std::endl << std::endl;
-			}
-			
-			try {
-				std::cout << ".--- Invalid Handle (Re-used Index)" <<
-						std::endl;
-				std::cout << "| " << "Handle (" << h1.mIndex << ", " <<
-						h1.mCounter << ")" << std::endl;
-				std::cout << "| " << "Store Size: " <<
-						store.Size() << std::endl;
-				
-				store.Get(h1);
-			} catch (std::exception& e) {
-				std::cout << "| E: " << e.what() << std::endl;
-				std::cout << "'---------" << std::endl << std::endl;
-			}
-			
-			try {
-				TestHandle h(100u, 0u);
-				
-				std::cout << ".--- Invalid Handle (Out of Bounds)" <<
-						std::endl;
-				std::cout << "| " << "Handle (" << h.mIndex << ", " <<
-						h.mCounter << ")" << std::endl;
-				std::cout << "| " << "Store Size: " <<
-						store.Size() << std::endl;
-				
-				store.Get(h);
-			} catch (std::exception& e) {
-				std::cout << "| E: " << e.what() << std::endl;
-				std::cout << "'---------" << std::endl << std::endl;
-			}
-		//
-		
-		// 
-		try {
-			std::cout << ".--- Moved and Swappped Store" << std::endl;
-			
-			using std::swap;
-			
-			uair::HVector<Test> store2 = std::move(store);
-			uair::HVector<Test> store3;
-			swap(store3, store2);
-			
-			Test& t = store3.Get(h3);
-			
-			std::cout << "| " << "Test (" << t.mI << ")" << std::endl;
-			std::cout << "| " << "Handle (" << h3.mIndex << ", " <<
-					h3.mCounter << ")" << std::endl;
-			std::cout << "| " << "Store Size: " << store.Size() << " " <<
-					store2.Size() << " " << store3.Size() << std::endl;
-			std::cout << "'---------" << std::endl << std::endl;
-		} catch (std::exception& e) {
-			std::cout << e.what() << std::endl;
-		}
-		//
+	if (!gFAILED) {
+		std::cout << "testing iterators..." << std::endl;
+		TestIterators();
+		std::cout << std::endl;
+	}
+	
+	if (!gFAILED) {
+		std::cout << "testing copy construct..." << std::endl;
+		TestCopyConstruct();
+		std::cout << std::endl;
+	}
+	
+	if (!gFAILED) {
+		std::cout << "testing move construct..." << std::endl;
+		TestMoveConstruct();
+		std::cout << std::endl;
+	}
+	
+	if (!gFAILED) {
+		std::cout << "testing copy assignment..." << std::endl;
+		TestCopyAssign();
+		std::cout << std::endl;
+	}
+	
+	if (!gFAILED) {
+		std::cout << "testing move assignment..." << std::endl;
+		TestMoveAssign();
+		std::cout << std::endl;
 	}
 	
 	// pause the console so we can see any output before quitting
