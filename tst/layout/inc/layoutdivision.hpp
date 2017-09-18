@@ -25,7 +25,7 @@
 **		   source distribution.
 ** **************************************************************** */
 
-#ifndef UAIRLAYOUTDIVISION_HPP
+/* #ifndef UAIRLAYOUTDIVISION_HPP
 #define UAIRLAYOUTDIVISION_HPP
 
 #include <glm/glm.hpp>
@@ -39,12 +39,12 @@ class LayoutContainer;
 // allow interaction with element for positioning
 class LayoutElement;
 
-class EXPORTDLL LayoutDivision {
+class LayoutDivision {
 	// allow a container access to parent object
 	friend class LayoutContainer;
 	
 	public :
-		struct EXPORTDLL Cell {
+		struct Cell {
 			public :
 				Cell() = default;
 				Cell(const glm::ivec2& position, const unsigned int& width,
@@ -194,4 +194,4 @@ class EXPORTDLL LayoutDivision {
 };
 }
 
-#endif
+#endif */

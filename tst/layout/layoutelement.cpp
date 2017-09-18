@@ -25,7 +25,7 @@
 **		   source distribution.
 ** **************************************************************** */
 
-#include "layoutelement.hpp"
+/* #include "layoutelement.hpp"
 
 #include "layoutcontainer.hpp"
 #include "layoutdivision.hpp"
@@ -66,4 +66,4 @@ unsigned int LayoutElement::GetHeight() const {
 void LayoutElement::SetHeight(const unsigned int height) {
 	mHeight = height;
 }
-}
+} */

@@ -65,7 +65,17 @@ T& RefPtr<T>::operator*() {
 }
 
 template <class T>
+const T& RefPtr<T>::operator*() const {
+	return *mPtr;
+}
+
+template <class T>
 T* RefPtr<T>::operator->() {
+	return mPtr;
+}
+
+template <class T>
+const T* RefPtr<T>::operator->() const {
 	return mPtr;
 }
 

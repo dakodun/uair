@@ -25,45 +25,21 @@
 **		   source distribution.
 ** **************************************************************** */
 
-#include "layoutelement.hpp"
+#include <iostream>
+#include <string>
 
-#include "layoutcontainer.hpp"
-#include "layoutdivision.hpp"
+#include "init.hpp"
+#include "scenea.hpp"
 
-namespace uair {
-LayoutElement::LayoutElement(const unsigned int& width,
-		const unsigned int& height) : mWidth(width), mHeight(height) {
+int main(int argc, char* argv[]) {
+	GAME.Init();
+	GAME.GetSceneManager()->RequestSceneChange(new SceneA("sceneA"));
+	GAME.Run();
 	
+	// pause the console so we can see any output before quitting
+	std::string pause;
+	std::cout << "\nEnter to continue..." << std::endl;
+	std::getline(std::cin, pause);
 	
-}
-
-bool LayoutElement::GetFloat() const {
-	return mFloat;
-}
-
-void LayoutElement::SetFloat(const bool& flt) {
-	mFloat = flt;
-}
-
-glm::ivec2 LayoutElement::GetPosition(const CoordinateSpace&
-		coordinateSpace) const {
-	
-	return mPosition;
-}
-
-unsigned int LayoutElement::GetWidth() const {
-	return mWidth;
-}
-
-void LayoutElement::SetWidth(const unsigned int width) {
-	mWidth = width;
-}
-
-unsigned int LayoutElement::GetHeight() const {
-	return mHeight;
-}
-
-void LayoutElement::SetHeight(const unsigned int height) {
-	mHeight = height;
-}
+	return 0; // Exit
 }

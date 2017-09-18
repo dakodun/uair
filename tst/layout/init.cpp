@@ -25,45 +25,6 @@
 **		   source distribution.
 ** **************************************************************** */
 
-#include "layoutelement.hpp"
+#include "init.hpp"
 
-#include "layoutcontainer.hpp"
-#include "layoutdivision.hpp"
-
-namespace uair {
-LayoutElement::LayoutElement(const unsigned int& width,
-		const unsigned int& height) : mWidth(width), mHeight(height) {
-	
-	
-}
-
-bool LayoutElement::GetFloat() const {
-	return mFloat;
-}
-
-void LayoutElement::SetFloat(const bool& flt) {
-	mFloat = flt;
-}
-
-glm::ivec2 LayoutElement::GetPosition(const CoordinateSpace&
-		coordinateSpace) const {
-	
-	return mPosition;
-}
-
-unsigned int LayoutElement::GetWidth() const {
-	return mWidth;
-}
-
-void LayoutElement::SetWidth(const unsigned int width) {
-	mWidth = width;
-}
-
-unsigned int LayoutElement::GetHeight() const {
-	return mHeight;
-}
-
-void LayoutElement::SetHeight(const unsigned int height) {
-	mHeight = height;
-}
-}
+uair::Game GAME;

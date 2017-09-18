@@ -76,10 +76,10 @@
 #include "guibutton.hpp"
 #include "guicheckbox.hpp"
 #include "guiinputbox.hpp"
+#include "layoutparent.hpp"
 #include "layoutcontainer.hpp"
 #include "layoutdivision.hpp"
 #include "layoutelement.hpp"
-#include "layoutptr.hpp"
 
 #include "sound.hpp"
 

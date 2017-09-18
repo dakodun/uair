@@ -25,7 +25,7 @@
 **		   source distribution.
 ** **************************************************************** */
 
-#include "layoutcontainer.hpp"
+/* #include "layoutcontainer.hpp"
 
 #include "layoutdivision.hpp"
 #include "layoutelement.hpp"
@@ -292,7 +292,8 @@ unsigned int LayoutContainer::GetContainerReserve() const {
 
 void LayoutContainer::SetContainerReserve(const unsigned int& reserve) {
 	// update the container minimum reserve amount and then reserve more
-	// space if the container currently has less capacity than the new value
+	// space if the container hvector currently has less capacity
+	// than the new value
 	mContainerReserve = reserve;
 	if (mContainers.capacity() < mContainerReserve) {
 		mContainers.reserve(mContainerReserve);
@@ -367,4 +368,4 @@ std::vector<Shape> LayoutContainer::GetShapes() {
 	return shapes;
 }
 #endif
-}
+} */

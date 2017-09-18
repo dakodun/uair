@@ -25,7 +25,7 @@
 **		   source distribution.
 ** **************************************************************** */
 
-#ifndef UAIRLAYOUTCONTAINER_HPP
+/* #ifndef UAIRLAYOUTCONTAINER_HPP
 #define UAIRLAYOUTCONTAINER_HPP
 
 #include <glm/glm.hpp>
@@ -39,7 +39,7 @@ class LayoutDivision;
 // allow interaction with element for positioning
 class LayoutElement;
 
-class EXPORTDLL LayoutContainer {
+class LayoutContainer {
 	// allow a division access to parent object
 	friend class LayoutDivision;
 	
@@ -125,8 +125,8 @@ class EXPORTDLL LayoutContainer {
 		std::string GetVerticalAlign() const;
 		void SetVerticalAlign(const std::string& align);
 		
-		// position a list of element pointers with the container depending
-		// on their size and 'float' flag
+		// position a list of element pointers within the container
+		// depending on their size and 'float' flag
 		void PositionElements(std::list<LayoutElement*> elements);
 		
 		unsigned int GetContainerReserve() const;
@@ -165,10 +165,10 @@ class EXPORTDLL LayoutContainer {
 	#ifdef _UAIR_DEBUG
 	public :
 		// if debug mode is active then allow retrieval of outlines
-		// representing this container and all children
+		// representing this container and all its children
 		std::vector<Shape> GetShapes();
 	#endif
 };
 }
 
-#endif
+#endif */

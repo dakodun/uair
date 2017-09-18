@@ -25,7 +25,7 @@
 **		   source distribution.
 ** **************************************************************** */
 
-#include "layoutdivision.hpp"
+/* #include "layoutdivision.hpp"
 
 #include "layoutcontainer.hpp"
 #include "layoutelement.hpp"
@@ -543,4 +543,4 @@ std::vector<Shape> LayoutDivision::GetShapes() {
 	return shapes;
 }
 #endif
-}
+} */

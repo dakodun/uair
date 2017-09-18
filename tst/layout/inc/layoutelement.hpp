@@ -25,12 +25,8 @@
 **		   source distribution.
 ** **************************************************************** */
 
-#ifndef UAIRLAYOUTELEMENT_HPP
+/* #ifndef UAIRLAYOUTELEMENT_HPP
 #define UAIRLAYOUTELEMENT_HPP
-
-#include <glm/glm.hpp>
-
-#include "shape.hpp"
 
 namespace uair {
 // forward declare both container and division so we can store
@@ -38,7 +34,7 @@ namespace uair {
 class LayoutContainer;
 class LayoutDivision;
 
-class EXPORTDLL LayoutElement {
+class LayoutElement {
 	// allow both containers and divisions access to protected
 	// member 'mPosition'
 	friend class LayoutContainer;
@@ -78,4 +74,4 @@ class EXPORTDLL LayoutElement {
 };
 }
 
-#endif
+#endif */

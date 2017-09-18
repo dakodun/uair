@@ -74,7 +74,9 @@ class RefPtr : public RefPtrBase {
 		
 		RefPtr<T>& operator=(RefPtr other);
 		T& operator*();
+		const T& operator*() const;
 		T* operator->();
+		const T* operator->() const;
 		explicit operator bool() const;
 		
 		friend void swap(RefPtr& first, RefPtr& second) {
