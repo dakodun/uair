@@ -61,10 +61,32 @@ class EXPORTDLL WindowWin32 {
 	friend class Game;
 	friend class OpenGLContextWin32;
 	
+	protected :
+		struct InputDevice { // an input device connected to the system
+			int mID = 0; // the id assigned to the input device
+			
+			// the number of buttons reported by the input device
+			unsigned int mButtonCount = 0u;
+			
+			// the number of controls reported by the input device
+			unsigned int mControlCount = 0u;
+			
+			// the capabilities of controls present on the device
+			std::vector<InputManager::InputDevice::ControlCaps> mControls;
+			
+			// the current state of all buttons
+			std::vector<bool> mButtonStates;
+			
+			// the current values of all controls
+			std::map<Device, int> mControlStates;
+		};
+	
 	public :
 		WindowWin32();
-		WindowWin32(const std::string& windowTitle, const WindowDisplaySettings& settings,
-				const unsigned long& windowStyle = WindowStyles::Visible | WindowStyles::Titlebar | WindowStyles::Close);
+		WindowWin32(const std::string& windowTitle,
+				const WindowDisplaySettings& settings,
+				const unsigned long& windowStyle = WindowStyles::Visible |
+				WindowStyles::Titlebar | WindowStyles::Close);
 		WindowWin32(const WindowWin32& other) = delete;
 		WindowWin32(WindowWin32&& other);
 		virtual ~WindowWin32();
@@ -91,37 +113,45 @@ class EXPORTDLL WindowWin32 {
 		void MakeCurrent(OpenGLContext& context);
 		
 		std::pair<glm::ivec2, glm::ivec2> GetMouseCoords();
-		std::pair<glm::ivec2, glm::ivec2> SetMouseCoords(const glm::ivec2& newCoords, const CoordinateSpace& coordinateSpace = CoordinateSpace::Local);
-	protected :
-		struct InputDevice { // an input device connected to the system
-			int mID = 0; // the id assigned to the input device
-			unsigned int mButtonCount = 0u; // the number of buttons reported by the input device
-			unsigned int mControlCount = 0u; // the number of controls reported by the input device
-			std::vector<InputManager::InputDevice::ControlCaps> mControls; // the capabilities of controls present on the device
-			
-			std::vector<bool> mButtonStates; // the current state of all buttons
-			std::map<Device, int> mControlStates; // the current values of all controls
-		};
+		std::pair<glm::ivec2, glm::ivec2> SetMouseCoords(
+				const glm::ivec2& newCoords, const CoordinateSpace&
+				coordinateSpace = CoordinateSpace::Local);
 	protected :
 		void SetUpWindow();
 		
-		LRESULT CALLBACK HandleEvents(const HWND& hWnd, const UINT& message, const WPARAM& wParam, const LPARAM& lParam);
+		LRESULT CALLBACK HandleEvents(const HWND& hWnd, const UINT& message,
+				const WPARAM& wParam, const LPARAM& lParam);
 		
-		static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+		static LRESULT CALLBACK WndProc(HWND hWnd, UINT message,
+				WPARAM wParam, LPARAM lParam);
 		
 		Keyboard ToKeyboard(const WPARAM& code, const LPARAM& flags) const;
-		Device ToDevice(const unsigned int& valueID) const; // converts a control value id to an enum value
 		
-		bool RegisterInputDevice(HANDLE deviceHandle); // adds an input device to the store
-		bool GetDeviceCapabilities(const PHIDP_PREPARSED_DATA& preparsedData, HIDP_CAPS& caps, PHIDP_BUTTON_CAPS& buttonCaps,
-				std::unique_ptr<BYTE[]>& buttonCapsBuffer, PHIDP_VALUE_CAPS& valueCaps, std::unique_ptr<BYTE[]>& valueCapsBuffer); // gets the capabilities reported by the device
+		// converts a control value id to an enum value
+		Device ToDevice(const unsigned int& valueID) const;
+		
+		// adds an input device to the store
+		bool RegisterInputDevice(HANDLE deviceHandle);
+		
+		// gets the capabilities reported by the device
+		bool GetDeviceCapabilities(const PHIDP_PREPARSED_DATA&
+				preparsedData, HIDP_CAPS& caps,
+				PHIDP_BUTTON_CAPS& buttonCaps,
+				std::unique_ptr<BYTE[]>& buttonCapsBuffer,
+				PHIDP_VALUE_CAPS& valueCaps,
+				std::unique_ptr<BYTE[]>& valueCapsBuffer);
+		
+		void TrackSystemKeys(const Keyboard& key,
+				const unsigned int& state);
+	
 	protected :
 		static unsigned int mWindowCount;
 		
 		HWND mWindowHandle = 0;
 		HDC mDeviceContext = 0;
 		
-		MessageQueue mMessageQueue; // the window object maintains its own message queue
+		// the window object maintains its own message queue
+		MessageQueue mMessageQueue;
 		
 		bool mOpen = false;
 		std::string mWinTitle;
@@ -136,8 +166,16 @@ class EXPORTDLL WindowWin32 {
 		
 		glm::ivec2 mGlobalMouse;
 		glm::ivec2 mLocalMouse;
-		std::map<HANDLE, InputDevice> mInputDevices; // a store of input devices currently connected to the system
-		int mInputDeviceIDCounter = 0; // the counter used to assign a unique id to a connected device
+		
+		// a store of input devices currently connected to the system
+		std::map<HANDLE, InputDevice> mInputDevices;
+		
+		// the counter used to assign a unique id to a connected device
+		int mInputDeviceIDCounter = 0;
+		
+		// bit flag to track the state of both shift keys
+		// (0u - none; 1u - left; 2u - right)
+		unsigned int mShiftState = 0u;
 };
 }
 
