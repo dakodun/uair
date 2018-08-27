@@ -95,26 +95,21 @@ void Game::Run() {
 		Input(); // handle all user input
 		mInputManager->Process(); // process the input manager (to update states)
 		
-		// [todo] handle a large dt by integrating it
-		// if we have a frame limit do the below
 		{ // handle process timing
 			double prevFrameTime = mTimer.GetElapsedTime(); // the time since the prvious frame
 			mTimer.Reset(); // reset the frame timer
 			
-			if (mFrameLimit) {
+			if (prevFrameTime > mFrameLowerLimit) {
 				unsigned int processed = 0u; // the number of process calls this frame
-				
-				if (prevFrameTime > mFrameUpperLimit) { // if our time is longer than the upper frame limit...
-					prevFrameTime = mFrameUpperLimit; // cap it at the upper limit
-				}
-				
-				mAccumulator += prevFrameTime; // increase the accumulated time
-				
-				while (mAccumulator >= mFrameLowerLimit) { // whilst the accumulated time is above the lower frame limit...
+				double accum = prevFrameTime;
+				while (accum > mFrameLowerLimit) {
 					Process(mFrameLowerLimit); // handle all processing
 					++processed; // increase the process call count
+					accum -= mFrameLowerLimit; // decrease the accumulated time
 					
-					mAccumulator -= mFrameLowerLimit; // decrease the accumulated time
+					if (mFrameSkip || processed >= mMaxFrames) {
+						break;
+					}
 					
 					if (mOpen == false) { // if we are to quit the game...
 						mWindow->Quit();
@@ -127,9 +122,7 @@ void Game::Run() {
 					}
 				}
 				
-				if (processed > 0u) { // if we have had at least 1 process call...
-					PostProcess(processed, mFrameLowerLimit); // handle all post processing
-				}
+				PostProcess(processed, prevFrameTime); // handle all post processing
 			}
 			else {
 				Process(prevFrameTime);
@@ -292,7 +285,7 @@ flat out uint fragType;
 flat out float fragIsTextured;
 flat out vec2 fragSTMin;
 flat out vec2 fragSTMax;
-flat out vec4 fragRGBA;
+smooth out vec4 fragRGBA;
 flat out vec2 fragScale;
 
 void main() {
@@ -325,7 +318,7 @@ flat in uint fragType;
 flat in float fragIsTextured;
 flat in vec2 fragSTMin;
 flat in vec2 fragSTMax;
-flat in vec4 fragRGBA;
+smooth in vec4 fragRGBA;
 flat in vec2 fragScale;
 
 vec4 finalColour;
@@ -337,19 +330,19 @@ void main() {
 	if (fragType == 0u) {
 		vec3 texCoords = fragSTL;
 		
-		if (fragWrap & 1u) { // clip s
+		if (uint(fragWrap & 1u) != 0u) { // clip s
 			texCoords.x = ((texCoords.x - fragSTMin.x) * fragScale.x) + fragSTMin.x;
 			
 			if (texCoords.x > fragSTMax.x) {
 				discard;
 			}
 		}
-		else if (fragWrap & 4u) { // repeat s
+		else if (uint(fragWrap & 4u) != 0u) { // repeat s
 			texCoords.x = ((texCoords.x - fragSTMin.x) * fragScale.x) + fragSTMin.x;
 			texCoords.x = mod(texCoords.x, fragSTMax.x);
 		}
 		
-		if (fragWrap & 2u) { // clip t
+		if (uint(fragWrap & 2u) != 0u) { // clip t
 			texCoords.y = (((1.0f - texCoords.y) - fragSTMin.y) * fragScale.y) + fragSTMin.y;
 			
 			if (texCoords.y > fragSTMax.y) {
@@ -358,7 +351,7 @@ void main() {
 			
 			texCoords.y = 1.0f - texCoords.y;
 		}
-		else if (fragWrap & 8u) { // repeat t
+		else if (uint(fragWrap & 8u) != 0u) { // repeat t
 			texCoords.y = (((1.0f - texCoords.y) - fragSTMin.y) * fragScale.y) + fragSTMin.y;
 			texCoords.y = mod(texCoords.y, fragSTMax.y);
 			texCoords.y = 1.0f - texCoords.y;

@@ -343,7 +343,7 @@ class Manager {
 			std::pair<unsigned int, unsigned int> indexCounterPair; // 
 			
 			try {
-				indexCounterPair = storePtr->Add<Ps...>(name, params...); // add a new entry to the store and save the index and counter value returned
+				indexCounterPair = storePtr->Add(name, params...); // add a new entry to the store and save the index and counter value returned
 			} catch (std::exception& e) {
 				throw;
 			}

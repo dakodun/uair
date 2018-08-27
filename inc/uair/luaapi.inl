@@ -43,7 +43,7 @@ namespace uair {
 			WrappedType** data = static_cast<WrappedType**>(userdata);
 			*data = new WrappedType();
 			
-			(*data)->mUserData = new Ta;
+			(*data)->mUserData = new Ta();
 			(*data)->mShouldDelete = true;
 			
 			lua_setmetatable(l, -2); // assign the metatable to the new userdata
@@ -73,7 +73,7 @@ namespace uair {
 			WrappedType** data = static_cast<WrappedType**>(userdata);
 			*data = new WrappedType();
 			
-			(*data)->mUserData = new Ta;
+			(*data)->mUserData = new Ta(arg);
 			(*data)->mShouldDelete = true;
 			
 			lua_setmetatable(l, -2);
@@ -104,7 +104,7 @@ namespace uair {
 				WrappedType** data = static_cast<WrappedType**>(userdata);
 				*data = new WrappedType();
 				
-				(*data)->mUserData = new Ta;
+				(*data)->mUserData = new Ta(tupleElements...);
 				(*data)->mShouldDelete = true;
 				
 				lua_setmetatable(l, -2);
@@ -518,93 +518,107 @@ void LuaAPI::RegisteredType::AddSetter(lua_State* l, const std::string& funcName
 //
 	template <typename ...Ps>
 	void LuaAPI::CallString(const std::string& script, const Ps&... params) {
-		int stackSize = lua_gettop(mState);
-		
+		std::cout << "1. " << lua_gettop(mState) << std::endl;
+
+		if (lua_gettop(mState) != 0) {
+			throw std::runtime_error("(LuaAPI) Script Error: stack must be empty to use CallString. (did you mean CallStringU?)");
+		}
+
 		lua_getglobal(mState, "uair_run"); // get the sandbox function
 		PushStack(script, params...); // push the script and any parameters to the stack
 		
+		std::cout << "2. " << lua_gettop(mState) << std::endl;
+
 		// if the number of values on the stack doesn't match the number of parameters...
-		if ((lua_gettop(mState) - stackSize) - 1 != sizeof...(params) + 1) {
+		if (lua_gettop(mState) - 1 != sizeof...(params) + 1) {
 			std::cout << "(LuaAPI) Script Error: argument/stack count mismatch." << std::endl;
 		}
 		
 		// call the sandbox function (which in turn calls the script)
-		if (lua_pcall(mState, (lua_gettop(mState) - stackSize) - 1, LUA_MULTRET, 0) != 0) {
-			std::string errorMsg = ReadStack<std::string>(stackSize + 1);
-			lua_settop(mState, stackSize);
+		if (lua_pcall(mState, lua_gettop(mState) - 1, LUA_MULTRET, 0) != 0) {
+			std::string errorMsg = ReadStack<std::string>(1);
+			lua_settop(mState, 0);
 			throw std::runtime_error(errorMsg);
 		}
 		
-		if (ReadStack<bool>(stackSize + 1)) { // if script was called successfully...
-			lua_settop(mState, stackSize);
+		std::cout << "3. " << lua_gettop(mState) << std::endl;
+
+		if (ReadStack<bool>(1)) { // if script was called successfully...
+			std::cout << "4. " << lua_gettop(mState) << std::endl;
+
+			lua_settop(mState, 0);
 		}
 		else {
-			std::string errorMsg = ReadStack<std::string>(stackSize + 2);
-			lua_settop(mState, stackSize);
+			std::string errorMsg = ReadStack<std::string>(2);
+			lua_settop(mState, 0);
 			throw std::runtime_error(errorMsg);
 		}
 	}
 	
 	template <typename R, typename ...Ps>
 	R LuaAPI::CallString(const std::string& script, const Ps&... params) {
-		int stackSize = lua_gettop(mState);
+		if (lua_gettop(mState) != 0) {
+			throw std::runtime_error("(LuaAPI) Script Error: stack must be empty to use CallString. (did you mean CallStringU?)");
+		}
 		
 		lua_getglobal(mState, "uair_run");
 		PushStack(script, params...);
 		
-		if ((lua_gettop(mState) - stackSize) - 1 != sizeof...(params) + 1) {
+		if (lua_gettop(mState) - 1 != sizeof...(params) + 1) {
 			std::cout << "(LuaAPI) Script Error: argument/stack count mismatch." << std::endl;
 		}
 		
-		if (lua_pcall(mState, (lua_gettop(mState) - stackSize) - 1, LUA_MULTRET, 0) != 0) {
-			std::string errorMsg = ReadStack<std::string>(stackSize + 1);
-			lua_settop(mState, stackSize);
+		if (lua_pcall(mState, lua_gettop(mState) - 1, LUA_MULTRET, 0) != 0) {
+			std::string errorMsg = ReadStack<std::string>(1);
+			lua_settop(mState, 0);
 			throw std::runtime_error(errorMsg);
 		}
 		
-		if (ReadStack<bool>(stackSize + 1)) {
+		if (ReadStack<bool>(1)) {
 			R result;
 			
-			result = ReadStack<R>(stackSize + 2); // get the return value from the stack
-			lua_settop(mState, stackSize);
+			result = ReadStack<R>(2); // get the return value from the stack
+			lua_settop(mState, 0);
 			return result;
 		}
 		else {
-			std::string errorMsg = ReadStack<std::string>(stackSize + 2);
+			std::string errorMsg = ReadStack<std::string>(2);
 			
-			lua_settop(mState, stackSize);
+			lua_settop(mState, 0);
 			throw std::runtime_error(errorMsg);
 		}
 	}
 	
 	template <typename R1, typename R2, typename ...Rs, typename ...Ps>
 	std::tuple<R1, R2, Rs...> LuaAPI::CallString(const std::string& script, const Ps&... params) {
-		int stackSize = lua_gettop(mState);
+		if (lua_gettop(mState) != 0) {
+			throw std::runtime_error("(LuaAPI) Script Error: stack must be empty to use CallString. (did you mean CallStringU?)");
+		}
 		
 		lua_getglobal(mState, "uair_run");
 		PushStack(script, params...);
 		
-		if ((lua_gettop(mState) - stackSize) - 1 != sizeof...(params) + 1) {
+		if (lua_gettop(mState) - 1 != sizeof...(params) + 1) {
 			std::cout << "(LuaAPI) Script Error: argument/stack count mismatch." << std::endl;
 		}
 		
-		if (lua_pcall(mState, (lua_gettop(mState) - stackSize) - 1, LUA_MULTRET, 0) != 0) {
-			std::string errorMsg = ReadStack<std::string>(stackSize + 1);
-			lua_settop(mState, stackSize);
+		if (lua_pcall(mState, lua_gettop(mState) - 1, LUA_MULTRET, 0) != 0) {
+			std::string errorMsg = ReadStack<std::string>(1);
+			lua_settop(mState, 0);
 			throw std::runtime_error(errorMsg);
 		}
 		
-		if (ReadStack<bool>(stackSize + 1)) {
+		if (ReadStack<bool>(1)) {
 			std::tuple<R1, R2, Rs...> result;
 			
-			result = ReadStack<R1, R2, Rs...>(stackSize + 2); // get all return values from the stack
-			lua_settop(mState, stackSize);
+			result = ReadStack<R1, R2, Rs...>(2); // get all return values from the stack
+			lua_settop(mState, 0);
 			return result;
 		}
 		else {
-			std::string errorMsg = ReadStack<std::string>(stackSize + 2);
+			std::string errorMsg = ReadStack<std::string>(2);
 			
-			lua_settop(mState, stackSize);
+			lua_settop(mState, 0);
 			throw std::runtime_error(errorMsg);
 		}
 	}
@@ -927,8 +941,12 @@ bool LuaAPI::RegisterType(const std::string& name) {
 		return false;
 	}
 	
+	int stackSize = lua_gettop(mState);
+
 	// attempt to create a new metatable on the lua registry with name
 	if (!luaL_newmetatable(mState, (name + ".mt").c_str())) { // if the metatable already exists...
+		lua_settop(mState, stackSize);
+
 		std::cout << "(LuaAPI) Type Registration Error: metatable with name " << name << ".mt already exists in current Lua State." << std::endl;
 		return false;
 	}
@@ -937,6 +955,7 @@ bool LuaAPI::RegisterType(const std::string& name) {
 	lua_pushliteral(mState, "__index");
 	lua_pushvalue(mState, -2);
 	lua_settable(mState, -3);
+	lua_settop(mState, stackSize);
 	
 	// create a new registered type object and add a destructor to it
 	RegisteredType newType(mCounter, name);
@@ -957,17 +976,22 @@ bool LuaAPI::RegisterConstructor() {
 		std::cout << "(LuaAPI) Constructor Registration Error: type not registered." << std::endl;
 		return false;
 	}
+
+	int stackSize = lua_gettop(mState);
 	
 	// attempt to create a new metatable on the lua registry with name
 	if (luaL_newmetatable(mState, ((indexType->second).GetName() + ".mt").c_str())) { // if the metatable doesn't exist...
 		// remove the newly created (invalid) metatable from the lua registry
 		lua_pushnil(mState);
 		lua_setfield(mState, LUA_REGISTRYINDEX, ((indexType->second).GetName() + ".mt").c_str());
-		
+		lua_settop(mState, stackSize);
+
 		std::cout << "(LuaAPI) Constructor Registration Error: metatable with name " << (indexType->second).GetName() << ".mt doesn't exist in current Lua State." << std::endl;
 		return false;
 	}
 	
+	lua_settop(mState, stackSize);
+
 	(indexType->second).AddConstructor<T, Ps...>(mState);
 	
 	return true;
@@ -980,14 +1004,19 @@ bool LuaAPI::RegisterFunction(const std::string& funcName, R(T::*func)(Ps...)) {
 		std::cout << "(LuaAPI) Function Registration Error: type not registered." << std::endl;
 		return false;
 	}
+
+	int stackSize = lua_gettop(mState);
 	
 	if (luaL_newmetatable(mState, ((indexType->second).GetName() + ".mt").c_str())) {
 		lua_pushnil(mState);
 		lua_setfield(mState, LUA_REGISTRYINDEX, ((indexType->second).GetName() + ".mt").c_str());
-		
+		lua_settop(mState, stackSize);
+
 		std::cout << "(LuaAPI) Function Registration Error: metatable with name " << (indexType->second).GetName() << ".mt doesn't exist in current Lua State." << std::endl;
 		return false;
 	}
+
+	lua_settop(mState, stackSize);
 	
 	(indexType->second).AddFunction<T, R, Ps...>(mState, funcName, func);
 	
@@ -1001,15 +1030,20 @@ bool LuaAPI::RegisterGetter(const std::string& funcName, R T::*var) {
 		std::cout << "(LuaAPI) Getter Registration Error: type not registered." << std::endl;
 		return false;
 	}
+
+	int stackSize = lua_gettop(mState);
 	
 	if (luaL_newmetatable(mState, ((indexType->second).GetName() + ".mt").c_str())) {
 		lua_pushnil(mState);
 		lua_setfield(mState, LUA_REGISTRYINDEX, ((indexType->second).GetName() + ".mt").c_str());
-		
+		lua_settop(mState, stackSize);
+
 		std::cout << "(LuaAPI) Getter Registration Error: metatable with name " << (indexType->second).GetName() << ".mt doesn't exist in current Lua State." << std::endl;
 		return false;
 	}
 	
+	lua_settop(mState, stackSize);
+
 	(indexType->second).AddGetter<T, R>(mState, funcName, var);
 	
 	return true;
@@ -1022,15 +1056,20 @@ bool LuaAPI::RegisterSetter(const std::string& funcName, R T::*var) {
 		std::cout << "(LuaAPI) Getter Registration Error: type not registered." << std::endl;
 		return false;
 	}
+
+	int stackSize = lua_gettop(mState);
 	
 	if (luaL_newmetatable(mState, ((indexType->second).GetName() + ".mt").c_str())) {
 		lua_pushnil(mState);
 		lua_setfield(mState, LUA_REGISTRYINDEX, ((indexType->second).GetName() + ".mt").c_str());
-		
+		lua_settop(mState, stackSize);
+
 		std::cout << "(LuaAPI) Getter Registration Error: metatable with name " << (indexType->second).GetName() << ".mt doesn't exist in current Lua State." << std::endl;
 		return false;
 	}
 	
+	lua_settop(mState, stackSize);
+
 	(indexType->second).AddSetter<T, R>(mState, funcName, var);
 	
 	return true;

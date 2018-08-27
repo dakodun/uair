@@ -817,7 +817,7 @@ void Shape::CreateVBOVertices(RenderBatchData& batchData, const std::vector<glm:
 		if (textureSize.x != 0 && textureSize.y != 0 &&
 				maxST.x - minST.x != 0 && maxST.y - minST.y != 0) { // if texture and coordinates are valid...
 			
-			// caluclate the size of the shape (local bounding box)
+			// calculate the size of the shape (local bounding box)
 			glm::vec2 shapeSize;
 			std::vector<glm::vec2> bbox = GetLocalBoundingBox();
 			if (bbox.size() == 4) {

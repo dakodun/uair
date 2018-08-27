@@ -211,7 +211,26 @@ class EXPORTDLL LuaAPI {
 			
 			// call a script with 2 or more return values
 			template <typename R1, typename R2, typename ...Rs, typename ...Ps>
-			std::tuple<R1, R2, Rs...> CallString(const std::string& script, const Ps&... params);
+			std::tuple<R1, R2, Rs...> CallString(const std::string& script,
+					const Ps&... params);
+
+			// call a script without stack management
+			bool CallStringU(const std::string& script,
+					const int& paramCount);
+		//
+
+		// stack manipulation
+			int GetStackSize() const;
+			void SetStackSize(const int& size);
+
+			static int GetStackSize(const unsigned int& counter);
+			static void SetStackSize(const unsigned int& counter, const int& size); 
+
+			void PopStack(const int& count);
+			void RemoveStack(const int& index);
+
+			static void PopStack(const unsigned int& counter, const int& count);
+			static void RemoveStack(const unsigned int& counter, const int& index);
 		//
 		
 		// using overloaded functions, push a single value to the stack

@@ -217,14 +217,18 @@ class EXPORTDLL Game {
 		void MakeCurrent(WindowPtr windowPtr, OpenGLContextPtr contextPtr);
 	
 	public :
-		bool mFrameLimit = false;
+		bool mFrameSkip = false;
+		unsigned int mMaxFrames = 5u;
+		
 		float mFrameLowerLimit = 0.02f;
-		float mFrameUpperLimit = 1.0f;
+		
+		// bool mFrameLimit = false;
+		// float mFrameUpperLimit = 1.0f;
 		
 		unsigned int mRenderPasses = 1u;
 	private :
-		float mTotalFrameTime = 0.0f;
-		float mAccumulator = 0.0f;
+		// float mTotalFrameTime = 0.0f;
+		// float mAccumulator = 0.0f;
 		Timer mTimer;
 		
 		WindowPtr mWindow;

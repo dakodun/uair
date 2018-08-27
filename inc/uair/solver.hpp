@@ -36,6 +36,12 @@
 namespace uair {
 class EXPORTDLL Solver {
 	public :
+		typedef std::function<bool(Body&, Body&)> CollisionCallback;
+		
+		typedef std::function<void(Body&, Body&,
+				std::tuple<bool, glm::vec2, float>&)> BodyCallback;
+		typedef std::pair<Body, BodyCallback> BodyCallbackEntry;
+		
 		// a handle to a body that holds a pointer to the body and an iterator into a list
 		class EXPORTDLL BodyHandle {
 			friend class Solver; // allow solver to modify pointer and iterator values
@@ -71,33 +77,37 @@ class EXPORTDLL Solver {
 				//
 			
 			private :
-				std::list<Body>::iterator mBodyIter;
+				std::list<BodyCallbackEntry>::iterator mBodyIter;
 		};
 	
 	public :
 		void Step(float deltaTime);
 		
-		// create the requested type of body, add it to the list and return a handle (pointer and iterator)
-		BodyHandle CreateStaticBody();
-		BodyHandle CreateDynamicBody();
+		// create the requested type of body, add it to the list and
+		// return a handle (pointer and iterator)
+		// optionally pass in a pointer to a function that is called
+		// when a collision occurs
+		BodyHandle CreateStaticBody(const BodyCallback& callback = nullptr);
+		BodyHandle CreateDynamicBody(const BodyCallback& callback = nullptr);
 		
 		void DestroyBody(BodyHandle& handle); // remove a body using its handle
 		
 		bool AddCallback(const std::string& tagFirst, const std::string& tagSecond,
-				const std::function<void(Body& first, Body& second)>& callback = nullptr);
+				const CollisionCallback& callback = nullptr);
 	private :
-		bool HandleBodyCollision(Body& first, Body& second);
+		// bool HandleBodyCollision(Body& first, Body& second);
+		bool HandleBodyCollision(BodyCallbackEntry& first, BodyCallbackEntry& second);
 		std::tuple<bool, glm::vec2, float> CheckPolygonCollision(const Polygon& first, const Polygon& second);
 		void ApplyImpulse(Body& first, Body& second, const glm::vec2& collNorm);
 		void PerformSeperation(Body& first, Body& second, const glm::vec2& collNorm, const float& collDist,
 				const glm::vec2& velocityFirst, const glm::vec2& velocitySecond);
 	
 	private :
-		std::list<Body> mStaticBodies;
-		std::list<Body> mDynamicBodies;
+		std::list<BodyCallbackEntry> mStaticBodies;
+		std::list<BodyCallbackEntry> mDynamicBodies;
 		
-		std::map< std::pair<std::string, std::string>,
-				std::function<void(Body& first, Body& second)> > mCallbacks;
+		std::map<std::pair<std::string, std::string>,
+				CollisionCallback> mCallbacks;
 };
 }
 

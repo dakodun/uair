@@ -156,7 +156,7 @@ void Triangulate::HandleEnd() {
 void Triangulate::HandleVertexData(void *vertex_data, void *polygon_data) {
 	Triangulate& triangulate = *(static_cast<Triangulate*>(polygon_data)); // cast instance handle back
 	VertexData& vertex = *(static_cast<VertexData*>(vertex_data)); // cast vertex back
-	triangulate.mIndices.push_back(vertex.mIndex); // add new vertiex's index to instance handle's index array
+	triangulate.mIndices.push_back(vertex.mIndex); // add new vertex's index to instance handle's index array
 }
 
 void Triangulate::HandleCombineData(GLdouble coords[3], void *vertex_data[4], GLfloat weight[4], void **outData, void *polygon_data) {

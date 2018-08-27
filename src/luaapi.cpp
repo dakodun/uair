@@ -108,6 +108,83 @@ void swap(LuaAPI& first, LuaAPI& second) {
 	swap(first.mWhitelist, second.mWhitelist);
 }
 
+bool LuaAPI::CallStringU(const std::string& script,
+		const int& paramCount) {
+	
+	// add the script to the stack and move it to the bottom
+	PushStack(script);
+	lua_insert(mState, 1);
+
+	// add the sandbox function to the stack and move it to the bottom
+	lua_getglobal(mState, "uair_run");
+	lua_insert(mState, 1);
+
+	if (lua_pcall(mState, paramCount + 1, LUA_MULTRET, 0)) {
+		return false;
+	}
+
+	bool result = ReadStack<bool>(1);
+	lua_remove(mState, 1);
+	return result;
+}
+
+int LuaAPI::GetStackSize() const {
+	return lua_gettop(mState);
+}
+
+void LuaAPI::SetStackSize(const int& size) {
+	lua_settop(mState, size);
+}
+
+int LuaAPI::GetStackSize(const unsigned int& counter) {
+	auto apiInstance = mAPIInstances.find(counter); // retrieve the instance matching counter
+	if (apiInstance != mAPIInstances.end()) { // if a matching instance was found...
+		return (apiInstance->second)->GetStackSize(); // call that instance's matching stack function
+	}
+	else {
+		std::cout << "(LuaAPI) Stack Error (GetSize): invalid LuaAPI instance counter." << std::endl;
+		return 0;
+	}
+}
+
+void LuaAPI::SetStackSize(const unsigned int& counter, const int& size) {
+	auto apiInstance = mAPIInstances.find(counter);
+	if (apiInstance != mAPIInstances.end()) {
+		(apiInstance->second)->SetStackSize(size);
+	}
+	else {
+		std::cout << "(LuaAPI) Stack Error (SetSize): invalid LuaAPI instance counter." << std::endl;
+	}
+}
+
+void LuaAPI::PopStack(const int& count) {
+	lua_pop(mState, count);
+}
+
+void LuaAPI::RemoveStack(const int& index) {
+	lua_remove(mState, index);
+}
+
+void LuaAPI::PopStack(const unsigned int& counter, const int& count) {
+	auto apiInstance = mAPIInstances.find(counter);
+	if (apiInstance != mAPIInstances.end()) {
+		(apiInstance->second)->PopStack(count);
+	}
+	else {
+		std::cout << "(LuaAPI) Stack Error (Pop): invalid LuaAPI instance counter." << std::endl;
+	}
+}
+
+void LuaAPI::RemoveStack(const unsigned int& counter, const int& index) {
+	auto apiInstance = mAPIInstances.find(counter);
+	if (apiInstance != mAPIInstances.end()) {
+		(apiInstance->second)->RemoveStack(index);
+	}
+	else {
+		std::cout << "(LuaAPI) Stack Error (Remove): invalid LuaAPI instance counter." << std::endl;
+	}
+}
+
 void LuaAPI::PushStack(const Nil& value) {
 	lua_pushnil(mState); // push the value onto lua's stack
 }

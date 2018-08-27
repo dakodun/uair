@@ -80,7 +80,13 @@ void Shader::LinkProgram() {
 				vertShaderAttached = true;
 		}
 		else {
-			std::cout << "Compilation of the Vertex Shader failed." << std::endl; // error
+			GLint len = 0;
+			glGetShaderiv(vertShaderID, GL_INFO_LOG_LENGTH, &len);
+			std::vector<GLchar> buf(len);
+			glGetShaderInfoLog(vertShaderID, len, NULL, &buf[0]);
+			
+			std::string str(buf.begin(), buf.end());
+			std::cout << "Compilation of the Vertex Shader failed:\n" << str << std::endl; // error
 		}
 	}
 	
@@ -104,7 +110,13 @@ void Shader::LinkProgram() {
 				fragShaderAttached = true;
 		}
 		else {
-			std::cout << "Compilation of the Fragment Shader failed." << std::endl; // error
+			GLint len = 0;
+			glGetShaderiv(fragShaderID, GL_INFO_LOG_LENGTH, &len);
+			std::vector<GLchar> buf(len);
+			glGetShaderInfoLog(fragShaderID, len, NULL, &buf[0]);
+			
+			std::string str(buf.begin(), buf.end());
+			std::cout << "Compilation of the Fragment Shader failed:\n" << str << std::endl; // error
 		}
 	}
 	

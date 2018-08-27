@@ -31,75 +31,75 @@
 
 namespace uair {
 Body& Solver::BodyHandle::GetBody() {
-	return *mBodyIter;
+	return mBodyIter->first;
 }
 
 void Solver::BodyHandle::AddPolygon(Polygon polygon) {
-	mBodyIter->AddPolygon(polygon);
+	mBodyIter->first.AddPolygon(polygon);
 }
 
 const std::vector<Polygon>& Solver::BodyHandle::GetPolygons() const {
-	return mBodyIter->GetPolygons();
+	return mBodyIter->first.GetPolygons();
 }
 
 std::pair<glm::vec2, float> Solver::BodyHandle::GetBoundingCircle() const {
-	return mBodyIter->GetBoundingCircle();
+	return mBodyIter->first.GetBoundingCircle();
 }
 
 std::string Solver::BodyHandle::GetTag() const {
-	return mBodyIter->GetTag();
+	return mBodyIter->first.GetTag();
 }
 
 void Solver::BodyHandle::SetTag(const std::string& tag) {
-	mBodyIter->SetTag(tag);
+	mBodyIter->first.SetTag(tag);
 }
 
 void Solver::BodyHandle::SetType(const unsigned int& type) {
-	mBodyIter->SetType(type);
+	mBodyIter->first.SetType(type);
 }
 
 unsigned int Solver::BodyHandle::GetType() const {
-	return mBodyIter->GetType();
+	return mBodyIter->first.GetType();
 }
 
 bool Solver::BodyHandle::IsStatic() const {
-	return mBodyIter->IsStatic();
+	return mBodyIter->first.IsStatic();
 }
 
 bool Solver::BodyHandle::IsDynamic() const {
-	return mBodyIter->IsDynamic();
+	return mBodyIter->first.IsDynamic();
 }
 
 glm::vec2 Solver::BodyHandle::GetPosition() const {
-	return mBodyIter->GetPosition();
+	return mBodyIter->first.GetPosition();
 }
 
 void Solver::BodyHandle::SetPosition(const glm::vec2& pos) {
-	mBodyIter->SetPosition(pos);
+	mBodyIter->first.SetPosition(pos);
 }
 
 glm::vec2 Solver::BodyHandle::GetVelocity() const {
-	return mBodyIter->GetVelocity();
+	return mBodyIter->first.GetVelocity();
 }
 
 void Solver::BodyHandle::SetVelocity(const glm::vec2& velocity) {
-	mBodyIter->SetVelocity(velocity);
+	mBodyIter->first.SetVelocity(velocity);
 }
 
 float Solver::BodyHandle::GetInvMass() const {
-	return mBodyIter->GetInvMass();
+	return mBodyIter->first.GetInvMass();
 }
 
 void Solver::BodyHandle::SetMass(const float& mass) {
-	mBodyIter->SetMass(mass);
+	mBodyIter->first.SetMass(mass);
 }
 
 float Solver::BodyHandle::GetRestitution() const {
-	return mBodyIter->GetRestitution();
+	return mBodyIter->first.GetRestitution();
 }
 
 void Solver::BodyHandle::SetRestitution(const float& res) {
-	mBodyIter->SetRestitution(res);
+	mBodyIter->first.SetRestitution(res);
 }
 
 
@@ -107,7 +107,8 @@ void Solver::Step(float deltaTime) {
 	// for all dynamic bodies...
 	for (auto iterStart = mDynamicBodies.begin(); iterStart != mDynamicBodies.end(); ++iterStart) {
 		// move the body by its velocity (using the time since last frame)
-		iterStart->SetPosition(iterStart->GetPosition() + (iterStart->GetVelocity() * deltaTime));
+		iterStart->first.SetPosition(iterStart->first.GetPosition() +
+				(iterStart->first.GetVelocity() * deltaTime));
 	}
 	
 	// for all dynamic bodies...
@@ -115,19 +116,21 @@ void Solver::Step(float deltaTime) {
 		// for all OTHER dynamic bodies (from current body to list end)...
 		for (auto iterCurr = std::next(iterStart); iterCurr != mDynamicBodies.end(); ++iterCurr) {
 			// detect and resolve any collisions between both bodies
+			// HandleBodyCollision(iterStart->first, iterCurr->first);
 			HandleBodyCollision(*iterStart, *iterCurr);
 		}
 		
 		// for all static bodies...
 		for (auto iterStatic = mStaticBodies.begin(); iterStatic != mStaticBodies.end(); ++iterStatic) {
+			// HandleBodyCollision(iterStart->first, iterStatic->first);
 			HandleBodyCollision(*iterStart, *iterStatic);
 		}
 	}
 }
 
-Solver::BodyHandle Solver::CreateStaticBody() {
+Solver::BodyHandle Solver::CreateStaticBody(const BodyCallback& callback) {
 	// add a new body to the list and specifiy its type
-	mStaticBodies.emplace_back(0u);
+	mStaticBodies.emplace_back(0u, callback);
 	
 	// create the handle and set the matching type and an iterator to the new body
 	BodyHandle handle;
@@ -137,8 +140,8 @@ Solver::BodyHandle Solver::CreateStaticBody() {
 	return handle;
 }
 
-Solver::BodyHandle Solver::CreateDynamicBody() {
-	mDynamicBodies.emplace_back(1u);
+Solver::BodyHandle Solver::CreateDynamicBody(const BodyCallback& callback) {
+	mDynamicBodies.emplace_back(1u, callback);
 	
 	BodyHandle handle;
 	handle.mBodyIter = std::prev(mDynamicBodies.end());
@@ -172,7 +175,7 @@ void Solver::DestroyBody(BodyHandle& handle) {
 }
 
 bool Solver::AddCallback(const std::string& tagFirst, const std::string& tagSecond,
-		const std::function<void(Body& first, Body& second)>& callbackNew) {
+		const CollisionCallback& callbackNew) {
 	
 	// indication of exisitng callback for body types being replaced
 	bool result = false;
@@ -198,17 +201,21 @@ bool Solver::AddCallback(const std::string& tagFirst, const std::string& tagSeco
 	return result;
 }
 
-bool Solver::HandleBodyCollision(Body& first, Body& second) {
+// bool Solver::HandleBodyCollision(Body& first, Body& second) {
+bool Solver::HandleBodyCollision(BodyCallbackEntry& first, BodyCallbackEntry& second) {
+	Body& firstBody = first.first;
+	Body& secondBody = second.first;
+	
 	// indicate if a collision occurred
 	bool collision = false;
 	
 	// get the bounding circles for both bodies
-	std::pair<glm::vec2, float> firstCircle = first.GetBoundingCircle();
-	std::pair<glm::vec2, float> secondCircle = second.GetBoundingCircle();
+	std::pair<glm::vec2, float> firstCircle = firstBody.GetBoundingCircle();
+	std::pair<glm::vec2, float> secondCircle = secondBody.GetBoundingCircle();
 	
 	// calculate the (squared) distance between both circle's centre-points
-	glm::vec2 vecCircle = (secondCircle.first + second.GetPosition()) -
-			(firstCircle.first + first.GetPosition());
+	glm::vec2 vecCircle = (secondCircle.first + secondBody.GetPosition()) -
+			(firstCircle.first + firstBody.GetPosition());
 	float distSqCircle = (vecCircle.x * vecCircle.x) + (vecCircle.y * vecCircle.y);
 	
 	// calculate the sum of both circle's radii (squared since distance is squared)
@@ -217,8 +224,8 @@ bool Solver::HandleBodyCollision(Body& first, Body& second) {
 	
 	if (distSqCircle < sumSqRadii) { // if the circles intersect...
 		// get the collision shapes for both bodies
-		std::vector<Polygon> firstPolygons = first.GetPolygons();
-		std::vector<Polygon> secondPolygons = second.GetPolygons();
+		std::vector<Polygon> firstPolygons = firstBody.GetPolygons();
+		std::vector<Polygon> secondPolygons = secondBody.GetPolygons();
 		
 		// get and iterator to the first collision shape of both bodies
 		auto firstPoly = firstPolygons.begin();
@@ -230,17 +237,20 @@ bool Solver::HandleBodyCollision(Body& first, Body& second) {
 			auto collisionResult = CheckPolygonCollision(*firstPoly, *secondPoly);
 			if (std::get<0>(collisionResult)) { // if a collision occurred...
 				// construct the callback key from body types and ensure it is in ascending alphabetical order (first < second)
-				std::pair<std::string, std::string> callbackKey = std::make_pair(first.GetTag(), second.GetTag());
-				if (first.GetTag() > second.GetTag()) {
-					callbackKey = std::make_pair(second.GetTag(), first.GetTag());
+				std::pair<std::string, std::string> callbackKey = std::make_pair(firstBody.GetTag(), secondBody.GetTag());
+				if (firstBody.GetTag() > secondBody.GetTag()) {
+					callbackKey = std::make_pair(secondBody.GetTag(), firstBody.GetTag());
 				}
+				
+				bool performDefault = true;
 				
 				// attempt to retrieve the stored callback function and call it passing in current bodies
 				auto callback = mCallbacks.find(callbackKey);
 				if (callback != mCallbacks.end()) {
-					callback->second(first, second);
+					performDefault = callback->second(firstBody, secondBody);
 				}
-				else { // otherwise perform default response...
+				
+				if (performDefault) { // if we're to perform default response...
 					// get the relative position between both bodies centres
 					glm::vec2 rPos = (secondPoly->GetCentroid() + secondPoly->GetPosition()) -
 							(firstPoly->GetCentroid() + firstPoly->GetPosition());
@@ -255,17 +265,25 @@ bool Solver::HandleBodyCollision(Body& first, Body& second) {
 					}
 					
 					// store the current velocities before they are modified via impulse
-					glm::vec2 velFirst = first.GetVelocity();
-					glm::vec2 velSecond = second.GetVelocity();
+					glm::vec2 velFirst = firstBody.GetVelocity();
+					glm::vec2 velSecond = secondBody.GetVelocity();
 					
 					// resolve the collision by applying an impulse
-					ApplyImpulse(first, second, mtNorm);
+					ApplyImpulse(firstBody, secondBody, mtNorm);
 					
 					// seperate shapes along collision normal depending on mass, velocity and body type
-					PerformSeperation(first, second, mtNorm, mtDist, velFirst, velSecond);
+					PerformSeperation(firstBody, secondBody, mtNorm, mtDist, velFirst, velSecond);
 				}
 				
 				collision = true;
+				
+				if (first.second) {
+					(first.second)(firstBody, secondBody, collisionResult);
+				}
+				
+				if (second.second) {
+					(second.second)(secondBody, firstBody, collisionResult);
+				}
 			}
 			else { // otherwise no collision occurred...
 				secondPoly = std::next(secondPoly); // retrieve the next collision shape for the SECOND body
