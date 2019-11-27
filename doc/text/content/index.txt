@@ -1,5 +1,0 @@
-__	Home
-	Uair Engine - A simple C++ game engine
---
-	The Uair Engine is released under the [link:zlib license|http://www.zlib.net/zlib_license.html].
-__
