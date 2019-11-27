@@ -239,7 +239,7 @@ namespace uair {
 			
 			mFunctionPtr(*((*data)->mUserData));
 			
-			return 0;
+			return 1;
 		}
 		
 		return 0;
@@ -259,7 +259,7 @@ namespace uair {
 			auto arg = ReadStack<Pa>(counter, stackSize);
 			mFunctionPtr(*((*data)->mUserData), arg);
 			
-			return 0;
+			return 1;
 		}
 		
 		return 0;
@@ -281,7 +281,7 @@ namespace uair {
 				mFunctionPtr(*((*data)->mUserData), tupleElements...);
 			}
 			
-			return 0;
+			return 1;
 		};
 		
 		return util::ExpandTuple(call, args, std::make_index_sequence<std::tuple_size<decltype(args)>::value>());
@@ -328,10 +328,58 @@ namespace uair {
 			auto arg = ReadStack<R>(counter, stackSize);
 			(*data)->mUserData->*mVarPtr = arg;
 			
-			return 0;
+			return 1;
 		}
 		
 		return 0;
+	}
+
+
+	template <class R, class... Ps>
+	LuaAPI::RegisteredStaticFunc<R, Ps...>::RegisteredStaticFunc(R(*func)(Ps...)) : mFunctionPtr(func) {
+		
+	}
+	
+	template <class R, class... Ps>
+	int LuaAPI::RegisteredStaticFunc<R, Ps...>::Call(lua_State* l, const unsigned int& counter, const std::string& name) {
+		return CallAlias<R, typename std::decay<Ps>::type...>(l, counter, name);
+	}
+	
+	template <class R, class... Ps>
+	template <typename Ra>
+	int LuaAPI::RegisteredStaticFunc<R, Ps...>::CallAlias(lua_State* l, const unsigned int& counter, const std::string& name) {
+		auto res = mFunctionPtr();
+		PushStack(counter, res); // add the return value to the stack
+		
+		return 1;
+	}
+	
+	template <class R, class... Ps>
+	template <typename Ra, typename Pa>
+	int LuaAPI::RegisteredStaticFunc<R, Ps...>::CallAlias(lua_State* l, const unsigned int& counter, const std::string& name) {
+		int stackSize = lua_gettop(l);
+		
+		auto arg = ReadStack<Pa>(counter, stackSize);
+		auto res = mFunctionPtr(arg);
+		PushStack(counter, res);
+		
+		return 1;
+	}
+	
+	template <class R, class... Ps>
+	template <typename Ra, typename P1a, typename P2a, typename ...Psa>
+	int LuaAPI::RegisteredStaticFunc<R, Ps...>::CallAlias(lua_State* l, const unsigned int& counter, const std::string& name) {
+		int stackSize = lua_gettop(l);
+		auto args = ReadStack<P1a, P2a, Psa...>(counter, stackSize - (1 + sizeof...(Psa)));
+		
+		auto call = [this, l, &counter, &name](auto&... tupleElements)->int {
+			auto res = mFunctionPtr(tupleElements...);
+			PushStack(counter, res);
+			
+			return 1;
+		};
+		
+		return util::ExpandTuple(call, args, std::make_index_sequence<std::tuple_size<decltype(args)>::value>());
 	}
 //
 
@@ -518,16 +566,12 @@ void LuaAPI::RegisteredType::AddSetter(lua_State* l, const std::string& funcName
 //
 	template <typename ...Ps>
 	void LuaAPI::CallString(const std::string& script, const Ps&... params) {
-		std::cout << "1. " << lua_gettop(mState) << std::endl;
-
 		if (lua_gettop(mState) != 0) {
 			throw std::runtime_error("(LuaAPI) Script Error: stack must be empty to use CallString. (did you mean CallStringU?)");
 		}
 
 		lua_getglobal(mState, "uair_run"); // get the sandbox function
 		PushStack(script, params...); // push the script and any parameters to the stack
-		
-		std::cout << "2. " << lua_gettop(mState) << std::endl;
 
 		// if the number of values on the stack doesn't match the number of parameters...
 		if (lua_gettop(mState) - 1 != sizeof...(params) + 1) {
@@ -540,12 +584,8 @@ void LuaAPI::RegisteredType::AddSetter(lua_State* l, const std::string& funcName
 			lua_settop(mState, 0);
 			throw std::runtime_error(errorMsg);
 		}
-		
-		std::cout << "3. " << lua_gettop(mState) << std::endl;
 
 		if (ReadStack<bool>(1)) { // if script was called successfully...
-			std::cout << "4. " << lua_gettop(mState) << std::endl;
-
 			lua_settop(mState, 0);
 		}
 		else {
@@ -908,33 +948,12 @@ void LuaAPI::RegisteredType::AddSetter(lua_State* l, const std::string& funcName
 
 template <typename T>
 bool LuaAPI::RegisterType(const std::string& name) {
-	// split the name into parts (0, 1 ... n-1 => namespace, namespace ... typename)
-	std::vector<std::string> parts = util::SplitString(name, '.');
-	if (parts.size() > 1u) { // if there was at least one namespace...
-		size_t size = parts.size() - 1u; // discount the final entry (typename)
-		std::string partName = ""; // the full namespace
-		
-		for (unsigned int i = 0u; i < size; ++i) { // for all namespaces...
-			partName += parts.at(i); // add the namespace to the full namespace
-			
-			auto nameIndex = mNameIndexMap.find(partName); // check if there is a type matching the current full namespace
-			if (nameIndex != mNameIndexMap.end()) { // if a matching type was already registered...
-				std::cout << "(LuaAPI) Type Registration Error: namespace with name " << partName << " is already a registered type." << std::endl;
-				return false;
-			}
-			
-			partName += '.';
-		}
-	}
-	
-	// attempt to retrieve the type registered with name
-	auto nameIndex = mNameIndexMap.find(name);
-	if (nameIndex != mNameIndexMap.end()) { // if a type using name was already registered...
-		std::cout << "(LuaAPI) Type Registration Error: a type with name " << name << " is already registered." << std::endl;
+	if (!CheckNameAvailability(name)) {
 		return false;
 	}
 	
-	// attempt to retrieve the "registered type object" registered with type
+	// perform an extra check to see if the type has been registered under
+	// a different name (TODO: should multiple registrations be allowed?)
 	auto indexType = mIndexTypeMap.find(std::type_index(typeid(T)));
 	if (indexType != mIndexTypeMap.end()) { // if the type was already registered...
 		std::cout << "(LuaAPI) Type Registration Error: type is already registered under a different name." << std::endl;
@@ -1072,6 +1091,81 @@ bool LuaAPI::RegisterSetter(const std::string& funcName, R T::*var) {
 
 	(indexType->second).AddSetter<T, R>(mState, funcName, var);
 	
+	return true;
+}
+
+template <typename R, typename... Ps>
+bool LuaAPI::RegisterStaticFunction(const std::string& funcName, R(*func)(Ps...)) {
+	//
+		if (!CheckNameAvailability(funcName)) {
+			return false;
+		}
+
+		int stackSize = lua_gettop(mState);
+		if (!luaL_newmetatable(mState, (funcName + ".mt").c_str())) {
+			lua_settop(mState, stackSize);
+
+			std::cout << "(LuaAPI) Static Function Registration Error: metatable with name " << funcName << ".mt already exists in current Lua State." << std::endl;
+			return false;
+		}
+
+		// assign the metatable as its own __index metamethod
+		lua_pushliteral(mState, "__index");
+		lua_pushvalue(mState, -2);
+		lua_settable(mState, -3);
+		lua_settop(mState, stackSize);
+
+		std::unique_ptr<RegisteredFuncBase> funcPtr = std::make_unique< RegisteredStaticFunc<R, Ps...> >(func);
+		auto res = mStaticFuncs.insert(std::make_pair(funcName, std::move(funcPtr)));
+	//
+	
+	//
+		stackSize = lua_gettop(mState);
+
+		if (!luaL_newmetatable(mState, (funcName + ".mt").c_str())) {
+			int locType = LUA_GLOBALSINDEX;
+			
+			std::vector<std::string> parts = util::SplitString(funcName, '.');
+			if (parts.size() > 1u) {
+				locType = -2;
+				size_t size = parts.size() - 1u;
+
+				auto lambdaGetTable = [this](const int& loc, const std::string& name) {
+					int locSet = loc;
+					if (loc != LUA_GLOBALSINDEX) {
+						--locSet;
+					}
+					
+					lua_getfield(mState, loc, name.c_str());
+					
+					if (lua_isnil(mState, -1)) {
+						lua_remove(mState, -1);
+						lua_newtable(mState);
+						lua_setfield(mState, locSet, name.c_str());
+						lua_getfield(mState, loc, name.c_str());
+					}
+				};
+				
+				lambdaGetTable(LUA_GLOBALSINDEX, parts.front());
+				for (unsigned int i = 1u; i < size; ++i) {
+					lambdaGetTable(-1, parts.at(i));
+				}
+			}
+			
+			lua_pushinteger(mState, mCounter);
+			lua_pushstring(mState, funcName.c_str());
+			lua_pushcclosure(mState, LuaAPI::OnStaticFunc, 2);
+			lua_setfield(mState, locType, (parts.back()).c_str());
+		}
+		else {
+			lua_pushnil(mState);
+			lua_setfield(mState, LUA_REGISTRYINDEX, (funcName + ".mt").c_str());
+			std::cout << "(LuaAPI) Static Function Registration Error: metatable with name " << funcName << ".mt doesn't exist in current Lua State." << std::endl;
+		}
+
+		lua_settop(mState, stackSize);
+	//
+
 	return true;
 }
 }

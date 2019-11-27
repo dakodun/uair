@@ -373,6 +373,52 @@ int LuaAPI::OnFunction(lua_State* l) {
 	return (indexType->second).CallFunction(l, funcName);
 }
 
+int LuaAPI::OnStaticFunc(lua_State* l) {
+	// validate and retrieve the instance counter upvalue
+	unsigned int counter = 0u;
+	if (lua_isnumber(l, lua_upvalueindex(1))) {
+		counter = lua_tointeger(l, lua_upvalueindex(1));
+	}
+	
+	// validate and retrieve the type name upvalue
+	std::string name = "";
+	if (lua_isstring(l, lua_upvalueindex(2))) {
+		name = lua_tostring(l, lua_upvalueindex(2));
+	}
+	
+	auto apiInstance = mAPIInstances.find(counter); // retrieve the instance matching counter
+	if (apiInstance == mAPIInstances.end()) { // if no instance was found...
+		std::cout << "(LuaAPI) Callback Error (Constructor): invalid LuaAPI instance counter." << std::endl;
+		return 0; // error
+	}
+
+	/* auto nameIndex = (apiInstance->second)->mNameIndexMap.find(name);
+	if (nameIndex == (apiInstance->second)->mNameIndexMap.end()) {
+		std::cout << "(LuaAPI) Callback Error (Function): type with name " << name << " isn't registered." << std::endl;
+		return 0;
+	}
+	
+	auto indexType = (apiInstance->second)->mIndexTypeMap.find((nameIndex->second));
+	if (indexType == (apiInstance->second)->mIndexTypeMap.end()) {
+		std::cout << "(LuaAPI) Callback Error (Function): mismatched name/type pair." << std::endl;
+		return 0;
+	} */
+
+	auto funcPtr = (apiInstance->second)->mStaticFuncs.find(name);	
+	if (funcPtr == (apiInstance->second)->mStaticFuncs.end()) {
+		std::cout << "(LuaAPI) Callback Error (Function): function with name " << name << " isn't registered." << std::endl;
+		return 0;
+		
+	}
+
+	return (funcPtr->second)->Call(l, counter, name);
+	// return (func->second).CallFunction(l, funcName);
+	
+	/* std::cout << "get static func: " << name << std::endl;
+	std::cout << "call static func: " << name << std::endl;
+	return 0; // ---^ */
+}
+
 bool LuaAPI::AddWhitelist(const std::string& var, std::string alias) {
 	if (alias == "") { // if no alias was supplied...
 		alias = var; // set the alias the the variable name
@@ -432,7 +478,7 @@ bool LuaAPI::CreateSandbox() {
 		
 		env += "}";
 	//
-	
+
 	// create the sandbox script by prepending the new environment table to the sandbox function code
 	mSandbox = env + R"(
 		
@@ -471,6 +517,53 @@ bool LuaAPI::CreateSandbox() {
 		return false;
 	}
 	
+	return true;
+}
+
+
+bool LuaAPI::CheckNameAvailability(const std::string& name) const {
+	// check if any of the namespaces are already registered types or functions...
+		// split the name into parts (0, 1 ... n-1 => namespace, namespace ... typename)
+		std::vector<std::string> parts = util::SplitString(name, '.');
+		if (parts.size() > 1u) { // if there was at least one namespace...
+			size_t size = parts.size() - 1u; // discount the final entry (typename)
+			std::string partName = ""; // the full namespace
+			
+			for (unsigned int i = 0u; i < size; ++i) { // for all namespaces...
+				partName += parts.at(i); // add the namespace to the full namespace
+
+				auto nameIndex = mNameIndexMap.find(partName); // check if there is a type matching the current full namespace
+				if (nameIndex != mNameIndexMap.end()) { // if a matching type was already registered...
+					std::cout << "(LuaAPI) Registration Error: namespace with name " << partName << " is already a registered type." << std::endl;
+					return false;
+				}
+
+				auto staticFunc = mStaticFuncs.find(partName);
+				if (staticFunc != mStaticFuncs.end()) {
+					std::cout << "(LuaAPI) Registration Error: namespace with name " << partName << " is already a registered static function." << std::endl;
+					return false;
+				}
+				
+				partName += '.';
+			}
+		}
+	//
+	
+	// check if the type or function name is already in use...
+		// search for the type or function in the registered types
+		auto nameIndex = mNameIndexMap.find(name);
+		if (nameIndex != mNameIndexMap.end()) { // if a type using name was already registered...
+			std::cout << "(LuaAPI) Registration Error: a type with name " << name << " is already registered." << std::endl;
+			return false;
+		}
+
+		auto staticFunc = mStaticFuncs.find(name);
+		if (staticFunc != mStaticFuncs.end()) {
+			std::cout << "(LuaAPI) Registration Error: a static function with name " << name << " is already registered." << std::endl;
+			return false;
+		}
+	//
+
 	return true;
 }
 }

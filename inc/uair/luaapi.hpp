@@ -145,6 +145,30 @@ class EXPORTDLL LuaAPI {
 				private :
 					R T::*mVarPtr;
 			};
+
+
+			// stores a static function (R Func(Ps...))
+			template <class R, class... Ps>
+			class RegisteredStaticFunc : public RegisteredFuncBase {
+				public :
+					RegisteredStaticFunc(R(*func)(Ps...));
+					
+					int Call(lua_State* l, const unsigned int& counter, const std::string& name);
+				private :
+					template <typename Ra>
+					int CallAlias(lua_State* l, const unsigned int& counter, const std::string& name);
+					
+					template <typename Ra, typename Pa>
+					int CallAlias(lua_State* l, const unsigned int& counter, const std::string& name);
+					
+					template <typename Ra, typename P1a, typename P2a, typename ...Psa>
+					int CallAlias(lua_State* l, const unsigned int& counter, const std::string& name);
+				
+				private :
+					std::function<R(Ps...)> mFunctionPtr;
+			};
+
+			// [TODO] specialisation to allow static functions return void
 		//
 		
 		// holds the constructor, destructor and functions for a type registered with lua
@@ -191,7 +215,7 @@ class EXPORTDLL LuaAPI {
 		};
 	public :
 		LuaAPI();
-		LuaAPI(const LuaAPI& other)  = delete;
+		LuaAPI(const LuaAPI& other) = delete;
 		LuaAPI(LuaAPI&& other);
 		
 		~LuaAPI();
@@ -279,7 +303,7 @@ class EXPORTDLL LuaAPI {
 		//
 		
 		// using compile time index sequences and polymorphic lambdas (c++14) read multiple values from the stack
-			// require a minimum of 2 paramaters (P1, P2) to avoid ambiguity
+			// require a minimum of 2 parameters (P1, P2) to avoid ambiguity
 			template <typename P1, typename P2, typename... Ps>
 			std::tuple<P1, P2, Ps...> ReadStack(int index);
 			
@@ -308,16 +332,24 @@ class EXPORTDLL LuaAPI {
 			// register a simple setter to assign a value to var (var = value)
 			template <typename T, typename R>
 			bool RegisterSetter(const std::string& funcName, R T::*var);
+
+			// register a static function (R Func(Ps...))
+			template <typename R, typename... Ps>
+			bool RegisterStaticFunction(const std::string& funcName, R(*func)(Ps...));
 		//
 		
 		// static callbacks that maps from lua to a luaapi(via upvalues)
 			static int OnNew(lua_State* l);
 			static int OnDelete(lua_State* l);
 			static int OnFunction(lua_State* l);
+
+			static int OnStaticFunc(lua_State* l);
 		//
-		
+
 		bool AddWhitelist(const std::string& var, std::string alias = "");
 		bool CreateSandbox();
+	private :
+		bool CheckNameAvailability(const std::string& name) const;
 	
 	public :
 		// counter to assign a unique id to a LuaAPI for map access
@@ -330,10 +362,12 @@ class EXPORTDLL LuaAPI {
 		std::string mSandbox;
 		unsigned int mCounter; // a unique id for use with map access
 		
-		// maps that allow retrieval of register types via unqie names or typeids
+		// maps that allow retrieval of registered types via unique names or typeids
 		std::map<std::string, std::type_index> mNameIndexMap;
 		std::map<std::type_index, RegisteredType> mIndexTypeMap;
-		
+
+		std::map< std::string, std::unique_ptr<RegisteredFuncBase> > mStaticFuncs;
+
 		std::map< std::string, std::map<std::string, std::string> > mWhitelist;
 };
 }
