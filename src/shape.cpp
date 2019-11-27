@@ -444,6 +444,18 @@ AnimationFrame Shape::GetFrame(const unsigned int& frame) const {
 	throw std::runtime_error("requested frame is invalid");
 }
 
+void Shape::RemoveFrame() {
+	// reset the animation to default and remove any existing frames
+	SetAnimation();
+	mFrames.clear();
+}
+
+void Shape::RemoveFrame(const unsigned int& frame) {
+	// [TODO] dummy function
+	//   remove selected frame if valid
+	//   adjust animation if necessary
+}
+
 void Shape::SetAnimation() {
 	mIsAnimated = false; // set shape as static
 	mAnimationDirection = 0;

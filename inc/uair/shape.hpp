@@ -107,6 +107,9 @@ class EXPORTDLL Shape : public Polygon, public Renderable {
 		
 		AnimationFrame GetFrame() const;
 		AnimationFrame GetFrame(const unsigned int& frame) const;
+
+		void RemoveFrame();
+		void RemoveFrame(const unsigned int& frame);
 		
 		// set the animation attributes
 		void SetAnimation();
