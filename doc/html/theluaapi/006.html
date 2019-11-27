@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+	<head>
+    <title id="title">The LuaAPI</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+
+  <body>
+    <div id="site-wrapper">
+			<div id="content">
+       <div id="nav-left"><a href="005.html">Previous</a></div>
+       <div id="nav-center"><a href="index.html">Index</a></div>
+       <div id="nav-right">Next</div>
+    
+       <div id="content-body">
+					<div id='body-main'>
+						<h1>Additional Information</h1>
+						<p>It is also possible to pass (non-fundamental) objects to Lua via reference and thus modify them directly via Lua.</p>
+						<div class='code'>
+							<div class='codeHeader'>Pass by reference</div>
+							<pre class='codeBody'><code>try {
+  CType c; c.mI = 4;
+
+  std::string scr = R"(
+    local c = ...
+    c:seti(6)
+  )";
+
+  luaAPI.CallString(scr, &amp;c);
+  c.Output();
+} catch (std::exception&amp; e) {
+  std::cout &lt;&lt; e.what() &lt;&lt; std::endl;
+}</code></pre>
+						</div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

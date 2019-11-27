@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+	<head>
+    <title id="title">The LuaAPI</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+
+  <body>
+    <div id="site-wrapper">
+			<div id="content">
+       <div id="nav-left"><a href="001.html">Previous</a></div>
+       <div id="nav-center"><a href="index.html">Index</a></div>
+       <div id="nav-right"><a href="003.html">Next</a></div>
+    
+       <div id="content-body">
+					<div id='body-main'>
+						<h1>Calling Scripts</h1>
+						<p>Parameters are passed to the script through the CallString function with automatic type deduction. Multiple return values are returned as a tuple and the return type must be specified as a template parameter (a single return value is returned as an object of that type).</p>
+						<div class='code'>
+							<div class='codeHeader'>Multiple parameters and return values</div>
+							<pre class='codeBody'><code>try {
+  std::string scr = R"(
+    local i, j = ...
+    local k = i + j
+
+    local s = ""
+    if k &lt; 0 then
+      s = ": in the red..."
+    else
+      s = ": in the black!"
+    end
+
+    return k, s
+  )";
+
+  auto r = luaAPI.CallString&lt;int, std::string&gt;(scr, 3, -5);
+  std::cout &lt;&lt; std::get&lt;0&gt;(r) &lt;&lt; std::get&lt;1&gt;(r) &lt;&lt; std::endl;
+} catch (std::exception&amp; e) {
+  std::cout &lt;&lt; e.what() &lt;&lt; std::endl;
+}</code></pre>
+						</div>
+						<p>The CallString function requires to stack to be empty in order to properly perform stack management. If you wish to maintain the stack yourself you can instead call the unmanaged function (CallStringU), adding the parameters to the stack beforehand, indicating the number of parameters and then reading the return values from the stack afterwards.</p>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

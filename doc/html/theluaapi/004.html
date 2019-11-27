@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+	<head>
+    <title id="title">The LuaAPI</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+
+  <body>
+    <div id="site-wrapper">
+			<div id="content">
+       <div id="nav-left"><a href="003.html">Previous</a></div>
+       <div id="nav-center"><a href="index.html">Index</a></div>
+       <div id="nav-right"><a href="005.html">Next</a></div>
+    
+       <div id="content-body">
+					<div id='body-main'>
+						<h1>Registering Types</h1>
+						<p>All fundamental types are represented (including a custom LuaAPI::Nil type) through overloaded functions. Custom types are supported by first registering the type and then the functions of that type you wish to use, exposing them to Lua.</p>
+						<div class='code'>
+							<div class='codeHeader'>Registering a Custom Type</div>
+							<pre class='codeBody'><code>class CType {
+	public :
+    void Output() {
+      std::cout &lt;&lt; "CType: " &lt;&lt; mI &lt;&lt; std::endl;
+    }
+	
+	public :
+		int mI = 0;
+};
+
+luaAPI.RegisterType&lt;CType&gt;("uair.ctype");
+luaAPI.RegisterConstructor&lt;CType&gt;();
+luaAPI.RegisterFunction&lt;CType, void&gt;("output", &amp;CType::Output);
+luaAPI.RegisterGetter&lt;CType, int&gt;("geti", &amp;CType::mI);
+luaAPI.RegisterSetter&lt;CType, int&gt;("seti", &amp;CType::mI);</code></pre>
+						</div>
+						<p>After registering our custom type and whitelisting it to be available in Lua ("uair.ctype") our type can now be passed to Lua, created and manipulated in Lua, and passed back from Lua to our program.</p>
+						<div class='code'>
+							<div class='codeHeader'>Using a Custom Type</div>
+							<pre class='codeBody'><code>try {
+  CType c; c.mI = 4;
+
+  std::string scr = R"(
+    local c = ...
+    c:seti(6)
+    c:output()
+
+    local c2 = uair.ctype()
+    c2:seti(3)
+    return c2
+  )";
+
+  CType c2 = luaAPI.CallString&lt;CType&gt;(scr, c);
+  c2.Output();
+} catch (std::exception&amp; e) {
+  std::cout &lt;&lt; e.what() &lt;&lt; std::endl;
+}</code></pre>
+						</div>
+						<p>If the custom type that you're registering doesn't allow default construction or has some other special restriction then it might be necessary to manually define the PushStack and ReadStack overloads to properly handle your type.</p>
+						<div class='code'>
+							<div class='codeHeader'>Custom Push/Read for non-default Special Type</div>
+							<pre class='codeBody'><code>class SType {
+	public :
+    // no default constructor available
+		SType(const int&amp; i) : mI(i) {
+			
+		}
+
+    void Output() {
+      std::cout &lt;&lt; "SType: " &lt;&lt; mI &lt;&lt; std::endl;
+    }
+	
+	public :
+		int mI = 0;
+};
+
+template &lt;&gt;
+void LuaAPI::PushStack&lt;SType&gt;(SType value) {
+  typedef UserDataWrapper&lt;SType&gt; WrappedType;
+  
+  void* userdata = lua_newuserdata(mState,
+      sizeof(WrappedType*));
+  WrappedType** data = static_cast&lt;WrappedType**&gt;(userdata);
+  *data = new WrappedType();
+  
+  (*data)-&gt;mUserData = new SType(0);
+  *((*data)-&gt;mUserData) = value;
+  (*data)-&gt;mShouldDelete = true;
+  
+  lua_setmetatable(mState, -2);
+}
+
+template &lt;&gt;
+SType LuaAPI::ReadStack(const int&amp; index) {
+  typedef UserDataWrapper&lt;SType&gt; WrappedType;
+  
+  SType result(0);
+  WrappedType** data = static_cast&lt;WrappedType**&gt;(userdata);
+  result = *((*data)-&gt;mUserData);
+  return result;
+}</code></pre>
+						</div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
