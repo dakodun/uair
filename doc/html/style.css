@@ -54,10 +54,19 @@ a:hover {
 	box-sizing: border-box;
 }
 
+#nav-home {
+	text-align: center;
+	width: 100%;
+	border-bottom: 1px dashed #AAAAAA;
+
+	color: #999999;
+	font-size: 18px;
+}
+
 #nav-left {
 	float: left;
 	text-align: left;
-	width: 33.33333%;
+	width: 33.33%;
 
 	color: #999999;
 	font-size: 18px;
@@ -66,7 +75,7 @@ a:hover {
 #nav-center {
 	float: left;
 	text-align: center;
-	width: 33.33333%;
+	width: 33.33%;
 
 	color: #999999;
 	font-size: 18px;
@@ -75,7 +84,7 @@ a:hover {
 #nav-right {
 	float: left;
 	text-align: right;
-	width: 33.33333%;
+	width: 33.33%;
 
 	color: #999999;
 	font-size: 18px;
