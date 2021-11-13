@@ -107,7 +107,8 @@ std::vector<Contour> Contour::GetOffset(float distance, const ClipperLib::JoinTy
 Winding Contour::GetWinding() const {
 	float area = 0.0f;
 	for (unsigned int i = 0u; i < mPoints.size(); ++i) {
-		area += (mPoints.at((i + 1) % mPoints.size()).x - mPoints.at(i).x) * (mPoints.at((i + 1) % mPoints.size()).x + mPoints.at(i).y);
+		// x - x * y + y?
+    area += (mPoints.at((i + 1) % mPoints.size()).x - mPoints.at(i).x) * (mPoints.at((i + 1) % mPoints.size()).x + mPoints.at(i).y);
 	}
 	
 	if (area >= 0.0f) {
